@@ -1,0 +1,87 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net;
+using System.IO;
+using System.Threading;
+
+namespace iKCoder_Platform_SDK_Kit
+{
+    public class Net_RemoteRequest
+    {
+        public byte[] getRemoteRequestToByte(string input, string remoteurl, int requestTimeOut, int buffersize, List<Cookie> activeCookies)
+        {
+            try
+            {
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if (activeCookies != null && activeCookies.Count > 0)
+                    foreach (Cookie activeCookie in activeCookies)
+                        request.CookieContainer.Add(activeCookie);
+                request.Timeout = 0x1b7740;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                Stream responseStream = ((HttpWebResponse)request.GetResponse()).GetResponseStream();
+                byte[] buffer2 = null;
+                BinaryReader reader = new BinaryReader(responseStream);
+                buffer2 = reader.ReadBytes(buffersize);
+                reader.Close();
+                responseStream.Close();
+                return buffer2;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<Cookie> getRemoteServerCookie(string remoteurl, string input)
+        {
+            try
+            {
+                List<Cookie> result = new List<Cookie>();
+                HttpWebResponse response = null;
+                HttpWebRequest request = null;
+                Stream requestStream = null;
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                CookieContainer cookies = new CookieContainer();
+                request.Timeout = 1000 * 60 * 2;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = bytes.Length;
+                request.CookieContainer = cookies;
+                Thread.Sleep(1000);
+                requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                response = (HttpWebResponse)request.GetResponse();             
+                Uri newUri = new Uri(remoteurl);
+                if (response != null && request != null && requestStream != null && response.StatusCode == HttpStatusCode.OK && request.CookieContainer.GetCookies(newUri).Count > 0)
+                {
+                    List<string> tmpstrCookiesList = new List<string>();
+                    foreach (Cookie activeCookie in request.CookieContainer.GetCookies(newUri))
+                    {
+                        tmpstrCookiesList.Add(activeCookie.Domain + ":" + activeCookie.Name + "=" + activeCookie.Value);
+                        result.Add(activeCookie);
+                    }
+                    requestStream.Close();
+                }              
+                return result;
+            }
+            catch 
+            {
+                return null;
+            }
+        }
+
+    }
+}

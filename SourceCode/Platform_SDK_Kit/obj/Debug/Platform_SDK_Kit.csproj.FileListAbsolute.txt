@@ -1,0 +1,4 @@
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\bin\Debug\iKCoder_Platform_SDK_Kit.dll
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\bin\Debug\iKCoder_Platform_SDK_Kit.pdb
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\obj\Debug\iKCoder_Platform_SDK_Kit.dll
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\obj\Debug\iKCoder_Platform_SDK_Kit.pdb

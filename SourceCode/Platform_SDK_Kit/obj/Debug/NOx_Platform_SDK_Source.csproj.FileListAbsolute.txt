@@ -1,0 +1,4 @@
+D:\SourceFromGIT_InternalTools\rd.internaltools\NOx-Project\NOx-Source\NOx-Source-SDK\NOx_Platform_SDK_Source\bin\Debug\NOx_Platform_SDK_Source.dll
+D:\SourceFromGIT_InternalTools\rd.internaltools\NOx-Project\NOx-Source\NOx-Source-SDK\NOx_Platform_SDK_Source\bin\Debug\NOx_Platform_SDK_Source.pdb
+D:\SourceFromGIT_InternalTools\rd.internaltools\NOx-Project\NOx-Source\NOx-Source-SDK\NOx_Platform_SDK_Source\obj\Debug\NOx_Platform_SDK_Source.dll
+D:\SourceFromGIT_InternalTools\rd.internaltools\NOx-Project\NOx-Source\NOx-Source-SDK\NOx_Platform_SDK_Source\obj\Debug\NOx_Platform_SDK_Source.pdb
