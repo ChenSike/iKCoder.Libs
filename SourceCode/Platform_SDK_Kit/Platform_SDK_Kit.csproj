@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
@@ -63,6 +64,12 @@
     <Compile Include="SDK.Data\Data_SqlSPHelper.cs" />
     <Compile Include="SDK.Data\Data_Util.cs" />
     <Compile Include="SDK.Data\Data_ZipOperations.cs" />
+    <Compile Include="SDK.Forms\Forms_NoBorderBaseform.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SDK.Forms\Forms_NoBorderBaseform.Designer.cs">
+      <DependentUpon>Forms_NoBorderBaseform.cs</DependentUpon>
+    </Compile>
     <Compile Include="SDK.Net\Net_MailServices.cs" />
     <Compile Include="SDK.Net\Net_RemoteRequest.cs" />
     <Compile Include="SDK.Plugin\Plugin_AllBase.cs" />
@@ -74,7 +81,11 @@
     <Compile Include="SDK.Token\Token_Status.cs" />
     <Compile Include="SDK.Util\Util_Common.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="SDK.Forms\Forms_NoBorderBaseform.resx">
+      <DependentUpon>Forms_NoBorderBaseform.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
