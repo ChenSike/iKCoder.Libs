@@ -46,6 +46,57 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
+        public static string Encoder_Base64(byte[] data)
+        {
+            try
+            {
+                if (data != null && data.Length > 0)
+                {
+                    return Convert.ToBase64String(data);
+                }
+                else
+                    return "";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        public static byte[] Action_GetBytesFromFile(string filename)
+        {
+            if (filename != "")
+            {
+                try
+                {
+                    List<byte> buffer = new List<byte>();
+                    FileStream fs = new FileStream(filename, FileMode.Open);
+                    BinaryReader br = new BinaryReader(fs);
+                    while (true)
+                    {
+                        try
+                        {
+                            byte tmpByte = br.ReadByte();
+                            buffer.Add(tmpByte);
+                        }
+                        catch (EndOfStreamException err)
+                        {
+                            break;
+                        }
+                    }
+                    br.Close();
+                    fs.Close();
+                    return buffer.ToArray();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            else
+                return null;
+        }
+
         public static string Decoder_Base64(string data)
         {
             if (string.IsNullOrEmpty(data))

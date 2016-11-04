@@ -1,4 +1,4 @@
-﻿namespace iKCoder_Platform_SDK_Kit.SDK.Forms
+﻿namespace iKCoder_Platform_SDK_Kit
 {
     partial class Forms_NoBorderBaseform
     {
@@ -32,6 +32,7 @@
             // 
             // Forms_NoBorderBaseform
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
@@ -39,6 +40,9 @@
             this.Name = "Forms_NoBorderBaseform";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.Forms_NoBorderBaseform_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Forms_NoBorderBaseform_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Forms_NoBorderBaseform_DragEnter);
+            this.DragOver += new System.Windows.Forms.DragEventHandler(this.Forms_NoBorderBaseform_DragOver);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Forms_NoBorderBaseform_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Forms_NoBorderBaseform_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Forms_NoBorderBaseform_MouseUp);

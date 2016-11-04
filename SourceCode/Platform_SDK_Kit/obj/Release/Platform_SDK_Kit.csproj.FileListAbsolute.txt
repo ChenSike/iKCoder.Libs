@@ -1,0 +1,7 @@
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\obj\Release\Platform_SDK_Kit.csproj.GenerateResource.Cache
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\bin\Release\iKCoder_Platform_SDK_Kit.dll
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\bin\Release\iKCoder_Platform_SDK_Kit.pdb
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\obj\Release\iKCoder_Platform_SDK_Kit.dll
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\obj\Release\iKCoder_Platform_SDK_Kit.pdb
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\obj\Release\iKCoder_Platform_SDK_Kit.Forms_NoBorderBaseform.resources
+D:\iKCoder\iKCoder.Libs\SourceCode\Platform_SDK_Kit\obj\Release\Platform_SDK_Kit.csprojResolveAssemblyReference.cache

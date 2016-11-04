@@ -8,13 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace iKCoder_Platform_SDK_Kit.SDK.Forms
+namespace iKCoder_Platform_SDK_Kit
 {
     public partial class Forms_NoBorderBaseform : Form
     {
 
         protected Point ponit_MouseOff; 
         protected bool bool_leftFlag;
+        protected string string_activeDragDropFilename;
+        protected TextBox ref_TextBox_DragDropFilename = null;
 
         public Forms_NoBorderBaseform()
         {
@@ -40,8 +42,8 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Forms
             if (bool_leftFlag)
             {
                 Point mouseSet = Control.MousePosition;
-                mouseSet.Offset(ponit_MouseOff.X, ponit_MouseOff.Y);  
-                (((System.Windows.Forms.PictureBox)sender).Parent).Location = mouseSet;
+                mouseSet.Offset(ponit_MouseOff.X, ponit_MouseOff.Y);
+                this.Location = mouseSet;                
             }  
         }
 
@@ -51,6 +53,28 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Forms
             {
                 bool_leftFlag = false;  
             }  
+        }
+
+        private void Forms_NoBorderBaseform_DragDrop(object sender, DragEventArgs e)
+        {            
+            string path = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+            string_activeDragDropFilename = path;
+            if(ref_TextBox_DragDropFilename!=null)
+            {
+                ref_TextBox_DragDropFilename.Text = path;
+            }
+        }
+
+        private void Forms_NoBorderBaseform_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.All;
+        }
+
+        private void Forms_NoBorderBaseform_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Link;
+            else e.Effect = DragDropEffects.None;
         }
     }
 }
