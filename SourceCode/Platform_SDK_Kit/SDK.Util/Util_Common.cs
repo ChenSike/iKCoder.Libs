@@ -61,7 +61,7 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 return "";
             }
-        }
+        }       
 
         public static byte[] Action_GetBytesFromFile(string filename)
         {
@@ -95,7 +95,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 return null;
-        }
+        }        
 
         public static string Decoder_Base64(string data)
         {
@@ -112,6 +112,24 @@ namespace iKCoder_Platform_SDK_Kit
                 catch
                 {
                     return string.Empty;
+                }
+            }
+        }
+
+        public static byte[] Decoder_Base64ToByte(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                return null;
+            else
+            {
+                try
+                {
+                    byte[] outputb = Convert.FromBase64String(data);
+                    return outputb;
+                }
+                catch
+                {
+                    return null;
                 }
             }
         }
