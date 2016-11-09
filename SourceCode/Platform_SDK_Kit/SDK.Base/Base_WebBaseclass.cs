@@ -13,8 +13,26 @@ namespace iKCoder_Platform_SDK_Kit
     {
 
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
-        public XmlDocument REQUESTDOCUMENT;
-        public string APPFOLDERPATH = "";
+        public XmlDocument REQUESTDOCUMENT;        
+        protected int REQUESTSPANTIME = 100;
+
+        public string OVERREQUESTTIMEMSG
+        {
+            set;
+            get;
+        }
+        
+        public string APPFOLDERPATH
+        {
+            set;
+            get;
+        }
+
+        public string REQUESTIP
+        {
+            set;
+            get;
+        }
 
         public Base_WebBaseclass()
         {
@@ -36,17 +54,9 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 return "";
-        }
+        }       
 
-        protected virtual void InitServices()
-        {
-        }
-
-        protected virtual void StartServices()
-        {            
-        }
-
-        protected virtual void FinishedLoad()
+        protected virtual void DoAction()
         {
            
         }
@@ -71,19 +81,33 @@ namespace iKCoder_Platform_SDK_Kit
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {
+        {            
+            REQUESTIP = Page.Request.UserHostAddress;
+            if(REQUESTIP=="")
+                REQUESTIP = "127.0.0.1";
+            if(Session[REQUESTIP]!=null)
+            {
+                DateTime lastRequestTime =  DateTime.Now;
+                if(Session[REQUESTIP].ToString()=="")
+                {
+                    DateTime.TryParse(Session[REQUESTIP].ToString(),out lastRequestTime);
+                    if((lastRequestTime - DateTime.Now).Milliseconds < REQUESTSPANTIME)
+                    {
+                        
+                    }
+                }
+            }
+            Session[REQUESTIP] = DateTime.Now.ToString();
             if (Request.InputStream != null && Request.InputStream.Length > 0)
             {
                 StreamReader streamReaderObj = new StreamReader(Request.InputStream);
                 string requestStrDoc = streamReaderObj.ReadToEnd();
                 streamReaderObj.Close();
                 REQUESTDOCUMENT = new XmlDocument();
-                REQUESTDOCUMENT.LoadXml(requestStrDoc);
+                REQUESTDOCUMENT.LoadXml(requestStrDoc);            
             }
-            APPFOLDERPATH = Server.MapPath("~/");
-            InitServices();
-            StartServices();
-            FinishedLoad();
+            APPFOLDERPATH = Server.MapPath("~/");            
+            DoAction();
         }       
     }
 }

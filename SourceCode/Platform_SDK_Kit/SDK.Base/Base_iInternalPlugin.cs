@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public interface Base_iInternalPlugin
+    public interface interface_Base_iInternalPlugin
     {
         object actionGet(object paramsList);
         object actionSet(object paramsList);

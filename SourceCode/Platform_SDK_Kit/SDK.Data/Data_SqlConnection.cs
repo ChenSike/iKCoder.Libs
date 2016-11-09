@@ -43,7 +43,7 @@ namespace iKCoder_Platform_SDK_Kit
                     ActiveSqlConnectionCollection.Add(Key, newEntry);
                     return true;
                 }
-                catch(Base_AppExceptions err)
+                catch(class_Base_AppExceptions err)
                 {                    
                     return false;
                 }
@@ -72,7 +72,7 @@ namespace iKCoder_Platform_SDK_Kit
                         ActiveSqlConnectionCollection.Remove(key);
                     }
                 }
-                catch(Base_AppExceptions err)
+                catch(class_Base_AppExceptions err)
                 {
                     continue;
                 }

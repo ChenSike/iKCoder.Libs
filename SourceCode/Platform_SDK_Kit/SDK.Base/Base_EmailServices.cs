@@ -9,23 +9,23 @@ using System.Threading;
 namespace iKCoder_Platform_SDK_Kit
 {
 
-    internal class Base_EmailEntry
+    internal class class_Base_EmailEntry
     {
         public string mailto;
         public string subject;
         public string content;
     }
 
-    public class Base_EmailServices
+    public class class_Base_EmailServices
     {
-        Base_EmailIntent ActiveEmailIntent;
+        class_Base_EmailIntent ActiveEmailIntent;
         Thread ServicesThread;
 
-        Queue<Base_EmailEntry> MailTaskQueue = new Queue<Base_EmailEntry>();        
+        Queue<class_Base_EmailEntry> MailTaskQueue = new Queue<class_Base_EmailEntry>();        
 
-        public Base_EmailServices(string m_smtp, string m_from, string m_fromPWD)
+        public class_Base_EmailServices(string m_smtp, string m_from, string m_fromPWD)
         {
-            ActiveEmailIntent = new Base_EmailIntent(m_smtp, m_from, m_fromPWD);
+            ActiveEmailIntent = new class_Base_EmailIntent(m_smtp, m_from, m_fromPWD);
         }
 
         public bool Start_Services()
@@ -73,7 +73,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             while (true)
             {
-                Base_EmailEntry activeEntry = MailTaskQueue.Dequeue();
+                class_Base_EmailEntry activeEntry = MailTaskQueue.Dequeue();
                 if (activeEntry != null)
                 {
                     ActiveEmailIntent.SendMail(activeEntry.mailto, activeEntry.subject, activeEntry.content);
@@ -85,17 +85,16 @@ namespace iKCoder_Platform_SDK_Kit
 
         public void SetMailTask(string mailto, string subject, string content)
         {
-            Base_EmailEntry newEntry = new Base_EmailEntry();
+            class_Base_EmailEntry newEntry = new class_Base_EmailEntry();
             newEntry.mailto = mailto;
             newEntry.subject = subject;
             newEntry.content = content;
             MailTaskQueue.Enqueue(newEntry);                
-
         }       
 
     }
 
-    public class Base_EmailIntent
+    public class class_Base_EmailIntent
     {
         public string m_from;
         public string m_fromPWD;
@@ -104,7 +103,7 @@ namespace iKCoder_Platform_SDK_Kit
         private SmtpClient activeSmtpClientObj;
         private MailAddress addFrom;
 
-        public Base_EmailIntent(string m_smtp, string m_from, string m_fromPWD)
+        public class_Base_EmailIntent(string m_smtp, string m_from, string m_fromPWD)
         {
             this.m_from = m_from;
             this.m_smtp = m_smtp;

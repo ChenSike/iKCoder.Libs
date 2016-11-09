@@ -200,7 +200,7 @@ namespace iKCoder_Platform_SDK_Kit
                 else
                     return false;
             }
-            catch(Base_AppExceptions err)
+            catch(class_Base_AppExceptions err)
             {
                 return false;
             }
@@ -230,7 +230,7 @@ namespace iKCoder_Platform_SDK_Kit
                 else
                     return result;
             }
-            catch(Base_AppExceptions err)
+            catch(class_Base_AppExceptions err)
             {
                 return result;
             }
@@ -260,7 +260,7 @@ namespace iKCoder_Platform_SDK_Kit
                 else
                     return result;
             }
-            catch(Base_AppExceptions err)
+            catch(class_Base_AppExceptions err)
             {
                 return result;
             }
@@ -311,7 +311,7 @@ namespace iKCoder_Platform_SDK_Kit
                         return false;
                 }
             }
-            catch(Base_AppExceptions err)
+            catch(class_Base_AppExceptions err)
             {
                 return false;
             }

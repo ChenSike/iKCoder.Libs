@@ -8,12 +8,12 @@ using System.IO;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Base_Config
+    public class class_Base_Config
     {
         XmlDocument _configDoc = new XmlDocument();
         string _fileName = "";
         bool isloadedDoc = false;
-        Base_iInternalPlugin refInternalPlugin;
+        interface_Base_iInternalPlugin refInternalPlugin;
 
 
         public bool Is_LoadedDoc
@@ -25,22 +25,22 @@ namespace iKCoder_Platform_SDK_Kit
         }
     
 
-        public Base_Config(string xmlData)
+        public class_Base_Config(string xmlData)
         {
             _configDoc = new XmlDocument();
             _configDoc.LoadXml(xmlData);
             isloadedDoc = true;            
         }
 
-        public Base_Config(Base_iInternalPlugin refInternalPluginObj)
+        public class_Base_Config(interface_Base_iInternalPlugin refInternalPluginObj)
         {
             refInternalPlugin = refInternalPluginObj;            
         }
-        public Base_Config()
+        public class_Base_Config()
         {
         }
-        
-        public Base_Config(string fileName,Base_iInternalPlugin refInternalPluginObj)
+
+        public class_Base_Config(string fileName, interface_Base_iInternalPlugin refInternalPluginObj)
         {
             try
             {
@@ -49,19 +49,19 @@ namespace iKCoder_Platform_SDK_Kit
                 isloadedDoc = true;
                 refInternalPlugin = refInternalPluginObj;       
             }
-            catch(Base_AppExceptions err)
+            catch(class_Base_AppExceptions err)
             {
                 _configDoc.LoadXml("<root></root>");
                 throw err;
             }
         }
 
-        public XmlDocument Get_ConfigDocument()
+        public XmlDocument GetConfigDocument()
         {
             return _configDoc;
         }
 
-        public bool Create_NewConfigDocument()
+        public bool CreateNewConfigDocument()
         {
             try
             {
@@ -77,7 +77,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         }
 
-        public bool Create_NewConfigDocument(string newFilePath)
+        public bool CreateNewConfigDocument(string newFilePath)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool doSave()
+        public bool DoSave()
         {
             try
             {
@@ -109,7 +109,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool doOpen(string fileNamePath)
+        public bool DoOpen(string fileNamePath)
         {
             try
             {
@@ -125,12 +125,12 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public void doReset()
+        public void DoReset()
         {
             isloadedDoc = false;
         }
 
-        public bool Is_DocumentExisted(string activeFolderPath, string fileName)
+        public bool IsDocumentExisted(string activeFolderPath, string fileName)
         {
             if (fileName == "")
                 return false;
@@ -147,7 +147,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public XmlNode Create_NewSession(string SessionName, string SessionValue,bool IsInternalPluginUsed,string configKey)
+        public XmlNode CreateNewSession(string SessionName, string SessionValue,bool IsInternalPluginUsed,string configKey)
         {
             if (SessionName == "")
                 return null;
@@ -170,7 +170,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public XmlNode Create_Item(XmlNode activeParentNode, string ItemName, string ItemValue, bool IsInternalPluginUsed, string configKey)
+        public XmlNode CreateItem(XmlNode activeParentNode, string ItemName, string ItemValue, bool IsInternalPluginUsed, string configKey)
         {
             if (activeParentNode == null)
                 return null;
@@ -197,9 +197,9 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public XmlNode Get_ItemNode(string SessionName, string ItemName)
+        public XmlNode GetItemNode(string SessionName, string ItemName)
         {
-            XmlNode activeSession = Get_SessionNode(SessionName);
+            XmlNode activeSession = GetSessionNode(SessionName);
             if (activeSession != null)
             {
                 XmlNode itemNode = activeSession.SelectSingleNode("item[@name='" + ItemName + "']");
@@ -209,7 +209,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public XmlNode Get_ItemNode(XmlNode parentNode, string ItemName)
+        public XmlNode GetItemNode(XmlNode parentNode, string ItemName)
         {
             if (parentNode != null)
             {                
@@ -220,9 +220,9 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public XmlNodeList Get_ItemNodes(string SessionName, string ItemName)
+        public XmlNodeList GetItemNodes(string SessionName, string ItemName)
         {
-            XmlNode activeSession = Get_SessionNode(SessionName);
+            XmlNode activeSession = GetSessionNode(SessionName);
             if (activeSession != null)
             {
                 XmlNodeList itemNodes = activeSession.SelectNodes("item[@name='" + ItemName + "']");
@@ -232,9 +232,9 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public XmlNodeList Get_ItemNodes(string SessionName)
+        public XmlNodeList GetItemNodes(string SessionName)
         {
-            XmlNode activeSession = Get_SessionNode(SessionName);
+            XmlNode activeSession = GetSessionNode(SessionName);
             if (activeSession != null)
             {
                 XmlNodeList itemNodes = activeSession.SelectNodes("item");
@@ -244,7 +244,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public string Get_NodeValue(XmlNode activeNode, bool IsInternalPluginUsed,string configKey)
+        public string GetNodeValue(XmlNode activeNode, bool IsInternalPluginUsed,string configKey)
         {
             if (activeNode != null)
             {
@@ -270,7 +270,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return "";
         }        
 
-        public XmlNode Get_SessionNode(string SessionName)
+        public XmlNode GetSessionNode(string SessionName)
         {
             if (SessionName == "")
                 return null;
@@ -284,7 +284,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public XmlNodeList Get_SessionNodes()
+        public XmlNodeList GetSessionNodes()
         {
             if (_configDoc != null)
             {
@@ -294,12 +294,12 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public List<XmlAttribute> Get_SessionAttrs(string SessionName)
+        public List<XmlAttribute> GetSessionAttrs(string SessionName)
         {
             List<XmlAttribute> resultList=new List<XmlAttribute>();
-            if (Is_SessionExisted(SessionName))
+            if (IsSessionExisted(SessionName))
             {
-                XmlNode activeSessionNode = Get_SessionNode(SessionName);
+                XmlNode activeSessionNode = GetSessionNode(SessionName);
                 if (activeSessionNode != null)
                 {
                     foreach (XmlAttribute activeAttr in activeSessionNode.Attributes)
@@ -311,7 +311,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return resultList;
         }
 
-        public bool Set_SessionAttr(string SessionName, string AttrName, string AttrValue, bool IsInternalPluginUsed,string configKey)
+        public bool SetSessionAttr(string SessionName, string AttrName, string AttrValue, bool IsInternalPluginUsed,string configKey)
         {
             if(SessionName=="" || AttrName=="")
                 return false;
@@ -326,7 +326,7 @@ namespace iKCoder_Platform_SDK_Kit
                 refInternalPlugin.actionGet(paramsDirc);
                 result = paramsDirc["return"].ToString();                             
             }
-            XmlNode activeSessionNode = Get_SessionNode(SessionName);
+            XmlNode activeSessionNode = GetSessionNode(SessionName);
             if (activeSessionNode != null)
             {
                 XmlHelper.SetAttribute(activeSessionNode, AttrName, result);
@@ -336,13 +336,13 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool Set_SessionValue(string SessionName, string SessionValue, bool IsInternalPluginUsed, string configKey)
+        public bool SetSessionValue(string SessionName, string SessionValue, bool IsInternalPluginUsed, string configKey)
         {
             if (SessionName == "")
                 return false;
             else
             {
-                XmlNode activeSessionNode = Get_SessionNode(SessionName);
+                XmlNode activeSessionNode = GetSessionNode(SessionName);
                 if (activeSessionNode != null)
                 {
                     string SessionValueResult = "";
@@ -366,7 +366,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Set_ItemAttr(XmlNode Item, string AttrName, string AttrValue, bool IsInternalPluginUsed, string configKey)
+        public bool SetItemAttr(XmlNode Item, string AttrName, string AttrValue, bool IsInternalPluginUsed, string configKey)
         {
             if (Item == null)
                 return false;
@@ -388,7 +388,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Set_InitDocument(string tagName, string tagValue, bool IsInternalPluginUsed, string configKey)
+        public bool SetInitDocument(string tagName, string tagValue, bool IsInternalPluginUsed, string configKey)
         {
             if (_configDoc == null)
                 return false;
@@ -415,7 +415,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Is_InitDocument(string tagName, string tagValue, bool IsInternalPluginUsed, string configKey)
+        public bool IsInitDocument(string tagName, string tagValue, bool IsInternalPluginUsed, string configKey)
         {
             if (_configDoc == null)
                 return false;
@@ -444,22 +444,22 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Is_SessionExisted(string SessionName)
+        public bool IsSessionExisted(string SessionName)
         {
-            XmlNode activeSessionNode = Get_SessionNode(SessionName);
+            XmlNode activeSessionNode = GetSessionNode(SessionName);
             if (activeSessionNode != null)
                 return true;
             else
                 return false;
         }
 
-        public string Get_SessionValue(string SessionName, bool IsInternalPluginUsed, string configKey)
+        public string GetSessionValue(string SessionName, bool IsInternalPluginUsed, string configKey)
         {
             if (SessionName == "")
                 return "";
             else
             {
-                XmlNode activeSessionNode = Get_SessionNode(SessionName);
+                XmlNode activeSessionNode = GetSessionNode(SessionName);
                 string result = "";
                 if (activeSessionNode != null)
                 {
@@ -480,7 +480,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public string Get_AttrValue(XmlNode ActiveNode, string AttrName, bool IsInternalPluginUsed, string configKey)
+        public string GetAttrValue(XmlNode ActiveNode, string AttrName, bool IsInternalPluginUsed, string configKey)
         {
             if (ActiveNode == null)
                 return "";
@@ -501,13 +501,13 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public string Get_ItemValue(string SessionName, string ItemName, bool IsInternalPluginUsed, string configKey)
+        public string GetItemValue(string SessionName, string ItemName, bool IsInternalPluginUsed, string configKey)
         {
             if (SessionName == "" || ItemName=="")
                 return "";
             else
             {
-                XmlNode activeItemNode = Get_ItemNode(SessionName, ItemName);
+                XmlNode activeItemNode = GetItemNode(SessionName, ItemName);
                 string attrResult = XmlHelper.GetNodeValue("", activeItemNode);
                 string Result = attrResult;
                 if (IsInternalPluginUsed && refInternalPlugin!=null)
@@ -523,7 +523,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public string Get_ItemValue(XmlNode parentNode, bool IsInternalPluginUsed, string configKey)
+        public string GetItemValue(XmlNode parentNode, bool IsInternalPluginUsed, string configKey)
         {
             if (parentNode == null)
                 return "";
@@ -546,11 +546,11 @@ namespace iKCoder_Platform_SDK_Kit
 
         
 
-        public bool Remove_Session(string SessionName)
+        public bool RemoveSession(string SessionName)
         {
-            if (Is_SessionExisted(SessionName))
+            if (IsSessionExisted(SessionName))
             {
-                XmlNode activeSessionNode = Get_SessionNode(SessionName);
+                XmlNode activeSessionNode = GetSessionNode(SessionName);
                 if (activeSessionNode != null)
                 {
                     activeSessionNode.ParentNode.RemoveChild(activeSessionNode);
@@ -563,14 +563,14 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool Remove_SessionItem(string SessionName, string SessionItemName)
+        public bool RemoveSessionItem(string SessionName, string SessionItemName)
         {
             if (SessionName != "" && SessionItemName != "")
             {
-                XmlNode activeSessionNode = Get_SessionNode(SessionName);
+                XmlNode activeSessionNode = GetSessionNode(SessionName);
                 if (activeSessionNode != null)
                 {
-                    XmlNode itemNode = Get_ItemNode(SessionName, SessionItemName);
+                    XmlNode itemNode = GetItemNode(SessionName, SessionItemName);
                     if (itemNode != null)
                     {
                         activeSessionNode.RemoveChild(itemNode);
@@ -587,7 +587,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool Remove_ActiveItem(XmlNode ParentNode, string ActiveItemName)
+        public bool RemoveActiveItem(XmlNode ParentNode, string ActiveItemName)
         {
             if (ParentNode == null)
                 return false;
@@ -604,11 +604,11 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Remove_SessionAttr(string SessionName, string SessionAttrName)
+        public bool RemoveSessionAttr(string SessionName, string SessionAttrName)
         {
-            if (Is_SessionExisted(SessionName))
+            if (IsSessionExisted(SessionName))
             {
-                XmlNode activeSessionNode = Get_SessionNode(SessionName);
+                XmlNode activeSessionNode = GetSessionNode(SessionName);
                 XmlAttribute activeAttr = activeSessionNode.Attributes[SessionAttrName];
                 if (activeAttr != null)
                 {

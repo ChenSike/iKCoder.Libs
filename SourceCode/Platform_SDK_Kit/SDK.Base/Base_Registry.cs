@@ -9,7 +9,7 @@ using Microsoft.Win32;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Base_Registry
+    public class class_Base_Registry
     {
         /// <summary>
         /// SetKeyForLocalMachineNode

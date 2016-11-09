@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class LogServices_AppRuuningLogServices
+    public class class_Base_AppRuuningLogServices
     {
         private XmlDocument _AppRunningDoc = new XmlDocument();
         private string _LogStruct = "<root></root>";
@@ -14,22 +14,22 @@ namespace iKCoder_Platform_SDK_Kit
         private FileStream fs;
         private StreamWriter sw;
 
-        public LogServices_AppRuuningLogServices(string ActiveLogFilePath)
+        public class_Base_AppRuuningLogServices(string ActiveLogFilePath)
         {
-            loadLog(ActiveLogFilePath);
+            LoadLog(ActiveLogFilePath);
         }
 
-        public LogServices_AppRuuningLogServices()
+        public class_Base_AppRuuningLogServices()
         {
             _AppRunningDoc.LoadXml(_LogStruct);
         }
 
-        public XmlDocument getLogDoc()
+        public XmlDocument GetLogDoc()
         {
             return _AppRunningDoc;
         }
 
-        public void addNewRecord(string key, DateTime activeTime, bool isSystemInfo, bool isFaild, string Key, string Message)
+        public void AddNewRecord(string key, DateTime activeTime, bool isSystemInfo, bool isFaild, string Key, string Message)
         {
             XmlNode parent = this._AppRunningDoc.SelectSingleNode("/root/item[@key='" + key + "']");
             if (parent == null)
@@ -60,6 +60,8 @@ namespace iKCoder_Platform_SDK_Kit
             XmlHelper.SetAttribute(node5, "key", Key);
             XmlHelper.SetAttribute(node5, "message", Message);
             newChild.AppendChild(node5);
+            if (this.LogFilePath != "")
+                this.ActionSaveLog(); 
         }
 
         public void AddLogItem(string header, Dictionary<string, string> attrList)
@@ -125,7 +127,7 @@ namespace iKCoder_Platform_SDK_Kit
             return "";
         }
 
-        public void loadLog(string logFileName)
+        public void LoadLog(string logFileName)
         {
             FileInfo fi = new FileInfo(logFileName);
             this.LogFilePath = logFileName;            
