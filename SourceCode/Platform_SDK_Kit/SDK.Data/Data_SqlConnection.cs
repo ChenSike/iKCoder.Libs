@@ -8,7 +8,7 @@ using System.Data.SqlClient;
 namespace iKCoder_Platform_SDK_Kit
 {
 
-    public class Data_SqlConnectionItemEntry
+    public class class_Data_SqlConnectionItemEntry
     {
         public string Key;
         public string Server;
@@ -19,15 +19,15 @@ namespace iKCoder_Platform_SDK_Kit
         public SqlConnection ActiveConnection;
     }
 
-    public class Data_SqlConnectionHelper
+    public class class_Data_SqlConnectionHelper
     {        
-        public Dictionary<string, Data_SqlConnectionItemEntry> ActiveSqlConnectionCollection = new Dictionary<string, Data_SqlConnectionItemEntry>();
+        public Dictionary<string, class_Data_SqlConnectionItemEntry> ActiveSqlConnectionCollection = new Dictionary<string, class_Data_SqlConnectionItemEntry>();
 
         public bool Set_NewConnectionItem(string Key, string Server, string UserID, string Password,string activeDB)
         {
             if (!ActiveSqlConnectionCollection.ContainsKey(Key))
             {
-                Data_SqlConnectionItemEntry newEntry = new Data_SqlConnectionItemEntry();
+                class_Data_SqlConnectionItemEntry newEntry = new class_Data_SqlConnectionItemEntry();
                 newEntry.Server = Server;
                 newEntry.UserID = UserID;
                 newEntry.Password = Password;

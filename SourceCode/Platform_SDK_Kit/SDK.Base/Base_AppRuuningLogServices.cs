@@ -34,31 +34,31 @@ namespace iKCoder_Platform_SDK_Kit
             XmlNode parent = this._AppRunningDoc.SelectSingleNode("/root/item[@key='" + key + "']");
             if (parent == null)
             {
-                parent = XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
-                XmlHelper.SetAttribute(parent, "key", key);
+                parent = class_XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
+                class_XmlHelper.SetAttribute(parent, "key", key);
                 this._AppRunningDoc.SelectSingleNode("/root").AppendChild(parent);
             }
             XmlNode node2 = parent.SelectSingleNode("point[@time='" + activeTime.ToString() + "']");
             if (node2 == null)
             {
-                node2 = XmlHelper.CreateNode(this._AppRunningDoc, "point", "");
-                XmlHelper.SetAttribute(node2, "time", DateTime.Now.ToString());
+                node2 = class_XmlHelper.CreateNode(this._AppRunningDoc, "point", "");
+                class_XmlHelper.SetAttribute(node2, "time", DateTime.Now.ToString());
                 parent.AppendChild(node2);
             }
             XmlNode newChild = node2.SelectSingleNode(isFaild ? "fail" : "pass");
             if (newChild == null)
             {
-                newChild = XmlHelper.CreateNode(this._AppRunningDoc, isFaild ? "fail" : "pass", "");
+                newChild = class_XmlHelper.CreateNode(this._AppRunningDoc, isFaild ? "fail" : "pass", "");
                 node2.AppendChild(newChild);
             }
             if (newChild.SelectSingleNode(isSystemInfo ? "systeminfo" : "records") == null)
             {
-                XmlNode node4 = XmlHelper.CreateNode(this._AppRunningDoc, isSystemInfo ? "systeminfo" : "records", "");
+                XmlNode node4 = class_XmlHelper.CreateNode(this._AppRunningDoc, isSystemInfo ? "systeminfo" : "records", "");
                 newChild.AppendChild(node4);
             }
-            XmlNode node5 = XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
-            XmlHelper.SetAttribute(node5, "key", Key);
-            XmlHelper.SetAttribute(node5, "message", Message);
+            XmlNode node5 = class_XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
+            class_XmlHelper.SetAttribute(node5, "key", Key);
+            class_XmlHelper.SetAttribute(node5, "message", Message);
             newChild.AppendChild(node5);
             if (this.LogFilePath != "")
                 this.ActionSaveLog(); 
@@ -68,12 +68,12 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (attrList.Count != 0)
             {
-                XmlNode newChild = XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
+                XmlNode newChild = class_XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
                 this._AppRunningDoc.SelectSingleNode("/root").AppendChild(newChild);
-                XmlHelper.SetAttrValue(newChild, "header", header);
+                class_XmlHelper.SetAttrValue(newChild, "header", header);
                 foreach (string str in attrList.Keys)
                 {
-                    XmlHelper.SetAttribute(newChild, str, attrList[str]);
+                    class_XmlHelper.SetAttribute(newChild, str, attrList[str]);
                 }
                 if (this.LogFilePath != "")
                     this.ActionSaveLog();             
@@ -83,10 +83,10 @@ namespace iKCoder_Platform_SDK_Kit
 
         public void AddLogItem(string header, string content)
         {
-            XmlNode newChild = XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
+            XmlNode newChild = class_XmlHelper.CreateNode(this._AppRunningDoc, "item", "");
             this._AppRunningDoc.SelectSingleNode("/root").AppendChild(newChild);
-            XmlHelper.SetAttribute(newChild, "header", header);
-            XmlHelper.SetNodeValue(newChild, content);
+            class_XmlHelper.SetAttribute(newChild, "header", header);
+            class_XmlHelper.SetNodeValue(newChild, content);
             if (this.LogFilePath != "")
                 this.ActionSaveLog();   
         }
@@ -122,7 +122,7 @@ namespace iKCoder_Platform_SDK_Kit
             XmlNode node = this._AppRunningDoc.SelectSingleNode("/root/item[@header='" + header + "']");
             if (node != null)
             {
-                return XmlHelper.GetNodeValue("@" + attrName, node);
+                return class_XmlHelper.GetNodeValue("@" + attrName, node);
             }
             return "";
         }

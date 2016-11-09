@@ -25,7 +25,7 @@ namespace iKCoder_Platform_SDK_Kit
                 if (ActiveConnection != null)
                 {
                     string sql_getALLTables = Data_SqlStringHelper.SQL_GETALLTABLES_FOR_SQL2008;
-                    Data_SqlDataHelper obj_dataHelper = new Data_SqlDataHelper();
+                    class_Data_SqlDataHelper obj_dataHelper = new class_Data_SqlDataHelper();
                     obj_dataHelper.ActiveConnection = ActiveConnection;
                     DataTable TablesInfo = new DataTable();
                     DataTable ColumnInfo = new DataTable();
@@ -38,9 +38,9 @@ namespace iKCoder_Platform_SDK_Kit
                             {
                                 string sql_getALLColumns = "select * from sys.syscolumns";
                                 string tableName = "";
-                                obj_dataHelper.Static_GetColumnData(activeDR_1, "name", out tableName);
+                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "name", out tableName);
                                 string objectID = "";
-                                obj_dataHelper.Static_GetColumnData(activeDR_1, "object_id", out objectID);
+                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "object_id", out objectID);
                                 if (tableName != "")
                                 {
                                     if (objectID != "")
@@ -66,17 +66,17 @@ namespace iKCoder_Platform_SDK_Kit
                                             {
                                                 string sql_getALLTypes = "select * from sys.types";
                                                 string columnname = "";
-                                                obj_dataHelper.Static_GetColumnData(activeDR_2, "name", out columnname);
+                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "name", out columnname);
                                                 string typeid = "";
                                                 string length = "";
                                                 string status = "";
-                                                obj_dataHelper.Static_GetColumnData(activeDR_2, "xtype", out typeid);
-                                                obj_dataHelper.Static_GetColumnData(activeDR_2, "status", out status);
-                                                obj_dataHelper.Static_GetColumnData(activeDR_2, "prec", out length);
+                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "xtype", out typeid);
+                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "status", out status);
+                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "prec", out length);
                                                 sql_getALLTypes = sql_getALLTypes + " where system_type_id=" + typeid;
                                                 obj_dataHelper.Action_ExecuteForDT(sql_getALLTypes, out TypesInfo);
                                                 string typename = "";
-                                                obj_dataHelper.Static_GetColumnData(TypesInfo.Rows[0], "name", out typename);
+                                                class_Data_SqlDataHelper.StaticGetColumnData(TypesInfo.Rows[0], "name", out typename);
                                                 if (typename.Contains("nvarchar"))
                                                 {
                                                     if (Int32.Parse(length) < 0)
@@ -214,14 +214,14 @@ namespace iKCoder_Platform_SDK_Kit
                 string sql_getALLTables = Data_SqlStringHelper.SQL_GETALLTABLES_FOR_SQL2008;
                 if (ActiveConnection != null)
                 {
-                    Data_SqlDataHelper obj_dataHelper = new Data_SqlDataHelper();
+                    class_Data_SqlDataHelper obj_dataHelper = new class_Data_SqlDataHelper();
                     obj_dataHelper.ActiveConnection = ActiveConnection;
                     DataTable TablesInfo = new DataTable();
                     obj_dataHelper.Action_ExecuteForDT(sql_getALLTables, out TablesInfo);
                     foreach (DataRow activeDR_1 in TablesInfo.Rows)
                     {
                         string tableName = "";
-                        obj_dataHelper.Static_GetColumnData(activeDR_1, "name", out tableName);
+                        class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "name", out tableName);
                         result.Add(tableName);
                     }
                     return result;
@@ -244,14 +244,14 @@ namespace iKCoder_Platform_SDK_Kit
                 string sql_getALLTables = "select * from sys.all_objects where type='P' and is_ms_shipped=0";
                 if (ActiveConnection != null)
                 {
-                    Data_SqlDataHelper obj_dataHelper = new Data_SqlDataHelper();
+                    class_Data_SqlDataHelper obj_dataHelper = new class_Data_SqlDataHelper();
                     obj_dataHelper.ActiveConnection = ActiveConnection;
                     DataTable TablesInfo = new DataTable();
                     obj_dataHelper.Action_ExecuteForDT(sql_getALLTables, out TablesInfo);
                     foreach (DataRow activeDR_1 in TablesInfo.Rows)
                     {
                         string tableName = "";
-                        obj_dataHelper.Static_GetColumnData(activeDR_1, "name", out tableName);
+                        class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "name", out tableName);
                         result.Add(tableName);
                     }
                     return result;
@@ -293,7 +293,7 @@ namespace iKCoder_Platform_SDK_Kit
                     return false;
                 else
                 {
-                    Data_SqlDataHelper obj_dataHelper = new Data_SqlDataHelper();
+                    class_Data_SqlDataHelper obj_dataHelper = new class_Data_SqlDataHelper();
                     obj_dataHelper.ActiveConnection = ActiveConnection;
                     StringBuilder sql_CreateNewSp = new StringBuilder("IF OBJECTPROPERTY(OBJECT_ID(N'" + tableName + "'), N'IsTable') = 1");
                     sql_CreateNewSp.AppendLine();
@@ -322,7 +322,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (ActiveConnection != null)
             {
-                Data_SqlDataHelper obj=new Data_SqlDataHelper();
+                class_Data_SqlDataHelper obj=new class_Data_SqlDataHelper();
                 obj.ActiveConnection = ActiveConnection;
                 string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0)";
                 DataTable activeSPSDT=new DataTable();
@@ -400,13 +400,13 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public DataTable ExecuteGetSPS(Data_SqlSPEntry activeEntry, Data_SqlConnectionHelper SqlHelperObj, string Server)
+        public DataTable ExecuteGetSPS(Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server)
         {
             DataTable dt = new DataTable();
             if (activeEntry != null)
             {
                 Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "get");
-                Data_SqlDataHelper activeSqlSPHelper = new  Data_SqlDataHelper();
+                class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();
                 activeSqlSPHelper.ActiveConnection = SqlHelperObj.Get_ActiveConnection(Server);
                 activeSqlSPHelper.Action_ExecuteForDT(activeEntry, out dt);
                 return dt;
@@ -415,7 +415,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public bool ExecuteInsertSPS(Data_SqlSPEntry activeEntry, Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteInsertSPS(Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
         {
             if (activeEntry != null)
             {
@@ -433,7 +433,7 @@ namespace iKCoder_Platform_SDK_Kit
 
                     }
                 }
-                Data_SqlDataHelper activeSqlSPHelper = new Data_SqlDataHelper();
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 activeSqlSPHelper.ActiveConnection = SqlHelperObj.Get_ActiveConnection(Server);
                 activeSqlSPHelper.Action_ExecuteForNonQuery(activeEntry);
                 return true;
@@ -442,7 +442,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ExecuteUpdateSPS(Data_SqlSPEntry activeEntry, Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteUpdateSPS(Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
         {
             if (activeEntry != null)
             {
@@ -463,7 +463,7 @@ namespace iKCoder_Platform_SDK_Kit
 
                     }                      
                 }
-                Data_SqlDataHelper activeSqlSPHelper = new Data_SqlDataHelper();
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 activeSqlSPHelper.ActiveConnection = SqlHelperObj.Get_ActiveConnection(Server);
                 activeSqlSPHelper.Action_ExecuteForNonQuery(activeEntry);
                 return true;
@@ -472,7 +472,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ExecuteDeleteSPS(Data_SqlSPEntry activeEntry,Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteDeleteSPS(Data_SqlSPEntry activeEntry,class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
         {
             if (activeEntry != null)
             {
@@ -491,7 +491,7 @@ namespace iKCoder_Platform_SDK_Kit
 
                     }
                 }
-                Data_SqlDataHelper activeSqlSPHelper = new Data_SqlDataHelper();
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 activeSqlSPHelper.ActiveConnection = SqlHelperObj.Get_ActiveConnection(Server);
                 activeSqlSPHelper.Action_ExecuteForNonQuery(activeEntry);
                 return true;

@@ -163,8 +163,8 @@ namespace iKCoder_Platform_SDK_Kit
                     refInternalPlugin.actionSet(paramsDirc);
                     result = paramsDirc["return"].ToString();
                 }
-                XmlNode newSessionNode = XmlHelper.CreateNode(_configDoc, "session", result);
-                XmlHelper.SetAttribute(newSessionNode, "name", SessionName);
+                XmlNode newSessionNode = class_XmlHelper.CreateNode(_configDoc, "session", result);
+                class_XmlHelper.SetAttribute(newSessionNode, "name", SessionName);
                 _configDoc.SelectSingleNode("/root").AppendChild(newSessionNode);
                 return newSessionNode;
             }
@@ -186,8 +186,8 @@ namespace iKCoder_Platform_SDK_Kit
             }
             try
             {
-                XmlNode newItemNode = XmlHelper.CreateNode(_configDoc, "item", result);
-                XmlHelper.SetAttribute(newItemNode, "name", ItemName);
+                XmlNode newItemNode = class_XmlHelper.CreateNode(_configDoc, "item", result);
+                class_XmlHelper.SetAttribute(newItemNode, "name", ItemName);
                 activeParentNode.AppendChild(newItemNode);
                 return newItemNode;
             }
@@ -249,7 +249,7 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeNode != null)
             {
 
-                string sourceData =  XmlHelper.GetNodeValue("", activeNode);
+                string sourceData =  class_XmlHelper.GetNodeValue("", activeNode);
                 string resultData="";
                 if (IsInternalPluginUsed && refInternalPlugin!=null)
                 {
@@ -329,7 +329,7 @@ namespace iKCoder_Platform_SDK_Kit
             XmlNode activeSessionNode = GetSessionNode(SessionName);
             if (activeSessionNode != null)
             {
-                XmlHelper.SetAttribute(activeSessionNode, AttrName, result);
+                class_XmlHelper.SetAttribute(activeSessionNode, AttrName, result);
                 return true;
             }
             else
@@ -383,7 +383,7 @@ namespace iKCoder_Platform_SDK_Kit
                     result = paramsDirc["return"].ToString();
 
                 }
-                XmlHelper.SetAttribute(Item, AttrName, result);
+                class_XmlHelper.SetAttribute(Item, AttrName, result);
                 return true;
             }
         }
@@ -409,7 +409,7 @@ namespace iKCoder_Platform_SDK_Kit
                         refInternalPlugin.actionSet(paramsDirc);
                         result = paramsDirc["return"].ToString();
                     }
-                    XmlHelper.SetAttribute(rootNode, tagName, IsInternalPluginUsed ? result : tagValue);
+                    class_XmlHelper.SetAttribute(rootNode, tagName, IsInternalPluginUsed ? result : tagValue);
                     return true;
                 }
             }
@@ -427,7 +427,7 @@ namespace iKCoder_Platform_SDK_Kit
                 else
                 {
                     if (!IsInternalPluginUsed || refInternalPlugin==null)
-                        return XmlHelper.GetNodeValue(tagName, rootNode) == tagValue ? true : false;
+                        return class_XmlHelper.GetNodeValue(tagName, rootNode) == tagValue ? true : false;
                     else
                     {
                         string result = "";
@@ -437,7 +437,7 @@ namespace iKCoder_Platform_SDK_Kit
                         paramsDirc.Add("return", "");
                         refInternalPlugin.actionSet(paramsDirc);
                         result = paramsDirc["return"].ToString();
-                        return XmlHelper.GetNodeValue(tagName, rootNode) == result ? true : false;
+                        return class_XmlHelper.GetNodeValue(tagName, rootNode) == result ? true : false;
                     }
                 }
                     
@@ -463,7 +463,7 @@ namespace iKCoder_Platform_SDK_Kit
                 string result = "";
                 if (activeSessionNode != null)
                 {
-                    string value = XmlHelper.GetNodeValue("", activeSessionNode);
+                    string value = class_XmlHelper.GetNodeValue("", activeSessionNode);
                     result = value;
                     if (IsInternalPluginUsed && refInternalPlugin != null)
                     {
@@ -486,7 +486,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return "";
             else
             {
-                string attrResult = XmlHelper.GetAttrValue(ActiveNode, AttrName);
+                string attrResult = class_XmlHelper.GetAttrValue(ActiveNode, AttrName);
                 string result = attrResult;
                 if (IsInternalPluginUsed && refInternalPlugin!=null)
                 {
@@ -508,7 +508,7 @@ namespace iKCoder_Platform_SDK_Kit
             else
             {
                 XmlNode activeItemNode = GetItemNode(SessionName, ItemName);
-                string attrResult = XmlHelper.GetNodeValue("", activeItemNode);
+                string attrResult = class_XmlHelper.GetNodeValue("", activeItemNode);
                 string Result = attrResult;
                 if (IsInternalPluginUsed && refInternalPlugin!=null)
                 {
@@ -529,7 +529,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return "";
             else
             {
-                string attrResult = XmlHelper.GetNodeValue("", parentNode);
+                string attrResult = class_XmlHelper.GetNodeValue("", parentNode);
                 string Result = attrResult;
                 if (IsInternalPluginUsed && refInternalPlugin != null)
                 {

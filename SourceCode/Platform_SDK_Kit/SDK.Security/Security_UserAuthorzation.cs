@@ -41,20 +41,20 @@ namespace iKCoder_Platform_SDK_Kit
                 {
                     Security_DES activeDesObj = new Security_DES(userDesKey);
                     XmlNode node = this.activeUserDoc.SelectSingleNode("/root");
-                    XmlNode newitemNode = XmlHelper.CreateNode(this.activeUserDoc, "item", "");
-                    XmlNode groupListNode = XmlHelper.CreateNode(this.activeUserDoc,"grouplist","");
+                    XmlNode newitemNode = class_XmlHelper.CreateNode(this.activeUserDoc, "item", "");
+                    XmlNode groupListNode = class_XmlHelper.CreateNode(this.activeUserDoc,"grouplist","");
                     newitemNode.AppendChild(groupListNode);
                     string resultUsername = "";
                     activeDesObj.DESCoding(username, out resultUsername);
-                    XmlHelper.SetAttribute(newitemNode, "username", resultUsername);
+                    class_XmlHelper.SetAttribute(newitemNode, "username", resultUsername);
                     string resultPwd = "";
                     activeDesObj.DESCoding(pwd, out resultPwd);
-                    XmlHelper.SetAttribute(newitemNode, "pwd", resultPwd);
+                    class_XmlHelper.SetAttribute(newitemNode, "pwd", resultPwd);
                     foreach (string key in attrs.Keys)
                     {
                         string resultType = "";
                         activeDesObj.DESCoding(attrs[key], out resultType);
-                        XmlHelper.SetAttribute(newitemNode, key, resultType);
+                        class_XmlHelper.SetAttribute(newitemNode, key, resultType);
                     }
                     node.AppendChild(newitemNode);
                     Security_UserItem obj = new Security_UserItem(userDesKey);
@@ -79,7 +79,7 @@ namespace iKCoder_Platform_SDK_Kit
                 string objAttrValue = "";
                 Security_DES activeDes = new Security_DES(userDesKey);
                 activeDes.DESCoding(attrValue, out objAttrValue);
-                XmlHelper.SetAttribute(activeUserNode, attrName, objAttrValue);
+                class_XmlHelper.SetAttribute(activeUserNode, attrName, objAttrValue);
                 return true;
             }
             else
@@ -120,10 +120,10 @@ namespace iKCoder_Platform_SDK_Kit
                 if(!Action_IsGroupExisted(groupName,desGroupKey))
                 {
                     Security_DES activeDesObj = new Security_DES(desGroupKey);
-                    XmlNode newGroup=XmlHelper.CreateNode(activeUserDoc, "group","");
+                    XmlNode newGroup=class_XmlHelper.CreateNode(activeUserDoc, "group","");
                     string activeGroupName="";
                     activeDesObj.DESCoding(groupName,out activeGroupName);
-                    XmlHelper.SetAttribute(newGroup,"name",activeGroupName);
+                    class_XmlHelper.SetAttribute(newGroup,"name",activeGroupName);
                     activeUserDoc.SelectSingleNode("/root").AppendChild(newGroup);
                     Security_UserGroup newGroupObj=new Security_UserGroup(desGroupKey);
                     newGroupObj.GroupKey=desGroupKey;
@@ -154,12 +154,12 @@ namespace iKCoder_Platform_SDK_Kit
                     string value = "";
                     if (isEncry)
                     {
-                        if (XmlHelper.GetNodeValue(attrName, activeNode) != "")
-                            activeDesObj.DESDecoding(XmlHelper.GetNodeValue(attrName.StartsWith("@") ? attrName : "@" + attrName, activeNode), out value);
+                        if (class_XmlHelper.GetNodeValue(attrName, activeNode) != "")
+                            activeDesObj.DESDecoding(class_XmlHelper.GetNodeValue(attrName.StartsWith("@") ? attrName : "@" + attrName, activeNode), out value);
 
                     }
                     else
-                        value = XmlHelper.GetNodeValue(attrName, activeNode);
+                        value = class_XmlHelper.GetNodeValue(attrName, activeNode);
                     return value;
                 }
                 else
@@ -177,9 +177,9 @@ namespace iKCoder_Platform_SDK_Kit
                 {
                     Security_UserItem obj = new Security_UserItem(userDesKey);
                     string result="";
-                    activeDesObj.DESDecoding(XmlHelper.GetNodeValue("@username", activeUserNode), out result);
+                    activeDesObj.DESDecoding(class_XmlHelper.GetNodeValue("@username", activeUserNode), out result);
                     obj.UserName = result;
-                    activeDesObj.DESDecoding(XmlHelper.GetNodeValue("@password", activeUserNode), out result);
+                    activeDesObj.DESDecoding(class_XmlHelper.GetNodeValue("@password", activeUserNode), out result);
                     obj.UserPassword = result;
                     obj.UserKey=userDesKey;
                     Pools_Security.AddItemToUserlist(obj);
@@ -222,8 +222,8 @@ namespace iKCoder_Platform_SDK_Kit
                 XmlNode groupListNode = activeUserNode.SelectSingleNode("grouplist");
                 if (groupListNode.SelectSingleNode("item[@value='" + activeGroupName + "']") == null)
                 {
-                    XmlNode newAssignedGroup = XmlHelper.CreateNode(activeUserDoc, "item", "");
-                    XmlHelper.SetAttribute(newAssignedGroup, "value", groupDesKey);
+                    XmlNode newAssignedGroup = class_XmlHelper.CreateNode(activeUserDoc, "item", "");
+                    class_XmlHelper.SetAttribute(newAssignedGroup, "value", groupDesKey);
                     groupListNode.AppendChild(newAssignedGroup);
                     Security_UserItem activeUserItem = Pools_Security.GetItemFromUserlist(activeUserName);
                     activeUserItem.Action_InsertGroup(activeGroupName);                    
@@ -316,7 +316,7 @@ namespace iKCoder_Platform_SDK_Kit
     {
         private const string Security_Flag = "NOx_SDK.SecurityDoc";
         private Security_DES _des = new Security_DES();
-        private Data_SqlDataHelper _sqlDataHelper = new Data_SqlDataHelper();
+        private class_Data_SqlDataHelper _sqlDataHelper = new class_Data_SqlDataHelper();
         public string activeSecurityFile = "";
 
         public Security_UserAuthorzationDoc(Security_DES activeDES)
@@ -336,7 +336,7 @@ namespace iKCoder_Platform_SDK_Kit
                 if (rootNode != null)
                 {
                     string result = "";
-                    string type=XmlHelper.GetNodeValue("@doctype",rootNode);
+                    string type=class_XmlHelper.GetNodeValue("@doctype",rootNode);
                     _des.DESDecoding(type, out result);
                     if (result == Security_Flag)
                         return true;
@@ -359,7 +359,7 @@ namespace iKCoder_Platform_SDK_Kit
                 {
                     string result = "";
                     _des.DESCoding(Security_Flag, out result);
-                    XmlHelper.SetAttribute(rootNode, "doctype", result);
+                    class_XmlHelper.SetAttribute(rootNode, "doctype", result);
                     return true;                        
                 }
                 else
@@ -437,7 +437,7 @@ namespace iKCoder_Platform_SDK_Kit
                 string result = "";
                 if (securitiesAttrs.Count == 0 && dr.Length == 1)
                 {
-                    XmlNode newItem =  XmlHelper.CreateNode(_doc, "item", "");
+                    XmlNode newItem =  class_XmlHelper.CreateNode(_doc, "item", "");
                     _doc.SelectSingleNode("/root").AppendChild(newItem);
                     foreach (DataColumn dc in activeDT.Columns)
                     {
@@ -447,14 +447,14 @@ namespace iKCoder_Platform_SDK_Kit
                             _des.DESCoding(columnValue, out result);
                         else
                             result = columnValue;
-                        XmlHelper.SetAttribute(newItem, dc.ColumnName, result);
+                        class_XmlHelper.SetAttribute(newItem, dc.ColumnName, result);
                     }
                 }
                 else if (securitiesAttrs.Count == 0 && dr.Length > 1)
                 {
                     foreach (DataRow activeDR in dr)
                     {
-                        XmlNode newItem = XmlHelper.CreateNode(_doc, "item", "");
+                        XmlNode newItem = class_XmlHelper.CreateNode(_doc, "item", "");
                         _doc.SelectSingleNode("/root").AppendChild(newItem);
                         foreach (DataColumn dc in activeDT.Columns)
                         {
@@ -464,7 +464,7 @@ namespace iKCoder_Platform_SDK_Kit
                                 _des.DESCoding(columnValue, out result);
                             else
                                 result = columnValue;
-                            XmlHelper.SetAttribute(newItem, dc.ColumnName, result);
+                            class_XmlHelper.SetAttribute(newItem, dc.ColumnName, result);
                         }
                     }
                 }

@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Data_SqlDataHelper
+    public class class_Data_SqlDataHelper
     {
         private SqlConnection activeconnection;       
         
@@ -23,7 +23,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Static_GetColumnData(DataRow activeDR, string activeColumnName,out string result)
+        public static bool StaticGetColumnData(DataRow activeDR, string activeColumnName,out string result)
         {
             result = "";
             if (activeDR != null)
@@ -42,7 +42,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool Static_GetColumnsFromDT(DataTable activeDT, out List<string> result)
+        public static bool StaticGetColumnsFromDT(DataTable activeDT, out List<string> result)
         {
             result = null;
             if (activeDT != null)
@@ -58,7 +58,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool Static_GetColumnsTypeFromDT(DataTable activeDT, out Dictionary<string, Type> result)
+        public static bool StaticGetColumnsTypeFromDT(DataTable activeDT, out Dictionary<string, Type> result)
         {
             result = null;
             if (activeDT != null)

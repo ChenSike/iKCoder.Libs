@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace iKCoder_Platform_SDK_Kit
 {    
-    public class XmlHelper
+    public class class_XmlHelper
     {
         public const string closeTagL = "</";
         public const string closeTagR = ">";

@@ -15,12 +15,7 @@ namespace iKCoder_Platform_SDK_Kit
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
         public XmlDocument REQUESTDOCUMENT;        
         protected int REQUESTSPANTIME = 100;
-
-        public string OVERREQUESTTIMEMSG
-        {
-            set;
-            get;
-        }
+        protected string OVERREQUESTTIME = "<root><msg>You are sending request to API server too often,please visit later.</msg></root>";
         
         public string APPFOLDERPATH
         {
@@ -63,27 +58,27 @@ namespace iKCoder_Platform_SDK_Kit
 
         protected void AddErrMessageToResponseDOC(string header, string message,string link)
         {
-            XmlNode errNode = XmlHelper.CreateNode(RESPONSEDOCUMENT, "err", "");
-            XmlHelper.SetAttribute(errNode, "header", header);
-            XmlHelper.SetAttribute(errNode, "msg", message);
-            XmlHelper.SetAttribute(errNode, "link", link);
+            XmlNode errNode = class_XmlHelper.CreateNode(RESPONSEDOCUMENT, "err", "");
+            class_XmlHelper.SetAttribute(errNode, "header", header);
+            class_XmlHelper.SetAttribute(errNode, "msg", message);
+            class_XmlHelper.SetAttribute(errNode, "link", link);
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(errNode);
         }
 
         protected void AddResponseMessageToResponseDOC(string header, string code, string message,string link)
         {
-            XmlNode newNode = XmlHelper.CreateNode(RESPONSEDOCUMENT, "msg", "");
-            XmlHelper.SetAttribute(newNode, "header", header);
-            XmlHelper.SetAttribute(newNode, "code", code);
-            XmlHelper.SetAttribute(newNode, "msg", message);
-            XmlHelper.SetAttribute(newNode, "link", link);
+            XmlNode newNode = class_XmlHelper.CreateNode(RESPONSEDOCUMENT, "msg", "");
+            class_XmlHelper.SetAttribute(newNode, "header", header);
+            class_XmlHelper.SetAttribute(newNode, "code", code);
+            class_XmlHelper.SetAttribute(newNode, "msg", message);
+            class_XmlHelper.SetAttribute(newNode, "link", link);
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(newNode);
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {            
             REQUESTIP = Page.Request.UserHostAddress;
-            if(REQUESTIP=="")
+            if(string.IsNullOrEmpty(REQUESTIP))
                 REQUESTIP = "127.0.0.1";
             if(Session[REQUESTIP]!=null)
             {
@@ -93,7 +88,9 @@ namespace iKCoder_Platform_SDK_Kit
                     DateTime.TryParse(Session[REQUESTIP].ToString(),out lastRequestTime);
                     if((lastRequestTime - DateTime.Now).Milliseconds < REQUESTSPANTIME)
                     {
-                        
+                        RESPONSEDOCUMENT.LoadXml(OVERREQUESTTIME);
+                        Response.Write(RESPONSEDOCUMENT.OuterXml);
+                        return;
                     }
                 }
             }
