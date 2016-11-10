@@ -8,20 +8,7 @@ using System.Data.SqlClient;
 namespace iKCoder_Platform_SDK_Kit
 {
     public class class_Data_SqlDataHelper
-    {
-        private SqlConnection activeconnection;       
-        
-        public SqlConnection ActiveConnection
-        {
-            set
-            {
-                activeconnection = value;
-            }
-            get
-            {
-                return activeconnection;
-            }
-        }
+    {       
 
         public static bool StaticGetColumnData(DataRow activeDR, string activeColumnName,out string result)
         {
@@ -74,7 +61,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool Static_GetActiveRow(DataTable activeDT, int activeRowIndex, out DataRow result)
+        public static bool StaticGetActiveRow(DataTable activeDT, int activeRowIndex, out DataRow result)
         {
             result = null;
             if (activeDT != null)
@@ -98,7 +85,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool Action_ExecuteForDS(string executeSql,out DataSet resultDS)
+        public static bool StaticActionExecuteForDS( SqlConnection activeconnection, string executeSql,out DataSet resultDS)
         {
             resultDS = null;
             try
@@ -126,7 +113,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Action_ExecuteForDS(Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
+        public static bool StaticActionExecuteForDS(SqlConnection activeconnection,Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
         {
             resultDS = null;
             try
@@ -158,7 +145,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Action_ExecuteForDT(Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
+        public static bool ActionExecuteForDT(SqlConnection activeconnection,Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
         {
             resultDT = null;
             try
@@ -197,7 +184,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Action_ExecuteForDT(string executeSql, out DataTable resultDT)
+        public static bool ActionExecuteForDT(SqlConnection activeconnection,string executeSql, out DataTable resultDT)
         {
             resultDT = null;
             try
@@ -225,7 +212,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Action_ExecuteForNonQuery(Data_SqlSPEntry activeSPEntry)
+        public static bool ActionExecuteForNonQuery(SqlConnection activeconnection,Data_SqlSPEntry activeSPEntry)
         {
             try
             {
@@ -267,7 +254,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Action_ExecuteForNonQuery(string executeSql)
+        public static bool ActionExecuteForNonQuery(SqlConnection activeconnection,string executeSql)
         {
             try
             {
@@ -295,8 +282,7 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 return false;
             }
-        }
-        
+        }        
 
     }
 }

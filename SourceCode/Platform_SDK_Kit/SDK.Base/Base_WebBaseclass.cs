@@ -93,8 +93,10 @@ namespace iKCoder_Platform_SDK_Kit
                         return;
                     }
                 }
+                Session[REQUESTIP] = DateTime.Now.ToString();
             }
-            Session[REQUESTIP] = DateTime.Now.ToString();
+            else            
+                Session.Add(REQUESTIP, DateTime.Now.ToString());              
             if (Request.InputStream != null && Request.InputStream.Length > 0)
             {
                 StreamReader streamReaderObj = new StreamReader(Request.InputStream);
