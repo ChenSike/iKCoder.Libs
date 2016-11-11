@@ -442,7 +442,7 @@ namespace iKCoder_Platform_SDK_Kit
                     foreach (DataColumn dc in activeDT.Columns)
                     {
                         string columnValue = "";
-                        _sqlDataHelper.Static_GetColumnData(dr[0], dc.ColumnName, out columnValue);
+                        class_Data_SqlDataHelper.StaticGetColumnData(dr[0], dc.ColumnName, out columnValue);
                         if (isEncry)
                             _des.DESCoding(columnValue, out result);
                         else
@@ -459,7 +459,7 @@ namespace iKCoder_Platform_SDK_Kit
                         foreach (DataColumn dc in activeDT.Columns)
                         {
                             string columnValue = "";
-                            _sqlDataHelper.Static_GetColumnData(activeDR, dc.ColumnName, out columnValue);
+                            class_Data_SqlDataHelper.StaticGetColumnData(activeDR, dc.ColumnName, out columnValue);
                             if (isEncry)
                                 _des.DESCoding(columnValue, out result);
                             else

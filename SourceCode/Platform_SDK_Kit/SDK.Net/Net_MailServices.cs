@@ -8,7 +8,7 @@ using System.Net.Mail;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Net_MailServices
+    public class class_Net_MailServices
     {
         public bool SendMail(string server, string account, string password, List<string> mailto, string header, string content)
         {

@@ -50,7 +50,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 return false;
-        }
+        }       
 
         public SqlConnection Get_ActiveConnection(string key)
         {

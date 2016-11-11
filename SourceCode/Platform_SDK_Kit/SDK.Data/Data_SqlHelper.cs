@@ -294,7 +294,7 @@ namespace iKCoder_Platform_SDK_Kit
                     string sql = ActionBuildCreateSqlString(activeTableStructes, tableName, activeDBName);
                     if (sql != "")
                     {
-                        if (obj_dataHelper.Action_ExecuteForNonQuery(sql))
+                        if (class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection,sql))
                             return true;
                         else
                             return false;
@@ -313,12 +313,11 @@ namespace iKCoder_Platform_SDK_Kit
         public Dictionary<string, Data_SqlSPEntry> Action_AutoLoadingAllSPS(SqlConnection ActiveConnection,string SPType)
         {
             if (ActiveConnection != null)
-            {
-                class_Data_SqlDataHelper obj=new class_Data_SqlDataHelper();                
+            {                              
                 string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0)";
                 DataTable activeSPSDT=new DataTable();
                 Dictionary<string, Data_SqlSPEntry> result = new Dictionary<string,Data_SqlSPEntry>();
-                if (obj.ActionExecuteForDT(ActiveConnection,sql_getallsps, out activeSPSDT))
+                if (class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getallsps, out activeSPSDT))
                 {
                     foreach (DataRow activeRow in activeSPSDT.Rows)
                     {
@@ -477,9 +476,8 @@ namespace iKCoder_Platform_SDK_Kit
 
                     }
                 }
-                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
-                activeSqlSPHelper.ActiveConnection = SqlHelperObj.Get_ActiveConnection(Server);
-                activeSqlSPHelper.Action_ExecuteForNonQuery(activeEntry);
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();                
+                class_Data_SqlDataHelper.ActionExecuteForNonQuery(SqlHelperObj.Get_ActiveConnection(Server),activeEntry);
                 return true;
             }
             else

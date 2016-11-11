@@ -49,7 +49,12 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 return "";
-        }       
+        }
+
+        protected virtual void BeforeLoad()
+        {
+
+        }
 
         protected virtual void DoAction()
         {
@@ -105,7 +110,8 @@ namespace iKCoder_Platform_SDK_Kit
                 REQUESTDOCUMENT = new XmlDocument();
                 REQUESTDOCUMENT.LoadXml(requestStrDoc);            
             }
-            APPFOLDERPATH = Server.MapPath("~/");            
+            APPFOLDERPATH = Server.MapPath("~/");
+            BeforeLoad();
             DoAction();
         }       
     }
