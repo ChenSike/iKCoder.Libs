@@ -5,7 +5,7 @@ using System.Text;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Security_DES
+    public class class_Security_DES
     {
         
         public int bufferLength = 4096;
@@ -14,7 +14,7 @@ namespace iKCoder_Platform_SDK_Kit
         private Encoding MyEncoding = new UnicodeEncoding();
         private SymmetricAlgorithm provider = SymmetricAlgorithm.Create("TripleDES");
 
-        public Security_DES(string OptionalKey)
+        public class_Security_DES(string OptionalKey)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public Security_DES()
+        public class_Security_DES()
         {
             try
             {

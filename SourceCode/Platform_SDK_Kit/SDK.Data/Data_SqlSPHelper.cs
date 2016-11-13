@@ -23,13 +23,13 @@ namespace iKCoder_Platform_SDK_Kit
         public const string AllAction = "All";
     }
 
-    public class Data_SqlSPEntry:ICloneable
+    public class class_Data_SqlSPEntry:ICloneable
     {
-        public static bool AddSPEntryToQueue(string SPName, SqlDbType SPType, string EntryType, ref Queue<Data_SqlSPEntry> activeQueue)
+        public static bool AddSPEntryToQueue(string SPName, SqlDbType SPType, string EntryType, ref Queue<class_Data_SqlSPEntry> activeQueue)
         {
             if(activeQueue==null)
                 return false;
-            Data_SqlSPEntry activeEntry = new Data_SqlSPEntry();
+            class_Data_SqlSPEntry activeEntry = new class_Data_SqlSPEntry();
             activeEntry.SPName = SPName;
             activeEntry.SPType = SPType;
             activeEntry.EntryType = EntryType;
@@ -37,11 +37,11 @@ namespace iKCoder_Platform_SDK_Kit
             return true;
         }
 
-        public static bool AddSPEntryToList(string SPName, SqlDbType SPType, string EntryType, ref List<Data_SqlSPEntry> activeList)
+        public static bool AddSPEntryToList(string SPName, SqlDbType SPType, string EntryType, ref List<class_Data_SqlSPEntry> activeList)
         {
             if(activeList==null)
                 return false;
-            Data_SqlSPEntry activeEntry = new Data_SqlSPEntry();
+            class_Data_SqlSPEntry activeEntry = new class_Data_SqlSPEntry();
             activeEntry.SPName = SPName;
             activeEntry.SPType = SPType;
             activeEntry.EntryType = EntryType;
@@ -49,7 +49,7 @@ namespace iKCoder_Platform_SDK_Kit
             return true;
         }
 
-        public static int GetSPParameterIndex(ref Data_SqlSPEntry activeSPEntry, string Paramername)
+        public static int GetSPParameterIndex(ref class_Data_SqlSPEntry activeSPEntry, string Paramername)
         {
             int index = 0;
             if (activeSPEntry != null)
@@ -68,7 +68,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return -1;
         }
 
-        public static bool AddSPParameter(ref Data_SqlSPEntry activeSPEntry, string Paramername, SqlDbType SPType, ParameterDirection SPDirection,int size,object SPValue)
+        public static bool AddSPParameter(ref class_Data_SqlSPEntry activeSPEntry, string Paramername, SqlDbType SPType, ParameterDirection SPDirection,int size,object SPValue)
         {
             if (activeSPEntry == null)
                 return false;
@@ -82,7 +82,7 @@ namespace iKCoder_Platform_SDK_Kit
             return true;
         }
 
-        public static bool ModifySPParameter(ref Data_SqlSPEntry activeSPEntry, string Paramername, SqlDbType SPType, ParameterDirection SPDirection, object SPValue,int size=-1)
+        public static bool ModifySPParameter(ref class_Data_SqlSPEntry activeSPEntry, string Paramername, SqlDbType SPType, ParameterDirection SPDirection, object SPValue,int size=-1)
         {
             if (activeSPEntry == null)
                 return false;
@@ -111,7 +111,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static void ModifyExcludeSPParameter(ref Data_SqlSPEntry activeSPEntry, Dictionary<string,object> parameterMaping,List<string> filterParameter)
+        public static void ModifyExcludeSPParameter(ref class_Data_SqlSPEntry activeSPEntry, Dictionary<string,object> parameterMaping,List<string> filterParameter)
         {
             List<SqlParameter> excluded = new List<SqlParameter>();
             foreach (SqlParameter tmpParameter in activeSPEntry.ActiveParameters)
@@ -141,7 +141,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         public object Clone()
         {
-            Data_SqlSPEntry newEntry = new Data_SqlSPEntry();
+            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry();
             newEntry.ActiveParameters = this.ActiveParameters;
             newEntry.EntryType = this.EntryType;
             newEntry.KeyName = this.KeyName;
@@ -150,7 +150,7 @@ namespace iKCoder_Platform_SDK_Kit
             return newEntry;
         }
 
-        public static void CopyParams(ref Data_SqlSPEntry sourceEntry, ref Data_SqlSPEntry objectEntry)
+        public static void CopyParams(ref class_Data_SqlSPEntry sourceEntry, ref class_Data_SqlSPEntry objectEntry)
         {
             foreach (SqlParameter activeParameter in sourceEntry.ActiveParameters)
             {
@@ -189,15 +189,15 @@ namespace iKCoder_Platform_SDK_Kit
             _refConfigObj = refConfigObj;
         }                       
 
-        public Queue<Data_SqlSPEntry> Action_Auto_CreateNewQueue()
+        public Queue<class_Data_SqlSPEntry> Action_Auto_CreateNewQueue()
         {
-            Queue<Data_SqlSPEntry> queue = new Queue<Data_SqlSPEntry>();
+            Queue<class_Data_SqlSPEntry> queue = new Queue<class_Data_SqlSPEntry>();
             if (_refConfigObj != null)
             {
                 XmlNodeList activeItemNodes = _refConfigObj.GetItemNodes("storeProcedures", "spentry");
                 foreach (XmlNode activeItemNode in activeItemNodes)
                 {
-                    Data_SqlSPEntry activeSPEntry = Action_GetSPConfig(activeItemNode);
+                    class_Data_SqlSPEntry activeSPEntry = Action_GetSPConfig(activeItemNode);
                     if (activeSPEntry != null)
                         queue.Enqueue(activeSPEntry);
 
@@ -208,15 +208,15 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public List<Data_SqlSPEntry> Action_Auto_CreateNewList()
+        public List<class_Data_SqlSPEntry> Action_Auto_CreateNewList()
         {
-            List<Data_SqlSPEntry> list = new List<Data_SqlSPEntry>();
+            List<class_Data_SqlSPEntry> list = new List<class_Data_SqlSPEntry>();
             if (_refConfigObj != null)
             {
                 XmlNodeList activeItemNodes = _refConfigObj.GetItemNodes("storeProcedures", "spentry");
                 foreach (XmlNode activeItemNode in activeItemNodes)
                 {
-                    Data_SqlSPEntry activeSPEntry = Action_GetSPConfig(activeItemNode);
+                    class_Data_SqlSPEntry activeSPEntry = Action_GetSPConfig(activeItemNode);
                     if (activeSPEntry != null)
                         list.Add(activeSPEntry);
                 }
@@ -226,18 +226,18 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public Dictionary<string, List<Data_SqlSPEntry>> Action_Auto_CreateNewDirc(string keyType)
+        public Dictionary<string, List<class_Data_SqlSPEntry>> Action_Auto_CreateNewDirc(string keyType)
         {
-            Dictionary<string, List<Data_SqlSPEntry>> result = new Dictionary<string, List<Data_SqlSPEntry>>();
+            Dictionary<string, List<class_Data_SqlSPEntry>> result = new Dictionary<string, List<class_Data_SqlSPEntry>>();
             if (_refConfigObj != null)
             {
                 XmlNodeList activeItemNodes = _refConfigObj.GetItemNodes("storeProcedures", "spentry");
-                List<Data_SqlSPEntry> _selectSP = new List<Data_SqlSPEntry>();
-                List<Data_SqlSPEntry> _updateSP = new List<Data_SqlSPEntry>();
-                List<Data_SqlSPEntry> keynameList = new List<Data_SqlSPEntry>();
+                List<class_Data_SqlSPEntry> _selectSP = new List<class_Data_SqlSPEntry>();
+                List<class_Data_SqlSPEntry> _updateSP = new List<class_Data_SqlSPEntry>();
+                List<class_Data_SqlSPEntry> keynameList = new List<class_Data_SqlSPEntry>();
                 foreach (XmlNode activeItemNode in activeItemNodes)
                 {
-                    Data_SqlSPEntry activeSPEntry = Action_GetSPConfig(activeItemNode);
+                    class_Data_SqlSPEntry activeSPEntry = Action_GetSPConfig(activeItemNode);
                     if (activeSPEntry != null)
                     {
                         switch (keyType)
@@ -401,7 +401,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public Data_SqlSPEntry Action_GetSPConfig(XmlNode activeItemNode)
+        public class_Data_SqlSPEntry Action_GetSPConfig(XmlNode activeItemNode)
         {
             if (activeItemNode == null)
                 return null;
@@ -409,7 +409,7 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 if (Static_IsSPConfigDocument())
                 {
-                    Data_SqlSPEntry activeEntry = new Data_SqlSPEntry();
+                    class_Data_SqlSPEntry activeEntry = new class_Data_SqlSPEntry();
                     string keyName = _refConfigObj.GetAttrValue(activeItemNode, "key", false, "");
                     string spName = _refConfigObj.GetAttrValue(activeItemNode, "spname", false, "");
                     string spentry = _refConfigObj.GetAttrValue(activeItemNode, "entrytype", false, "");
@@ -421,7 +421,7 @@ namespace iKCoder_Platform_SDK_Kit
                         string parameterDirc = _refConfigObj.GetAttrValue(parameterNode, "pdirc", false, "");
                         string parameterValue = _refConfigObj.GetAttrValue(parameterNode, "pvalue", false, "");
                         string parameterSize = _refConfigObj.GetAttrValue(parameterNode, "psize", false, "");
-                        Data_SqlSPEntry.AddSPParameter(ref activeEntry, parameterName, Static_GetDbTypeFromConfigStr(parameterType), Static_GetDirectionFromConfigStr(parameterDirc), int.Parse(parameterSize), parameterValue);
+                        class_Data_SqlSPEntry.AddSPParameter(ref activeEntry, parameterName, Static_GetDbTypeFromConfigStr(parameterType), Static_GetDirectionFromConfigStr(parameterDirc), int.Parse(parameterSize), parameterValue);
                     }
                     return activeEntry;
                 }
@@ -430,7 +430,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public Data_SqlSPEntry Action_GetSPConfig(string keyNameForSpConfig)
+        public class_Data_SqlSPEntry Action_GetSPConfig(string keyNameForSpConfig)
         {
             if (_refConfigObj != null)
             {
@@ -439,7 +439,7 @@ namespace iKCoder_Platform_SDK_Kit
                     XmlNode activeConfigItemNode = _refConfigObj.GetItemNode("storeProcedures", keyNameForSpConfig);
                     if (activeConfigItemNode != null)
                     {
-                        Data_SqlSPEntry activeEntry = new Data_SqlSPEntry();
+                        class_Data_SqlSPEntry activeEntry = new class_Data_SqlSPEntry();
                         string keyName = _refConfigObj.GetAttrValue(activeConfigItemNode, "key", false, "");
                         string spName = _refConfigObj.GetAttrValue(activeConfigItemNode, "spname", false, "");
                         string spentry = _refConfigObj.GetAttrValue(activeConfigItemNode, "entrytype", false, "");
@@ -451,7 +451,7 @@ namespace iKCoder_Platform_SDK_Kit
                             string parameterDirc = _refConfigObj.GetAttrValue(parameterNode, "pdirc", false,"");
                             string parameterValue = _refConfigObj.GetAttrValue(parameterNode, "pvalue", false, "");
                             string parameterSize = _refConfigObj.GetAttrValue(parameterNode, "psize", false, "");
-                            Data_SqlSPEntry.AddSPParameter(ref activeEntry, parameterName, Static_GetDbTypeFromConfigStr(parameterType), Static_GetDirectionFromConfigStr(parameterDirc), int.Parse(parameterSize), parameterValue);                            
+                            class_Data_SqlSPEntry.AddSPParameter(ref activeEntry, parameterName, Static_GetDbTypeFromConfigStr(parameterType), Static_GetDirectionFromConfigStr(parameterDirc), int.Parse(parameterSize), parameterValue);                            
                         }
                         return activeEntry;
                     }

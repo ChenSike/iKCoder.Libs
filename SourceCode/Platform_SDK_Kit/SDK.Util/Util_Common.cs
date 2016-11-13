@@ -9,7 +9,7 @@ using System.IO;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Util_Common
+    public class class_Util_Common
     {
         public static void Action_ClearAllInputControls(Control.ControlCollection activeFormControls)
         {

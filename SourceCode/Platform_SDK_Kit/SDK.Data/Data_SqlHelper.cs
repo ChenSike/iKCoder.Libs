@@ -310,18 +310,18 @@ namespace iKCoder_Platform_SDK_Kit
         }
 
 
-        public Dictionary<string, Data_SqlSPEntry> Action_AutoLoadingAllSPS(SqlConnection ActiveConnection,string SPType)
+        public Dictionary<string, class_Data_SqlSPEntry> Action_AutoLoadingAllSPS(SqlConnection ActiveConnection,string SPType)
         {
             if (ActiveConnection != null)
             {                              
                 string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0)";
                 DataTable activeSPSDT=new DataTable();
-                Dictionary<string, Data_SqlSPEntry> result = new Dictionary<string,Data_SqlSPEntry>();
+                Dictionary<string, class_Data_SqlSPEntry> result = new Dictionary<string,class_Data_SqlSPEntry>();
                 if (class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getallsps, out activeSPSDT))
                 {
                     foreach (DataRow activeRow in activeSPSDT.Rows)
                     {
-                        Data_SqlSPEntry newSPEntry = new Data_SqlSPEntry();
+                        class_Data_SqlSPEntry newSPEntry = new class_Data_SqlSPEntry();
                         string spName = "";
                         class_Data_SqlDataHelper.StaticGetColumnData(activeRow, "name", out spName);
                         if (SPType != "")
@@ -371,7 +371,7 @@ namespace iKCoder_Platform_SDK_Kit
                                 if (dbtyps.Length > 0)
                                 {
                                     class_Data_SqlDataHelper.StaticGetColumnData(dbtyps[0], "name", out activeDBType);
-                                    Data_SqlSPEntry.AddSPParameter(ref newSPEntry, activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);
+                                    class_Data_SqlSPEntry.AddSPParameter(ref newSPEntry, activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);
                                 }
                                 else
                                     continue;
@@ -390,12 +390,12 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public DataTable ExecuteGetSPS(Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server)
+        public DataTable ExecuteGetSPS(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server)
         {
             DataTable dt = new DataTable();
             if (activeEntry != null)
             {
-                Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "get");
+                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "get");
                 class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();                
                 class_Data_SqlDataHelper.ActionExecuteForDT(SqlHelperObj.Get_ActiveConnection(Server),activeEntry, out dt);
                 return dt;
@@ -404,21 +404,21 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public bool ExecuteInsertSPS(Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteInsertSPS(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
         {
             if (activeEntry != null)
             {
-                Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "insert");
+                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "insert");
                 foreach (string activeParameter in ValueMaping.Keys)
                 {
-                    int activeParametersIndex = Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
+                    int activeParametersIndex = class_Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
                     if (activeParametersIndex != -1)
                     {
                         SqlParameter activeExistedParamter = activeEntry.ActiveParameters[activeParametersIndex];
                         if (!SizeMaping.ContainsKey(activeParameter))
-                            Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
+                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
                         else
-                            Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
+                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
 
                     }
                 }                
@@ -429,24 +429,24 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ExecuteUpdateSPS(Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteUpdateSPS(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
         {
             if (activeEntry != null)
             {
-                Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "update");                                
+                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "update");                                
                 List<string> filterExclude=new List<string>();
                 filterExclude.Add("@operation");
-                Data_SqlSPEntry.ModifyExcludeSPParameter(ref activeEntry, ValueMaping, filterExclude);
+                class_Data_SqlSPEntry.ModifyExcludeSPParameter(ref activeEntry, ValueMaping, filterExclude);
                 foreach (string activeParameter in ValueMaping.Keys)
                 {
-                    int activeParametersIndex = Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
+                    int activeParametersIndex = class_Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
                     if (activeParametersIndex != -1)
                     {
                         SqlParameter activeExistedParamter = activeEntry.ActiveParameters[activeParametersIndex];
                         if (!SizeMaping.ContainsKey(activeParameter))
-                            Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
+                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
                         else
-                            Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
+                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
 
                     }                      
                 }
@@ -457,22 +457,22 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ExecuteDeleteSPS(Data_SqlSPEntry activeEntry,class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteDeleteSPS(class_Data_SqlSPEntry activeEntry,class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
         {
             if (activeEntry != null)
             {
 
-                Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "delete");
+                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "delete");
                 foreach (string activeParameter in ValueMaping.Keys)
                 {
-                    int activeParametersIndex = Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
+                    int activeParametersIndex = class_Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
                     if (activeParametersIndex != -1)
                     {
                         SqlParameter activeExistedParamter = activeEntry.ActiveParameters[activeParametersIndex];
                         if (!SizeMaping.ContainsKey(activeParameter))
-                            Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
+                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
                         else
-                            Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
+                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
 
                     }
                 }

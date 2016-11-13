@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Base_WebBaseclass:System.Web.UI.Page
+    public class class_Base_WebBaseclass:System.Web.UI.Page
     {
 
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
@@ -29,7 +29,7 @@ namespace iKCoder_Platform_SDK_Kit
             get;
         }
 
-        public Base_WebBaseclass()
+        public class_Base_WebBaseclass()
         {
             RESPONSEDOCUMENT.LoadXml("<root></root>");
         }

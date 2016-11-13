@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Net_RemoteRequest
+    public class class_Net_RemoteRequest
     {
         public byte[] getRemoteRequestToByte(string input, string remoteurl, int requestTimeOut, int buffersize, List<Cookie> activeCookies)
         {
