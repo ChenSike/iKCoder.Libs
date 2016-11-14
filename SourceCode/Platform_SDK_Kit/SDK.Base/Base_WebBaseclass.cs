@@ -9,13 +9,13 @@ using System.Xml;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class Base_WebBaseclass:System.Web.UI.Page
+    public class class_Base_WebBaseclass:System.Web.UI.Page
     {
 
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
         public XmlDocument REQUESTDOCUMENT;        
-        protected int REQUESTSPANTIME = 100;
-        protected string OVERREQUESTTIME = "<root><msg>You are sending request to API server too often,please visit later.</msg></root>";
+        protected int REQUESTSPANTIME = 100;        
+        protected bool ISRESPONSEDOC = false;
         
         public string APPFOLDERPATH
         {
@@ -29,7 +29,7 @@ namespace iKCoder_Platform_SDK_Kit
             get;
         }
 
-        public Base_WebBaseclass()
+        public class_Base_WebBaseclass()
         {
             RESPONSEDOCUMENT.LoadXml("<root></root>");
         }
@@ -49,7 +49,12 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 return "";
-        }       
+        }
+
+        protected virtual void BeforeLoad()
+        {
+
+        }
 
         protected virtual void DoAction()
         {
@@ -88,7 +93,7 @@ namespace iKCoder_Platform_SDK_Kit
                     DateTime.TryParse(Session[REQUESTIP].ToString(),out lastRequestTime);
                     if((lastRequestTime - DateTime.Now).Milliseconds < REQUESTSPANTIME)
                     {
-                        RESPONSEDOCUMENT.LoadXml(OVERREQUESTTIME);
+                        AddErrMessageToResponseDOC("Request too often from client", "Sending request document too ofter.", "");
                         Response.Write(RESPONSEDOCUMENT.OuterXml);
                         return;
                     }
@@ -96,7 +101,8 @@ namespace iKCoder_Platform_SDK_Kit
                 Session[REQUESTIP] = DateTime.Now.ToString();
             }
             else            
-                Session.Add(REQUESTIP, DateTime.Now.ToString());              
+                Session.Add(REQUESTIP, DateTime.Now.ToString());
+            BeforeLoad();
             if (Request.InputStream != null && Request.InputStream.Length > 0)
             {
                 StreamReader streamReaderObj = new StreamReader(Request.InputStream);
@@ -105,8 +111,10 @@ namespace iKCoder_Platform_SDK_Kit
                 REQUESTDOCUMENT = new XmlDocument();
                 REQUESTDOCUMENT.LoadXml(requestStrDoc);            
             }
-            APPFOLDERPATH = Server.MapPath("~/");            
+            APPFOLDERPATH = Server.MapPath("~/");;
             DoAction();
+            if (ISRESPONSEDOC)
+                Response.Write(RESPONSEDOCUMENT);
         }       
     }
 }
