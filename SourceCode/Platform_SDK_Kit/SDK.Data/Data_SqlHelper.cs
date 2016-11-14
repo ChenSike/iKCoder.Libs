@@ -477,9 +477,7 @@ namespace iKCoder_Platform_SDK_Kit
 
                     }
                 }
-                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
-                activeSqlSPHelper.ActiveConnection = SqlHelperObj.Get_ActiveConnection(Server);
-                activeSqlSPHelper.Action_ExecuteForNonQuery(activeEntry);
+                class_Data_SqlDataHelper.ActionExecuteForNonQuery(SqlHelperObj.Get_ActiveConnection(Server),activeEntry);
                 return true;
             }
             else
