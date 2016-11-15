@@ -113,7 +113,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static bool StaticActionExecuteForDS(SqlConnection activeconnection,Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
+        public static bool StaticActionExecuteForDS(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
         {
             resultDS = null;
             try
@@ -145,7 +145,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static bool ActionExecuteForDT(SqlConnection activeconnection,Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
+        public static bool ActionExecuteForDT(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
         {
             resultDT = null;
             try
@@ -212,7 +212,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static bool ActionExecuteForNonQuery(SqlConnection activeconnection,Data_SqlSPEntry activeSPEntry)
+        public static bool ActionExecuteForNonQuery(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry)
         {
             try
             {
