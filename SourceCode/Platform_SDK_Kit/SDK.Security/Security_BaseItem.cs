@@ -8,7 +8,7 @@ namespace iKCoder_Platform_SDK_Kit
 {
     public class Security_BaseItem
     {
-       protected Security_DES Security_DESObj;
+       protected class_Security_DES Security_DESObj;
     }
 
     public enum Security_ActionType
@@ -33,7 +33,7 @@ namespace iKCoder_Platform_SDK_Kit
         public Security_UserGroup(string GroupKey)
         {
             this.Group_Key = GroupKey;
-            Security_DESObj=new Security_DES(GroupKey);
+            Security_DESObj=new class_Security_DES(GroupKey);
         }
 
         public string GroupKey
@@ -41,7 +41,7 @@ namespace iKCoder_Platform_SDK_Kit
             set
             {
                 this.Group_Key = value;
-                Security_DESObj = new Security_DES(this.Group_Key);
+                Security_DESObj = new class_Security_DES(this.Group_Key);
             }
         }
 
@@ -73,7 +73,7 @@ namespace iKCoder_Platform_SDK_Kit
         public Security_UserItem(string UserKey)
         {
             this.User_Key = UserKey;
-            Security_DESObj = new Security_DES(this.User_Key);
+            Security_DESObj = new class_Security_DES(this.User_Key);
         }
 
         public string UserName
@@ -100,7 +100,7 @@ namespace iKCoder_Platform_SDK_Kit
             set
             {
                 this.User_Key = value;
-                Security_DESObj = new Security_DES(this.User_Key);
+                Security_DESObj = new class_Security_DES(this.User_Key);
             }
             get
             {
@@ -164,7 +164,7 @@ namespace iKCoder_Platform_SDK_Kit
         
         public Security_AuthoriationContext(string contextKey)
         {
-            Security_DESObj = new Security_DES(contextKey);
+            Security_DESObj = new class_Security_DES(contextKey);
         }
 
 

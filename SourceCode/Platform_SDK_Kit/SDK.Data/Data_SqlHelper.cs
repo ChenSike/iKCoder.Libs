@@ -294,7 +294,7 @@ namespace iKCoder_Platform_SDK_Kit
                     string sql = ActionBuildCreateSqlString(activeTableStructes, tableName, activeDBName);
                     if (sql != "")
                     {
-                        if (obj_dataHelper.Action_ExecuteForNonQuery(sql))
+                        if (class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql))
                             return true;
                         else
                             return false;
@@ -313,12 +313,11 @@ namespace iKCoder_Platform_SDK_Kit
         public Dictionary<string, Data_SqlSPEntry> Action_AutoLoadingAllSPS(SqlConnection ActiveConnection,string SPType)
         {
             if (ActiveConnection != null)
-            {
-                class_Data_SqlDataHelper obj=new class_Data_SqlDataHelper();                
+            {                               
                 string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0)";
                 DataTable activeSPSDT=new DataTable();
                 Dictionary<string, Data_SqlSPEntry> result = new Dictionary<string,Data_SqlSPEntry>();
-                if (obj.ActionExecuteForDT(ActiveConnection,sql_getallsps, out activeSPSDT))
+                if (class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getallsps, out activeSPSDT))
                 {
                     foreach (DataRow activeRow in activeSPSDT.Rows)
                     {
@@ -339,8 +338,7 @@ namespace iKCoder_Platform_SDK_Kit
                             }
                         }
                         newSPEntry.SPName = spName;
-                        newSPEntry.KeyName = spName;
-                        
+                        newSPEntry.KeyName = spName;                        
                         string spObjectID = "";
                         class_Data_SqlDataHelper.StaticGetColumnData(activeRow, "object_id", out spObjectID);
                         string sql_paramters = "select * from sys.all_parameters where object_id = " + spObjectID;
