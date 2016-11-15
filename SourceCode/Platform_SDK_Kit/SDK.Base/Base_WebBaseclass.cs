@@ -114,7 +114,7 @@ namespace iKCoder_Platform_SDK_Kit
             APPFOLDERPATH = Server.MapPath("~/");;
             DoAction();
             if (ISRESPONSEDOC)
-                Response.Write(RESPONSEDOCUMENT);
+                Response.Write(RESPONSEDOCUMENT.OuterXml);
         }       
     }
 }
