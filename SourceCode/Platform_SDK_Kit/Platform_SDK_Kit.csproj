@@ -76,8 +76,8 @@
     <Compile Include="SDK.Pools\Pools_Security.cs" />
     <Compile Include="SDK.Security\Security_BaseItem.cs" />
     <Compile Include="SDK.Security\Security_DES.cs" />
-    <Compile Include="SDK.Token\Token_Connector.cs" />
-    <Compile Include="SDK.Token\Token_Status.cs" />
+    <Compile Include="SDK.Token\Token_Controller.cs" />
+    <Compile Include="SDK.Token\Token_TokenItem.cs" />
     <Compile Include="SDK.Util\Util_Common.cs" />
   </ItemGroup>
   <ItemGroup>

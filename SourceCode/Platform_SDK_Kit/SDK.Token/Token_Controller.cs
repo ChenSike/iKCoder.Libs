@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.UI;
 
 namespace iKCoder_Platform_SDK_Kit.SDK.Token
 {
     public class Token_Controller
     {
-        public Dictionary<string, class_TokenItem> registryTokensPool
+        System.Web.SessionState.HttpSessionState _refPageSession;
+        
+        public class_TokenItem registriedToken
         {
             set;
             get;
@@ -18,6 +22,7 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Token
 
         public bool AddBenchmarkToken(string name,string code,string key)
         {
+            
             if (!_benchmarkTokensList.ContainsKey(name))
             {
                 class_TokenItem newBenchmarkToken = new class_TokenItem();
@@ -33,12 +38,64 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Token
                 return false;
         }
 
-        public Token_Controller(Dictionary<string,class_TokenItem> activeRegistryTokensPool)
+        public Token_Controller(System.Web.SessionState.HttpSessionState refPageSession)
         {
-            this.registryTokensPool = activeRegistryTokensPool;
-        }        
+            _refPageSession = refPageSession;
+        }
+       
+        public bool FlushToken(string tokenGuid)
+        {
+            if (string.IsNullOrEmpty(tokenGuid))
+                return false;
+            else
+            {
+                try
+                {
+                    if (_refPageSession[tokenGuid] != null)
+                    {
+                        class_TokenItem activeToken = (class_TokenItem)_refPageSession[tokenGuid];
+                        activeToken.registryTime = DateTime.Now;
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }           
+        }
+        
+        public bool VerifyToken(string tokenGuid)
+        {
+            if (string.IsNullOrEmpty(tokenGuid))
+                return false;
+            else
+            {
+                try
+                {
+                    if (_refPageSession[tokenGuid] != null)
+                    {
+                        class_TokenItem activeToken = (class_TokenItem)_refPageSession[tokenGuid];
+                        if((DateTime.Now-activeToken.registryTime).Minutes >= activeToken.expireMinutes)
+                        {
+                            _refPageSession.Remove(tokenGuid);
+                            return false;
+                        }
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }           
+        }
 
-        public string VerifyToken(class_TokenItem activeToken)
+        public string GetToken(class_TokenItem activeToken)
         {
             if (activeToken != null)
             {
@@ -54,17 +111,17 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Token
                         if (_benchmarkTokensList[activeToken.productName].productCode == resuktDes)
                         {
                             string newGuid = "";
-                            while (registryTokensPool.ContainsKey(newGuid))
-                                 newGuid = Guid.NewGuid().ToString();
-                            class_TokenItem newRegItem = new class_TokenItem();
-                            newRegItem.productName = activeToken.productName;
-                            newRegItem.isBenchmark = false;
-                            newRegItem.productCode = activeToken.productCode;
-                            newRegItem.productKey = activeToken.productKey;
-                            newRegItem.registryTime = DateTime.Now.ToString();
-                            newRegItem.registryID = newGuid;
-                            //registryTokensPool.Add(" ",)
-                            
+                            registriedToken = new class_TokenItem();
+                            registriedToken.productName = activeToken.productName;
+                            registriedToken.isBenchmark = false;
+                            registriedToken.productCode = activeToken.productCode;
+                            registriedToken.productKey = activeToken.productKey;
+                            registriedToken.registryTime = DateTime.Now;
+                            registriedToken.registryID = newGuid;
+                            registriedToken.expireMinutes = activeToken.expireMinutes;
+                            registriedToken.isBenchmark = false;
+                            _refPageSession.Add(newGuid, registriedToken);
+                            return newGuid;                            
                         }
                         else
                             return string.Empty;
