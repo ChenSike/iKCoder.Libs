@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 
-namespace iKCoder_Platform_SDK_Kit.SDK.Token
+namespace iKCoder_Platform_SDK_Kit
 {
-    public class Token_Controller
+    public class class_Token_Controller
     {
         System.Web.SessionState.HttpSessionState _refPageSession;
         
@@ -20,7 +20,7 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Token
 
         private Dictionary<string, class_TokenItem> _benchmarkTokensList = new Dictionary<string, class_TokenItem>();
 
-        public bool AddBenchmarkToken(string name,string code,string key)
+        public bool AddBenchmarkToken(string name,string code,string key,int expired)
         {
             
             if (!_benchmarkTokensList.ContainsKey(name))
@@ -31,6 +31,7 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Token
                 newBenchmarkToken.productKey = key;
                 newBenchmarkToken.productCode = resultCode;
                 newBenchmarkToken.isBenchmark = true;
+                newBenchmarkToken.expireMinutes = expired;
                 _benchmarkTokensList.Add(name, newBenchmarkToken);
                 return true;                
             }
@@ -38,7 +39,7 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Token
                 return false;
         }
 
-        public Token_Controller(System.Web.SessionState.HttpSessionState refPageSession)
+        public class_Token_Controller(System.Web.SessionState.HttpSessionState refPageSession)
         {
             _refPageSession = refPageSession;
         }
@@ -118,7 +119,7 @@ namespace iKCoder_Platform_SDK_Kit.SDK.Token
                             registriedToken.productKey = activeToken.productKey;
                             registriedToken.registryTime = DateTime.Now;
                             registriedToken.registryID = newGuid;
-                            registriedToken.expireMinutes = activeToken.expireMinutes;
+                            registriedToken.expireMinutes = _benchmarkTokensList[activeToken.productName].expireMinutes;
                             registriedToken.isBenchmark = false;
                             _refPageSession.Add(newGuid, registriedToken);
                             return newGuid;                            

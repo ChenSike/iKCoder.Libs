@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace iKCoder_Platform_SDK_Kit.SDK.Token
+namespace iKCoder_Platform_SDK_Kit
 {
     public class class_TokenItem
     {
