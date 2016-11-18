@@ -43,6 +43,38 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
+        public string getRemoteRequestToString(string input, string remoteurl, int requestTimeOut, int buffersize, List<Cookie> activeCookies)
+        {
+            try
+            {
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if (activeCookies != null && activeCookies.Count > 0)
+                    foreach (Cookie activeCookie in activeCookies)
+                        request.CookieContainer.Add(activeCookie);
+                request.Timeout = 0x1b7740;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                Stream responseStream = ((HttpWebResponse)request.GetResponse()).GetResponseStream();
+                byte[] buffer2 = null;
+                BinaryReader reader = new BinaryReader(responseStream);
+                buffer2 = reader.ReadBytes(buffersize);
+                reader.Close();
+                responseStream.Close();
+                return System.Text.Encoding.Default.GetString(buffer2);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public List<Cookie> getRemoteServerCookie(string remoteurl, string input)
         {
             try
