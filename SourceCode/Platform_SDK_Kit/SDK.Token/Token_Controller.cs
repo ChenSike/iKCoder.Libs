@@ -20,7 +20,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         private Dictionary<string, class_TokenItem> _benchmarkTokensList = new Dictionary<string, class_TokenItem>();
 
-        public bool AddBenchmarkToken(string name,string code,string key,int expired)
+        public bool AddBenchmarkToken(string name,string code,int expired)
         {
             
             if (!_benchmarkTokensList.ContainsKey(name))
@@ -28,7 +28,6 @@ namespace iKCoder_Platform_SDK_Kit
                 class_TokenItem newBenchmarkToken = new class_TokenItem();
                 newBenchmarkToken.productName = name;
                 string resultCode = code;
-                newBenchmarkToken.productKey = key;
                 newBenchmarkToken.productCode = resultCode;
                 newBenchmarkToken.isBenchmark = true;
                 newBenchmarkToken.expireMinutes = expired;
@@ -106,17 +105,13 @@ namespace iKCoder_Platform_SDK_Kit
                 {
                     if (_benchmarkTokensList.ContainsKey(activeToken.productName))
                     {
-                        string resuktDes = "";
-                        class_Security_DES objectDes = new class_Security_DES(activeToken.productKey);
-                        objectDes.DESDecoding(_benchmarkTokensList[activeToken.productName].productCode, out resuktDes);
-                        if (_benchmarkTokensList[activeToken.productName].productCode == resuktDes)
+                        if (_benchmarkTokensList[activeToken.productName].productCode == activeToken.productCode)
                         {
                             string newGuid = "";
                             registriedToken = new class_TokenItem();
                             registriedToken.productName = activeToken.productName;
                             registriedToken.isBenchmark = false;
                             registriedToken.productCode = activeToken.productCode;
-                            registriedToken.productKey = activeToken.productKey;
                             registriedToken.registryTime = DateTime.Now;
                             registriedToken.registryID = newGuid;
                             registriedToken.expireMinutes = _benchmarkTokensList[activeToken.productName].expireMinutes;

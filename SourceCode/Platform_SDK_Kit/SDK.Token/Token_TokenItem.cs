@@ -30,13 +30,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             set;
             get;
-        }
-
-        public string productKey
-        {
-            set;
-            get;
-        }
+        }       
 
         public string registryID
         {
