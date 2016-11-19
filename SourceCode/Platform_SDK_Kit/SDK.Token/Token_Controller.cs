@@ -108,6 +108,7 @@ namespace iKCoder_Platform_SDK_Kit
                         if (_benchmarkTokensList[activeToken.productName].productCode == activeToken.productCode)
                         {
                             string newGuid = "";
+                            newGuid = Guid.NewGuid().ToString();
                             registriedToken = new class_TokenItem();
                             registriedToken.productName = activeToken.productName;
                             registriedToken.isBenchmark = false;

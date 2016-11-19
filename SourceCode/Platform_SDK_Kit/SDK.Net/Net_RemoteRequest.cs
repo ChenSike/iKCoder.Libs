@@ -61,17 +61,14 @@ namespace iKCoder_Platform_SDK_Kit
                 requestStream.Write(bytes, 0, bytes.Length);
                 requestStream.Flush();
                 requestStream.Close();
-                Stream responseStream = ((HttpWebResponse)request.GetResponse()).GetResponseStream();
-                byte[] buffer2 = null;
-                BinaryReader reader = new BinaryReader(responseStream);
-                buffer2 = reader.ReadBytes(buffersize);
-                reader.Close();
-                responseStream.Close();
-                return System.Text.Encoding.Default.GetString(buffer2);
+                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.Default);
+                string result = "";
+                result = responseStream.ReadToEnd();
+                return result;
             }
-            catch
+            catch(Exception err)
             {
-                return null;
+                return err.Message;
             }
         }
 

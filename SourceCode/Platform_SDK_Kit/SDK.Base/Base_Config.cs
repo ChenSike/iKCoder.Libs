@@ -64,6 +64,12 @@ namespace iKCoder_Platform_SDK_Kit
             isDesMode = true;
         }
 
+        public void SwitchToDESModeON()
+        {
+            _objectDes = new class_Security_DES(_desKey);
+            isDesMode = true;
+        }
+
         public void SwitchToDESModeOFF()
         {
             isDesMode = false;
