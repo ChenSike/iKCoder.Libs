@@ -66,17 +66,15 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 try
                 {
-                    if (ActiveSqlConnectionCollection[key].ActiveConnection.State != ConnectionState.Closed)
-                    {
-                        ActiveSqlConnectionCollection[key].ActiveConnection.Close();
-                        ActiveSqlConnectionCollection.Remove(key);
-                    }
+                    if (ActiveSqlConnectionCollection[key].ActiveConnection.State != ConnectionState.Closed)                    
+                        ActiveSqlConnectionCollection[key].ActiveConnection.Close();                                            
                 }
                 catch(class_Base_AppExceptions err)
                 {
                     continue;
                 }
             }
+            ActiveSqlConnectionCollection.Clear();
         }
 
         public bool Active_CloseActiveConnection(string Key)
