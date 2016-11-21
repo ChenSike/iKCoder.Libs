@@ -10,7 +10,7 @@ namespace iKCoder_Platform_SDK_Kit
     public class class_Data_SqlDataHelper
     {       
 
-        public static bool StaticGetColumnData(DataRow activeDR, string activeColumnName,out string result)
+        public static bool GetColumnData(DataRow activeDR, string activeColumnName,out string result)
         {
             result = "";
             if (activeDR != null)
@@ -29,7 +29,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public static bool StaticGetColumnsFromDT(DataTable activeDT, out List<string> result)
+        public static bool GetColumnsFromDT(DataTable activeDT, out List<string> result)
         {
             result = null;
             if (activeDT != null)
@@ -45,7 +45,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public static bool StaticGetColumnsTypeFromDT(DataTable activeDT, out Dictionary<string, Type> result)
+        public static bool GetColumnsTypeFromDT(DataTable activeDT, out Dictionary<string, Type> result)
         {
             result = null;
             if (activeDT != null)
@@ -61,7 +61,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public static bool StaticGetActiveRow(DataTable activeDT, int activeRowIndex, out DataRow result)
+        public static bool GetActiveRow(DataTable activeDT, int activeRowIndex, out DataRow result)
         {
             result = null;
             if (activeDT != null)
@@ -85,7 +85,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public static bool StaticActionExecuteForDS( SqlConnection activeconnection, string executeSql,out DataSet resultDS)
+        public static bool ActionExecuteForDS( SqlConnection activeconnection, string executeSql,out DataSet resultDS)
         {
             resultDS = null;
             try
@@ -113,7 +113,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static bool StaticActionExecuteForDS(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
+        public static bool ActionExecuteStoreProcedureForDS(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
         {
             resultDS = null;
             try
@@ -127,7 +127,7 @@ namespace iKCoder_Platform_SDK_Kit
                         SqlCommand cmd = new SqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.ActiveParameters)                        
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())                        
                             cmd.Parameters.Add(activeParameter);                        
                         cmd.Connection = activeconnection;                        
                         SqlDataAdapter sda = new SqlDataAdapter(cmd);
@@ -139,13 +139,13 @@ namespace iKCoder_Platform_SDK_Kit
                         return false;
                 }
             }
-            catch(class_Base_AppExceptions err)
+            catch
             {
                 return false;
             }
         }
 
-        public static bool ActionExecuteForDT(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
+        public static bool ActionExecuteStoreProcedureForDT(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
         {
             resultDT = null;
             try
@@ -159,7 +159,7 @@ namespace iKCoder_Platform_SDK_Kit
                         SqlCommand cmd = new SqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.ActiveParameters)
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
                         {
                             SqlParameter newParameter = cmd.CreateParameter();
                             newParameter.ParameterName = activeParameter.ParameterName;
@@ -178,13 +178,13 @@ namespace iKCoder_Platform_SDK_Kit
                         return false;
                 }
             }
-            catch(class_Base_AppExceptions err)
+            catch
             {
                 return false;
             }
         }
 
-        public static bool ActionExecuteForDT(SqlConnection activeconnection,string executeSql, out DataTable resultDT)
+        public static bool ActionExecuteSQLForDT(SqlConnection activeconnection,string executeSql, out DataTable resultDT)
         {
             resultDT = null;
             try
@@ -206,13 +206,13 @@ namespace iKCoder_Platform_SDK_Kit
                         return false;
                 }
             }
-            catch(class_Base_AppExceptions err)
+            catch
             {
                 return false;
             }
         }
 
-        public static bool ActionExecuteForNonQuery(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry)
+        public static bool ActionExecuteSPForNonQuery(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry)
         {
             try
             {
@@ -227,7 +227,7 @@ namespace iKCoder_Platform_SDK_Kit
                             SqlCommand cmd = new SqlCommand();
                             cmd.CommandText = activeSPEntry.SPName;
                             cmd.CommandType = CommandType.StoredProcedure;
-                            foreach (SqlParameter activeParameter in activeSPEntry.ActiveParameters)
+                            foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
                             {
                                 SqlParameter newParameter = new SqlParameter();
                                 newParameter.ParameterName = activeParameter.ParameterName;
@@ -278,11 +278,16 @@ namespace iKCoder_Platform_SDK_Kit
                         return false;
                 }
             }
-            catch(class_Base_AppExceptions err)
+            catch
             {
                 return false;
             }
-        }        
+        }
+        
+        public static string ActionConvertDTtoXMLString(DataTable activeDataTable)
+        {
+            return "";
+        }
 
     }
 }

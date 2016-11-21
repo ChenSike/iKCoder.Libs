@@ -28,7 +28,7 @@ namespace iKCoder_Platform_SDK_Kit
                     DataTable TablesInfo = new DataTable();
                     DataTable ColumnInfo = new DataTable();
                     DataTable TypesInfo = new DataTable();
-                    if (class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getALLTables, out TablesInfo))
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TablesInfo))
                     {
                         if (TablesInfo.Rows.Count > 0)
                         {
@@ -36,9 +36,9 @@ namespace iKCoder_Platform_SDK_Kit
                             {
                                 string sql_getALLColumns = "select * from sys.syscolumns";
                                 string tableName = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "name", out tableName);
+                                class_Data_SqlDataHelper.GetColumnData(activeDR_1, "name", out tableName);
                                 string objectID = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "object_id", out objectID);
+                                class_Data_SqlDataHelper.GetColumnData(activeDR_1, "object_id", out objectID);
                                 if (tableName != "")
                                 {
                                     if (objectID != "")
@@ -47,7 +47,7 @@ namespace iKCoder_Platform_SDK_Kit
                                         List<string> activeColumn = new List<string>();
                                         List<string> activeKeyColumn = new List<string>();
                                         List<string> filterColumn = new List<string>();                                        
-                                        if (class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getALLColumns, out ColumnInfo))
+                                        if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out ColumnInfo))
                                         {
                                             StringBuilder sql_CreateNewSp = new StringBuilder("IF OBJECTPROPERTY(OBJECT_ID(N'SPA_Operation_" + tableName + "'), N'IsProcedure') = 1");
                                             sql_CreateNewSp.AppendLine();
@@ -64,17 +64,17 @@ namespace iKCoder_Platform_SDK_Kit
                                             {
                                                 string sql_getALLTypes = "select * from sys.types";
                                                 string columnname = "";
-                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "name", out columnname);
+                                                class_Data_SqlDataHelper.GetColumnData(activeDR_2, "name", out columnname);
                                                 string typeid = "";
                                                 string length = "";
                                                 string status = "";
-                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "xtype", out typeid);
-                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "status", out status);
-                                                class_Data_SqlDataHelper.StaticGetColumnData(activeDR_2, "prec", out length);
+                                                class_Data_SqlDataHelper.GetColumnData(activeDR_2, "xtype", out typeid);
+                                                class_Data_SqlDataHelper.GetColumnData(activeDR_2, "status", out status);
+                                                class_Data_SqlDataHelper.GetColumnData(activeDR_2, "prec", out length);
                                                 sql_getALLTypes = sql_getALLTypes + " where system_type_id=" + typeid;
-                                                class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getALLTypes, out TypesInfo);
+                                                class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTypes, out TypesInfo);
                                                 string typename = "";
-                                                class_Data_SqlDataHelper.StaticGetColumnData(TypesInfo.Rows[0], "name", out typename);
+                                                class_Data_SqlDataHelper.GetColumnData(TypesInfo.Rows[0], "name", out typename);
                                                 if (typename.Contains("nvarchar"))
                                                 {
                                                     if (Int32.Parse(length) < 0)
@@ -213,11 +213,11 @@ namespace iKCoder_Platform_SDK_Kit
                 if (ActiveConnection != null)
                 {                                       
                     DataTable TablesInfo = new DataTable();
-                    class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getALLTables, out TablesInfo);
+                    class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TablesInfo);
                     foreach (DataRow activeDR_1 in TablesInfo.Rows)
                     {
                         string tableName = "";
-                        class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "name", out tableName);
+                        class_Data_SqlDataHelper.GetColumnData(activeDR_1, "name", out tableName);
                         result.Add(tableName);
                     }
                     return result;
@@ -241,11 +241,11 @@ namespace iKCoder_Platform_SDK_Kit
                 if (ActiveConnection != null)
                 {                                    
                     DataTable TablesInfo = new DataTable();
-                    class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getALLTables, out TablesInfo);
+                    class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TablesInfo);
                     foreach (DataRow activeDR_1 in TablesInfo.Rows)
                     {
                         string tableName = "";
-                        class_Data_SqlDataHelper.StaticGetColumnData(activeDR_1, "name", out tableName);
+                        class_Data_SqlDataHelper.GetColumnData(activeDR_1, "name", out tableName);
                         result.Add(tableName);
                     }
                     return result;
@@ -279,22 +279,22 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool Action_ExecuteCreateSql(List<string> activeTableStructes, string activeDBName,string tableName, SqlConnection ActiveConnection)
+        public bool ActionExecuteCreateSql(List<string> activeTableStructes, string activeDBName,string tableName, SqlConnection activeConnection)
         {
             try
             {
-                if (activeTableStructes.Count == 0 || activeDBName == "" || ActiveConnection == null)
+                if (activeTableStructes.Count == 0 || activeDBName == "" || activeConnection == null)
                     return false;
                 else
                {
                     StringBuilder sql_CreateNewSp = new StringBuilder("IF OBJECTPROPERTY(OBJECT_ID(N'" + tableName + "'), N'IsTable') = 1");
                     sql_CreateNewSp.AppendLine();
                     sql_CreateNewSp.AppendLine("DROP TABLE " + tableName);
-                    class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
+                    class_Data_SqlDataHelper.ActionExecuteForNonQuery(activeConnection, sql_CreateNewSp.ToString());
                     string sql = ActionBuildCreateSqlString(activeTableStructes, tableName, activeDBName);
                     if (sql != "")
                     {
-                        if (class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql))
+                        if (class_Data_SqlDataHelper.ActionExecuteForNonQuery(activeConnection, sql))
                             return true;
                         else
                             return false;
@@ -310,20 +310,20 @@ namespace iKCoder_Platform_SDK_Kit
         }
 
 
-        public Dictionary<string, class_Data_SqlSPEntry> Action_AutoLoadingAllSPS(SqlConnection ActiveConnection,string SPType)
+        public Dictionary<string, class_Data_SqlSPEntry> ActionAutoLoadingAllSPS(SqlConnection activeConnection,string SPType)
         {
-            if (ActiveConnection != null)
+            if (activeConnection != null)
             {                               
                 string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0)";
                 DataTable activeSPSDT=new DataTable();
                 Dictionary<string, class_Data_SqlSPEntry> result = new Dictionary<string,class_Data_SqlSPEntry>();
-                if (class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_getallsps, out activeSPSDT))
+                if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_getallsps, out activeSPSDT))
                 {
                     foreach (DataRow activeRow in activeSPSDT.Rows)
                     {
                         class_Data_SqlSPEntry newSPEntry = new class_Data_SqlSPEntry();
                         string spName = "";
-                        class_Data_SqlDataHelper.StaticGetColumnData(activeRow, "name", out spName);
+                        class_Data_SqlDataHelper.GetColumnData(activeRow, "name", out spName);
                         if (SPType != "")
                         {
                             if (SPType == class_Data_SqlSPEntryType.SelectAction)
@@ -340,37 +340,37 @@ namespace iKCoder_Platform_SDK_Kit
                         newSPEntry.SPName = spName;
                         newSPEntry.KeyName = spName;                        
                         string spObjectID = "";
-                        class_Data_SqlDataHelper.StaticGetColumnData(activeRow, "object_id", out spObjectID);
+                        class_Data_SqlDataHelper.GetColumnData(activeRow, "object_id", out spObjectID);
                         string sql_paramters = "select * from sys.all_parameters where object_id = " + spObjectID;
                         DataTable activeSPParametersDT=new DataTable();
                         string sql_paramstype = "select * from sys.types";
                         DataTable paramstypeDT=new DataTable();
-                        if (!class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_paramstype, out paramstypeDT))
+                        if (!class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramstype, out paramstypeDT))
                         {
                             return null;
                         }
-                        if (class_Data_SqlDataHelper.ActionExecuteForDT(ActiveConnection, sql_paramters, out activeSPParametersDT))
+                        if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramters, out activeSPParametersDT))
                         {
                             foreach (DataRow activeParamterRow in activeSPParametersDT.Rows)
                             {
                                 string activeSystemType_ID = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeParamterRow, "system_type_id", out activeSystemType_ID);
+                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "system_type_id", out activeSystemType_ID);
                                 string activeUserType_ID = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeParamterRow, "user_type_id", out activeUserType_ID);
+                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "user_type_id", out activeUserType_ID);
                                 string activeParamsMaxLength = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeParamterRow, "max_length", out activeParamsMaxLength);
+                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out activeParamsMaxLength);
                                 string activeParamsName = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeParamterRow, "name", out activeParamsName);
+                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "name", out activeParamsName);
                                 string activeIsOutPut = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeParamterRow, "is_output", out activeIsOutPut);
+                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "is_output", out activeIsOutPut);
                                 string max_length = "";
-                                class_Data_SqlDataHelper.StaticGetColumnData(activeParamterRow, "max_length", out max_length);
+                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out max_length);
                                 string activeDBType="";
                                 DataRow[] dbtyps = paramstypeDT.Select("system_type_id=" + activeSystemType_ID + " and user_type_id=" + activeUserType_ID);
                                 if (dbtyps.Length > 0)
                                 {
-                                    class_Data_SqlDataHelper.StaticGetColumnData(dbtyps[0], "name", out activeDBType);
-                                    class_Data_SqlSPEntry.AddSPParameter(ref newSPEntry, activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);
+                                    class_Data_SqlDataHelper.GetColumnData(dbtyps[0], "name", out activeDBType);
+                                    newSPEntry.SetNewParameter(activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);                                    
                                 }
                                 else
                                     continue;
@@ -389,93 +389,51 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public DataTable ExecuteGetSPS(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server)
+        public DataTable ExecuteSelectSPForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             DataTable dt = new DataTable();
             if (activeEntry != null)
             {
-                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "get");
-                class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();                
-                class_Data_SqlDataHelper.ActionExecuteForDT(SqlHelperObj.Get_ActiveConnection(Server),activeEntry, out dt);
+                activeEntry.ModifyParameterValue("@operation", "get");
+                class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
             }
             else
                 return null;
         }
 
-        public bool ExecuteInsertSPS(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteInsertSP(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             if (activeEntry != null)
             {
-                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "insert");
-                foreach (string activeParameter in ValueMaping.Keys)
-                {
-                    int activeParametersIndex = class_Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
-                    if (activeParametersIndex != -1)
-                    {
-                        SqlParameter activeExistedParamter = activeEntry.ActiveParameters[activeParametersIndex];
-                        if (!SizeMaping.ContainsKey(activeParameter))
-                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
-                        else
-                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
-
-                    }
-                }                
-                class_Data_SqlDataHelper.ActionExecuteForNonQuery(SqlHelperObj.Get_ActiveConnection(Server), activeEntry);
+                activeEntry.ModifyParameterValue("@operation", "insert");
+                class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
             else
                 return false;
         }
 
-        public bool ExecuteUpdateSPS(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteUpdateSP(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             if (activeEntry != null)
             {
-                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "update");                                
-                List<string> filterExclude=new List<string>();
-                filterExclude.Add("@operation");
-                class_Data_SqlSPEntry.ModifyExcludeSPParameter(ref activeEntry, ValueMaping, filterExclude);
-                foreach (string activeParameter in ValueMaping.Keys)
-                {
-                    int activeParametersIndex = class_Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
-                    if (activeParametersIndex != -1)
-                    {
-                        SqlParameter activeExistedParamter = activeEntry.ActiveParameters[activeParametersIndex];
-                        if (!SizeMaping.ContainsKey(activeParameter))
-                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
-                        else
-                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
-
-                    }                      
-                }
-                class_Data_SqlDataHelper.ActionExecuteForNonQuery(SqlHelperObj.Get_ActiveConnection(Server), activeEntry);
+                activeEntry.ModifyParameterValue("@operation", "update");
+                class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
             else
                 return false;
         }
 
-        public bool ExecuteDeleteSPS(class_Data_SqlSPEntry activeEntry,class_Data_SqlConnectionHelper SqlHelperObj, string Server, Dictionary<string, object> ValueMaping, Dictionary<string, int> SizeMaping)
+        public bool ExecuteDeleteSP(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             if (activeEntry != null)
             {
+                activeEntry.ModifyParameterValue("@operation", "delete");
 
-                class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, "@operation", SqlDbType.NVarChar, ParameterDirection.Input, "delete");
-                foreach (string activeParameter in ValueMaping.Keys)
-                {
-                    int activeParametersIndex = class_Data_SqlSPEntry.GetSPParameterIndex(ref activeEntry, activeParameter);
-                    if (activeParametersIndex != -1)
-                    {
-                        SqlParameter activeExistedParamter = activeEntry.ActiveParameters[activeParametersIndex];
-                        if (!SizeMaping.ContainsKey(activeParameter))
-                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter]);
-                        else
-                            class_Data_SqlSPEntry.ModifySPParameter(ref activeEntry, activeParameter, activeExistedParamter.SqlDbType, activeExistedParamter.Direction, ValueMaping[activeParameter], SizeMaping[activeParameter]);
-
-                    }
-                }
-                class_Data_SqlDataHelper.ActionExecuteForNonQuery(SqlHelperObj.Get_ActiveConnection(Server),activeEntry);
+                class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
             else
