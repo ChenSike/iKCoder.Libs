@@ -120,7 +120,7 @@ namespace iKCoder_Platform_SDK_Kit
                                             sql_insertValueColumns = sql_insertValueColumns.Remove(sql_insertValueColumns.Length - 1, 1);
                                             sql_CreateNewSp.AppendLine(")");
                                             sql_CreateNewSp.AppendLine("AS");
-                                            sql_CreateNewSp.AppendLine("if @operation='get'");
+                                            sql_CreateNewSp.AppendLine("if @operation='select'");
                                             sql_CreateNewSp.AppendLine("begin");
                                             sql_CreateNewSp.AppendLine("select * from [" + tableName + "]");
                                             sql_CreateNewSp.AppendLine("end");
@@ -184,6 +184,15 @@ namespace iKCoder_Platform_SDK_Kit
                                             sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
                                             sql_CreateNewSp.AppendLine("");
                                             //}
+                                            sql_CreateNewSp.AppendLine("end");
+                                            sql_CreateNewSp.AppendLine("else if @operation='selectkey'");
+                                            sql_CreateNewSp.AppendLine("begin");
+                                            sql_CreateNewSp.AppendLine("select * from [" + tableName + "] where ");
+                                            foreach (string keyColumn in activeKeyColumn)
+                                            {
+                                                sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " or");
+                                            }
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 3, 3);
                                             sql_CreateNewSp.AppendLine("end");
                                             class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
 
@@ -394,8 +403,22 @@ namespace iKCoder_Platform_SDK_Kit
             DataTable dt = new DataTable();
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "get");
+                activeEntry.ModifyParameterValue("@operation", "select");
                 class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
+                return dt;
+            }
+            else
+                return null;
+        }
+
+        public DataTable ExecuteSelectSPKeyForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            DataTable dt = new DataTable();
+            if (activeEntry != null)
+            {
+                activeEntry.ModifyParameterValue("@operation", "selectkey");
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
             }

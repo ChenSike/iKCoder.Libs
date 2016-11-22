@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
+using System.Xml;
 
 namespace iKCoder_Platform_SDK_Kit
 {
@@ -286,7 +287,29 @@ namespace iKCoder_Platform_SDK_Kit
         
         public static string ActionConvertDTtoXMLString(DataTable activeDataTable)
         {
-            return "";
+            if (activeDataTable == null)
+                return string.Empty;
+            else
+            {
+                XmlDocument resultDoc = new XmlDocument();
+                resultDoc.LoadXml("<root></root>");
+                XmlNode rootNode = resultDoc.SelectSingleNode("/root");
+                int rowIndex = 1;
+                foreach(DataRow dr in activeDataTable.Rows)
+                {
+                    XmlNode newRowNode = class_XmlHelper.CreateNode(resultDoc, "row", "");
+                    class_XmlHelper.SetAttribute(newRowNode, "index", rowIndex.ToString());                    
+                    foreach(DataColumn dc in activeDataTable.Columns)
+                    {
+                        string columnValue = "";
+                        GetColumnData(dr,dc.ColumnName,out columnValue);
+                        class_XmlHelper.SetAttribute(newRowNode, dc.ColumnName, columnValue);
+                    }
+                    rootNode.AppendChild(newRowNode);
+                }
+                class_XmlHelper.SetAttribute(rootNode, "itemcount", rowIndex.ToString());
+                return resultDoc.OuterXml;
+            }
         }
 
     }
