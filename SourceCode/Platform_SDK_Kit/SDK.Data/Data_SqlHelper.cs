@@ -193,6 +193,7 @@ namespace iKCoder_Platform_SDK_Kit
                                                 sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " or");
                                             }
                                             sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 3, 3);
+                                            sql_CreateNewSp.AppendLine("");
                                             sql_CreateNewSp.AppendLine("end");
                                             class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
 
