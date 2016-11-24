@@ -154,27 +154,6 @@ namespace iKCoder_Platform_SDK_Kit
                                             }
                                             sql_CreateNewSp.AppendLine("else if @operation='delete'");
                                             sql_CreateNewSp.AppendLine("begin");
-                                            /*if (activeKeyColumn.Count > 0)
-                                            {
-                                                sql_CreateNewSp.AppendLine("if ");
-                                                foreach (string keyColumn in activeKeyColumn)
-                                                {
-                                                    sql_CreateNewSp.Append("@" + keyColumn + "<>'' and");
-                                                }
-                                                sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
-                                                sql_CreateNewSp.AppendLine("begin");
-                                                sql_CreateNewSp.AppendLine("delete from " + tableName);
-                                                sql_CreateNewSp.AppendLine("where ");
-                                                foreach (string keyColumn in activeKeyColumn)
-                                                {
-                                                    sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " and");
-                                                }
-                                                sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
-                                                sql_CreateNewSp.AppendLine();
-                                                sql_CreateNewSp.AppendLine("end");
-                                            }
-                                            else
-                                            {*/
                                             sql_CreateNewSp.AppendLine("delete from " + tableName);
                                             sql_CreateNewSp.AppendLine(" where ");
                                             foreach (string keyColumn in activeKeyColumn)
@@ -182,13 +161,22 @@ namespace iKCoder_Platform_SDK_Kit
                                                 sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " and");
                                             }
                                             sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
-                                            sql_CreateNewSp.AppendLine("");
-                                            //}
+                                            sql_CreateNewSp.AppendLine("");                       
                                             sql_CreateNewSp.AppendLine("end");
                                             sql_CreateNewSp.AppendLine("else if @operation='selectkey'");
                                             sql_CreateNewSp.AppendLine("begin");
                                             sql_CreateNewSp.AppendLine("select * from [" + tableName + "] where ");
                                             foreach (string keyColumn in activeKeyColumn)
+                                            {
+                                                sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " or");
+                                            }
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 3, 3);
+                                            sql_CreateNewSp.AppendLine("");
+                                            sql_CreateNewSp.AppendLine("end");
+                                            sql_CreateNewSp.AppendLine("else if @operation='selectcondition'");
+                                            sql_CreateNewSp.AppendLine("begin");
+                                            sql_CreateNewSp.AppendLine("select * from [" + tableName + "] where ");
+                                            foreach (string keyColumn in activeColumn)
                                             {
                                                 sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " or");
                                             }
@@ -419,6 +407,20 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 activeEntry.ModifyParameterValue("@operation", "selectkey");
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
+                return dt;
+            }
+            else
+                return null;
+        }
+
+        public DataTable ExecuteSelectSPConditionForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            DataTable dt = new DataTable();
+            if (activeEntry != null)
+            {
+                activeEntry.ModifyParameterValue("@operation", "selectcondition");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;

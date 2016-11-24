@@ -149,6 +149,14 @@ namespace iKCoder_Platform_SDK_Kit
             this.ParametersCollection.Clear();
         }
 
+        public void ClearAllParamsValues()
+        {
+            foreach (string paramName in ParametersCollection.Keys)
+            {
+                this.ParametersCollection[paramName].Value = string.Empty;
+            }
+        }
+
         public bool RemoveParam(string Paraname)
         {
             if (ParametersCollection.ContainsKey(Paraname))
