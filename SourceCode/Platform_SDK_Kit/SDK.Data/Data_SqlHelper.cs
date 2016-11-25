@@ -46,7 +46,8 @@ namespace iKCoder_Platform_SDK_Kit
                                         sql_getALLColumns = sql_getALLColumns + " where id='" + objectID + "'";
                                         List<string> activeColumn = new List<string>();
                                         List<string> activeKeyColumn = new List<string>();
-                                        List<string> filterColumn = new List<string>();                                        
+                                        List<string> filterColumn = new List<string>();
+                                        List<string> filterTypeList = new List<string>();
                                         if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out ColumnInfo))
                                         {
                                             StringBuilder sql_CreateNewSp = new StringBuilder("IF OBJECTPROPERTY(OBJECT_ID(N'SPA_Operation_" + tableName + "'), N'IsProcedure') = 1");
@@ -105,6 +106,8 @@ namespace iKCoder_Platform_SDK_Kit
                                                     sql_CreateNewSp.AppendLine("@" + columnname + " " + typename + " = null ,");
                                                     filterColumn.Add(columnname);
                                                 }
+                                                if (typename.Contains("ntext"))
+                                                    filterTypeList.Add(columnname);
                                                 activeColumn.Add(columnname);
                                                 if (status == "128")
                                                     activeKeyColumn.Add(columnname);
@@ -176,9 +179,10 @@ namespace iKCoder_Platform_SDK_Kit
                                             sql_CreateNewSp.AppendLine("else if @operation='selectcondition'");
                                             sql_CreateNewSp.AppendLine("begin");
                                             sql_CreateNewSp.AppendLine("select * from [" + tableName + "] where ");
-                                            foreach (string keyColumn in activeColumn)
+                                            foreach (string selectColumn in activeColumn)
                                             {
-                                                sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " or ");
+                                                if(!filterTypeList.Contains(selectColumn))
+                                                    sql_CreateNewSp.Append(selectColumn + "=@" + selectColumn + " or ");
                                             }
                                             sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
                                             sql_CreateNewSp.AppendLine("");
