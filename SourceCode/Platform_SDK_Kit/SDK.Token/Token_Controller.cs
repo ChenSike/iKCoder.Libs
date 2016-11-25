@@ -67,8 +67,9 @@ namespace iKCoder_Platform_SDK_Kit
             }           
         }
         
-        public bool VerifyToken(string tokenGuid)
+        public bool VerifyToken(string tokenGuid,out string fromProduct)
         {
+            fromProduct = "";
             if (string.IsNullOrEmpty(tokenGuid))
                 return false;
             else
@@ -83,6 +84,7 @@ namespace iKCoder_Platform_SDK_Kit
                             _refPageSession.Remove(tokenGuid);
                             return false;
                         }
+                        fromProduct = activeToken.productName;
                         return true;
                     }
                     else
