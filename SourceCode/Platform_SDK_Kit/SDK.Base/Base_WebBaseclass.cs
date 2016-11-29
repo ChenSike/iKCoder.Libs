@@ -80,6 +80,16 @@ namespace iKCoder_Platform_SDK_Kit
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(newNode);
         }
 
+        protected void AddResponseMessageToResponseDOC(string header, string code,Dictionary<string,string> attrsList)
+        {
+            XmlNode newNode = class_XmlHelper.CreateNode(RESPONSEDOCUMENT, "msg", "");
+            class_XmlHelper.SetAttribute(newNode, "header", header);
+            class_XmlHelper.SetAttribute(newNode, "code", code);
+            foreach(string attrName in attrsList.Keys)            
+                class_XmlHelper.SetAttribute(newNode, attrName, attrsList[attrName]);            
+            RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(newNode);
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {            
             REQUESTIP = Page.Request.UserHostAddress;
