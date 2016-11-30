@@ -51,6 +51,15 @@ namespace iKCoder_Platform_SDK_Kit
                 return "";
         }
 
+        protected HttpCookie GetRequestCookie(string cookieName)
+        {
+            HttpCookie activeCookie = Request.Cookies.Get(cookieName);
+            if (activeCookie != null)
+                return activeCookie;
+            else
+                return null;
+        }
+
         protected virtual void BeforeLoad()
         {
 
