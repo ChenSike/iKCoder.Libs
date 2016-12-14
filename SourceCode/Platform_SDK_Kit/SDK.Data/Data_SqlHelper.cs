@@ -433,6 +433,48 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
+        public SqlDataReader ExecuteSelectSPConditionForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {            
+           SqlDataReader activeDataReader = null;
+            if (activeEntry != null)
+            {
+                activeEntry.ModifyParameterValue("@operation", "selectcondition");
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
+                return activeDataReader;
+            }
+            else
+                return null;      
+        }
+
+        public SqlDataReader ExecuteSelectSPKeyForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {            
+             SqlDataReader activeDataReader = null;
+            if (activeEntry != null)
+            {
+                activeEntry.ModifyParameterValue("@operation", "selectkey");
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
+                return activeDataReader;
+            }
+            else
+                return null;    
+        }
+
+        public SqlDataReader ExecuteSelectSPForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            SqlDataReader activeDataReader = null;
+            if (activeEntry != null)
+            {
+                activeEntry.ModifyParameterValue("@operation", "select");
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
+                return activeDataReader;
+            }
+            else
+                return null;             
+        }
+
         public bool ExecuteInsertSP(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             if (activeEntry != null)

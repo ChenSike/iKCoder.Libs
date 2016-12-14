@@ -13,6 +13,7 @@ namespace iKCoder_Platform_SDK_Kit
         public const string openTagR = ">";
         public const string quote = "\"";
         public const string rootTag = "root";
+        public delegate void ActionForNode(XmlNode selectedNode);
 
         public static void AddAttribute(XmlNode parent, string name, string data)
         {
@@ -350,6 +351,15 @@ namespace iKCoder_Platform_SDK_Kit
                 }
             }
             return "";
+        }
+
+        public static void TraverseNodes(XmlNode Node,ActionForNode degActionForNode)
+        {
+            degActionForNode(Node);
+            foreach(XmlNode childNode in Node.ChildNodes)
+            {
+                TraverseNodes(childNode,degActionForNode);
+            }
         }
 
         public static string GetNodeValue(XmlDocument xmldoc, string nodePath)

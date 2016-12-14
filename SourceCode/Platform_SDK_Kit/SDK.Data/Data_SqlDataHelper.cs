@@ -114,6 +114,62 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
+        public static bool ActionExecuteForDR(SqlConnection activeconnection, string executeSql, out SqlDataReader refDataReader)
+        {
+            refDataReader = null;
+            try
+            {
+                if (executeSql == "")
+                    return false;
+                else
+                {
+                    if (activeconnection != null)
+                    {
+                        SqlCommand cmd = new SqlCommand(executeSql);
+                        cmd.Connection = activeconnection;
+                        refDataReader = cmd.ExecuteReader();
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+            }
+            catch (class_Base_AppExceptions err)
+            {
+                return false;
+            }
+        }
+
+        public static bool ActionExecuteStoreProcedureForDR(SqlConnection activeconnection, class_Data_SqlSPEntry activeSPEntry, out SqlDataReader refDataReader)
+        {
+            refDataReader = null;
+            try
+            {
+                if (activeSPEntry == null)
+                    return false;
+                else
+                {
+                    if (activeconnection != null)
+                    {
+                        SqlCommand cmd = new SqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = activeconnection;
+                        refDataReader = cmd.ExecuteReader();
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static bool ActionExecuteStoreProcedureForDS(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
         {
             resultDS = null;
