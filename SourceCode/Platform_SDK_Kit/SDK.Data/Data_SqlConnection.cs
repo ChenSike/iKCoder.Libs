@@ -4,20 +4,53 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
+using MySql.Data;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-
     public class class_Data_SqlConnectionItemEntry
     {
-        public string Key;
-        public string Server;
-        public string UserID;
-        public string Password;
+        public string Key
+        {
+            set;
+            get;
+        }
+
+        public string Server
+        {
+            set;
+            get;
+        }
+
+        public string UserID
+        {
+            set;
+            get;
+        }
+
+        public string Password
+        {
+            set;
+            get;
+        }
+
         public string ActiveDataBase;
         public string ConnectionString = "server={server};uid={uid};pwd={pwd};database={db}";
-        public SqlConnection ActiveConnection;
-    }
+
+        public void CreateNewConnectionObject(enum_SqlConnectionType activeType)
+        {
+            this.ActiveConnection.activeConnectionType = activeType;
+
+        }
+
+        protected Data_PlatformDBConnection ActiveConnection
+        {
+            set;
+            get;
+        }
+
+    }   
 
     public class class_Data_SqlConnectionHelper
     {        
@@ -27,7 +60,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (!ActiveSqlConnectionCollection.ContainsKey(Key))
             {
-                class_Data_SqlConnectionItemEntry newEntry = new class_Data_SqlConnectionItemEntry();
+                class_Data_SqlConnectionItemEntry newEntry = new class_Data_SqlConnectionItemEntry(); 
                 newEntry.Server = Server;
                 newEntry.UserID = UserID;
                 newEntry.Password = Password;
@@ -43,7 +76,7 @@ namespace iKCoder_Platform_SDK_Kit
                     ActiveSqlConnectionCollection.Add(Key, newEntry);
                     return true;
                 }
-                catch(class_Base_AppExceptions err)
+                catch
                 {                    
                     return false;
                 }
@@ -51,7 +84,7 @@ namespace iKCoder_Platform_SDK_Kit
             else
                 return false;
         }
-
+        
         public SqlConnection Get_ActiveConnection(string key)
         {
             if (ActiveSqlConnectionCollection.ContainsKey(key))
