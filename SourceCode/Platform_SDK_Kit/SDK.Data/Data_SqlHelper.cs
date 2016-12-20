@@ -208,6 +208,7 @@ namespace iKCoder_Platform_SDK_Kit
                     class_data_MySqlConnectionItem mysqlActiveConnectionItem = (class_data_MySqlConnectionItem)ActiveConnection;
                     string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);
                     DataTable TablesInfo = new DataTable();
+                    //Select * from INFORMATION_SCHEMA.COLUMNS Where table_schema = 'platformdata'
                     if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TablesInfo))
                     {
                         foreach(DataRow activeTable in TablesInfo.Rows)
