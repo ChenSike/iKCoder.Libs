@@ -11,18 +11,24 @@ namespace iKCoder_Platform_SDK_Kit
 
     public class class_Data_SqlStringHelper
     {             
-        public const string SQL_GETALLTABLES_FOR_SQL2008 = "select * from sys.tables where (type = 'U')";
-        public const string sql_GETALLTABLES_FOR_SQL2005 = "select * from sys.all_objects where (type = 'U')"; 
+        public static string SQL_GETALLTABLES_FOR_SQL2008 = "select * from sys.tables where (type = 'U')";
+        public static string SQL_GETALLTABLES_FOR_SQL2005 = "select * from sys.all_objects where (type = 'U')";
+        private static string SQL_GETALLTABLES_FOR_MYSQL = "select table_name from information_schema.tables where table_schema = {schemaname}";
+
+        public static string Get_SQL_GETALLTABLES_FOR_MYSQL(string schemaname)
+        {
+            return SQL_GETALLTABLES_FOR_MYSQL.Replace("{schemaname}", schemaname);
+        }
     }
 
     public class class_Data_SqlHelper
-    {        
+    {
 
-        public bool ActionAutoCreateSPS(SqlConnection ActiveConnection)
+        public bool ActionAutoCreateSPS(class_data_PlatformDBConnection ActiveConnection)
         {
             try
             {
-                if (ActiveConnection != null)
+                if (ActiveConnection != null && ActiveConnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                 {
                     string sql_getALLTables = class_Data_SqlStringHelper.SQL_GETALLTABLES_FOR_SQL2008;                                      
                     DataTable TablesInfo = new DataTable();
@@ -197,16 +203,30 @@ namespace iKCoder_Platform_SDK_Kit
                     }
                     return true;
                 }
+                else if (ActiveConnection != null && ActiveConnection.activeDatabaseType == enum_DatabaseType.MySql)
+                {
+                    class_data_MySqlConnectionItem mysqlActiveConnectionItem = (class_data_MySqlConnectionItem)ActiveConnection;
+                    string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);
+                    DataTable TablesInfo = new DataTable();
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TablesInfo))
+                    {
+                        foreach(DataRow activeTable in TablesInfo.Rows)
+                        {
+
+                        }
+                    }
+                    return true;
+                }
                 else
                     return false;
             }
-            catch(class_Base_AppExceptions err)
+            catch
             {
                 return false;
             }
         }
 
-        public List<string> ActionGetAllUserTables(SqlConnection ActiveConnection)
+        public List<string> ActionGetAllUserTables(class_data_PlatformDBConnection ActiveConnection)
         {             
             List<string> result = new List<string>();
             try
@@ -234,7 +254,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public List<string> ActionGetAllUserStoreProcs(SqlConnection ActiveConnection)
+        public List<string> ActionGetAllUserStoreProcs(class_data_PlatformDBConnection ActiveConnection)
         {
             List<string> result = new List<string>();
             try
@@ -281,7 +301,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool ActionExecuteCreateSql(List<string> activeTableStructes, string activeDBName,string tableName, SqlConnection activeConnection)
+        public bool ActionExecuteCreateSql(List<string> activeTableStructes, string activeDBName, string tableName, class_data_PlatformDBConnection activeConnection)
         {
             try
             {
@@ -312,7 +332,7 @@ namespace iKCoder_Platform_SDK_Kit
         }
 
 
-        public Dictionary<string, class_Data_SqlSPEntry> ActionAutoLoadingAllSPS(SqlConnection activeConnection,string SPType)
+        public Dictionary<string, class_Data_SqlSPEntry> ActionAutoLoadingAllSPS(class_data_PlatformDBConnection activeConnection, string SPType)
         {
             if (activeConnection != null)
             {                               
@@ -433,9 +453,9 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-        public SqlDataReader ExecuteSelectSPConditionForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        public class_data_PlatformDBDataReader ExecuteSelectSPConditionForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {            
-           SqlDataReader activeDataReader = null;
+           class_data_PlatformDBDataReader activeDataReader = null;
             if (activeEntry != null)
             {
                 activeEntry.ModifyParameterValue("@operation", "selectcondition");
@@ -447,9 +467,9 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;      
         }
 
-        public SqlDataReader ExecuteSelectSPKeyForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
-        {            
-             SqlDataReader activeDataReader = null;
+        public class_data_PlatformDBDataReader ExecuteSelectSPKeyForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            class_data_PlatformDBDataReader activeDataReader = null;
             if (activeEntry != null)
             {
                 activeEntry.ModifyParameterValue("@operation", "selectkey");
@@ -461,9 +481,9 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;    
         }
 
-        public SqlDataReader ExecuteSelectSPForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        public class_data_PlatformDBDataReader ExecuteSelectSPForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
-            SqlDataReader activeDataReader = null;
+            class_data_PlatformDBDataReader activeDataReader = null;
             if (activeEntry != null)
             {
                 activeEntry.ModifyParameterValue("@operation", "select");

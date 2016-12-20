@@ -37,26 +37,26 @@ namespace iKCoder_Platform_SDK_Kit
 
         public string ActiveDataBase;
         public string ConnectionString = "server={server};uid={uid};pwd={pwd};database={db}";
-
-        public void CreateNewConnectionObject(enum_SqlConnectionType activeType)
-        {
-            this.ActiveConnection.activeConnectionType = activeType;
-
-        }
-
-        protected Data_PlatformDBConnection ActiveConnection
+        
+        public class_data_PlatformDBConnection ActiveConnection
         {
             set;
             get;
         }
 
+        public enum_DatabaseType ActiveConnectionType
+        {
+            set;
+            get;
+        }
+                
     }   
 
     public class class_Data_SqlConnectionHelper
     {        
         public Dictionary<string, class_Data_SqlConnectionItemEntry> ActiveSqlConnectionCollection = new Dictionary<string, class_Data_SqlConnectionItemEntry>();
 
-        public bool Set_NewConnectionItem(string Key, string Server, string UserID, string Password,string activeDB)
+        public bool Set_NewConnectionItem(string Key, string Server, string UserID, string Password,string activeDB,enum_DatabaseType activeDBType)
         {
             if (!ActiveSqlConnectionCollection.ContainsKey(Key))
             {
@@ -69,26 +69,77 @@ namespace iKCoder_Platform_SDK_Kit
                 newEntry.ConnectionString = newEntry.ConnectionString.Replace("{uid}", UserID);
                 newEntry.ConnectionString = newEntry.ConnectionString.Replace("{pwd}", Password);
                 newEntry.ConnectionString = newEntry.ConnectionString.Replace("{db}", activeDB);
-                newEntry.ActiveConnection = new SqlConnection(newEntry.ConnectionString);
-                try
-                {
-                    newEntry.ActiveConnection.Open();
-                    ActiveSqlConnectionCollection.Add(Key, newEntry);
-                    return true;
-                }
-                catch
+                newEntry.ActiveConnectionType = activeDBType;
+                if(activeDBType == enum_DatabaseType.SqlServer)
                 {                    
+                    newEntry.ActiveConnection = new class_data_SqlServerConnectionItem();
+                    ((class_data_SqlServerConnectionItem)newEntry.ActiveConnection).ActiveConnection = new SqlConnection(newEntry.ConnectionString);
+                    try
+                    {
+                        ((class_data_SqlServerConnectionItem)newEntry.ActiveConnection).ActiveConnection.Open();
+                        ActiveSqlConnectionCollection.Add(Key, newEntry);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+                else if(activeDBType == enum_DatabaseType.MySql)
+                {
+                    newEntry.ActiveConnection = new class_data_MySqlConnectionItem();
+                    ((class_data_MySqlConnectionItem)newEntry.ActiveConnection).ActiveConnection = new MySqlConnection(newEntry.ConnectionString);
+                    try
+                    {
+                        ((class_data_MySqlConnectionItem)newEntry.ActiveConnection).ActiveConnection.Open();
+                        ActiveSqlConnectionCollection.Add(Key, newEntry);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
                     return false;
                 }
+               
             }
             else
                 return false;
         }
-        
-        public SqlConnection Get_ActiveConnection(string key)
+
+        public class_data_PlatformDBConnection Get_ActiveConnection(string key)
         {
             if (ActiveSqlConnectionCollection.ContainsKey(key))
                 return ActiveSqlConnectionCollection[key].ActiveConnection;
+            else
+                return null;
+        }
+                
+        public class_data_MySqlConnectionItem Get_ActiveMySqlConnection(string key)
+        {
+            if (ActiveSqlConnectionCollection.ContainsKey(key))
+            {
+                if (ActiveSqlConnectionCollection[key].ActiveConnectionType == enum_DatabaseType.MySql)
+                    return (class_data_MySqlConnectionItem)ActiveSqlConnectionCollection[key].ActiveConnection;
+                else
+                    return null;
+            }
+            else
+                return null;
+        }
+
+        public class_data_SqlServerConnectionItem Get_ActiveSqlServerConnection(string key)
+        {
+            if (ActiveSqlConnectionCollection.ContainsKey(key))
+            {
+                if (ActiveSqlConnectionCollection[key].ActiveConnectionType == enum_DatabaseType.SqlServer)
+                    return (class_data_SqlServerConnectionItem)ActiveSqlConnectionCollection[key].ActiveConnection;
+                else
+                    return null;
+            }
             else
                 return null;
         }
@@ -99,10 +150,12 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 try
                 {
-                    if (ActiveSqlConnectionCollection[key].ActiveConnection.State != ConnectionState.Closed)                    
-                        ActiveSqlConnectionCollection[key].ActiveConnection.Close();                                            
+                    if (ActiveSqlConnectionCollection[key].ActiveConnectionType == enum_DatabaseType.MySql)
+                        ((class_data_MySqlConnectionItem)ActiveSqlConnectionCollection[key].ActiveConnection).ActiveConnection.Close();
+                    if (ActiveSqlConnectionCollection[key].ActiveConnectionType == enum_DatabaseType.SqlServer)
+                        ((class_data_SqlServerConnectionItem)ActiveSqlConnectionCollection[key].ActiveConnection).ActiveConnection.Close();                    
                 }
-                catch(class_Base_AppExceptions err)
+                catch
                 {
                     continue;
                 }
@@ -114,7 +167,12 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (ActiveSqlConnectionCollection.ContainsKey(Key))
             {
-                ActiveSqlConnectionCollection[Key].ActiveConnection.Close();
+
+                if (ActiveSqlConnectionCollection[Key].ActiveConnectionType == enum_DatabaseType.MySql)
+                    ((class_data_MySqlConnectionItem)ActiveSqlConnectionCollection[Key].ActiveConnection).ActiveConnection.Close();
+                if (ActiveSqlConnectionCollection[Key].ActiveConnectionType == enum_DatabaseType.SqlServer)
+                    ((class_data_SqlServerConnectionItem)ActiveSqlConnectionCollection[Key].ActiveConnection).ActiveConnection.Close();                    
+
                 ActiveSqlConnectionCollection.Remove(Key);
                 return true;
             }

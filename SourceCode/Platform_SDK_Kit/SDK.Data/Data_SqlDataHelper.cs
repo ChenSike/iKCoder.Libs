@@ -5,6 +5,8 @@ using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using System.Xml;
+using MySql.Data;
+using MySql.Data.MySqlClient;
 
 namespace iKCoder_Platform_SDK_Kit
 {
@@ -21,7 +23,7 @@ namespace iKCoder_Platform_SDK_Kit
                     result = activeDR[activeColumnName].ToString();
                     return true;
                 }
-                catch(class_Base_AppExceptions err)
+                catch
                 {
                     return false;
                 }
@@ -86,7 +88,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public static bool ActionExecuteForDS( SqlConnection activeconnection, string executeSql,out DataSet resultDS)
+        public static bool ActionExecuteForDS(class_data_PlatformDBConnection activeconnection, string executeSql,out DataSet resultDS)
         {
             resultDS = null;
             try
@@ -95,69 +97,22 @@ namespace iKCoder_Platform_SDK_Kit
                     return false;
                 else
                 {
-                    if (activeconnection != null)
+                    if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                     {
-                        SqlCommand cmd = new SqlCommand(executeSql);                        
-                        cmd.Connection = activeconnection;
+                        SqlCommand cmd = new SqlCommand(executeSql);
+                        cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
                         SqlDataAdapter sda = new SqlDataAdapter(cmd);                        
                         resultDS = new DataSet();
                         sda.Fill(resultDS);
                         return true;
                     }
-                    else
-                        return false;
-                }
-            }
-            catch(class_Base_AppExceptions err)
-            {
-                return false;
-            }
-        }
-
-        public static bool ActionExecuteForDR(SqlConnection activeconnection, string executeSql, out SqlDataReader refDataReader)
-        {
-            refDataReader = null;
-            try
-            {
-                if (executeSql == "")
-                    return false;
-                else
-                {
-                    if (activeconnection != null)
+                    else if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
                     {
-                        SqlCommand cmd = new SqlCommand(executeSql);
-                        cmd.Connection = activeconnection;
-                        refDataReader = cmd.ExecuteReader();
-                        return true;
-                    }
-                    else
-                        return false;
-                }
-            }
-            catch (class_Base_AppExceptions err)
-            {
-                return false;
-            }
-        }
-
-        public static bool ActionExecuteStoreProcedureForDR(SqlConnection activeconnection, class_Data_SqlSPEntry activeSPEntry, out SqlDataReader refDataReader)
-        {
-            refDataReader = null;
-            try
-            {
-                if (activeSPEntry == null)
-                    return false;
-                else
-                {
-                    if (activeconnection != null)
-                    {
-                        SqlCommand cmd = new SqlCommand();
-                        cmd.CommandText = activeSPEntry.SPName;
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
-                            cmd.Parameters.Add(activeParameter);
-                        cmd.Connection = activeconnection;
-                        refDataReader = cmd.ExecuteReader();
+                        MySqlCommand cmd = new MySqlCommand(executeSql);
+                        cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                        MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
+                        resultDS = new DataSet();
+                        sda.Fill(resultDS);
                         return true;
                     }
                     else
@@ -170,7 +125,96 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static bool ActionExecuteStoreProcedureForDS(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
+        public static bool ActionExecuteForDR(class_data_PlatformDBConnection activeconnection, string executeSql, out class_data_PlatformDBDataReader refDataReader)
+        {
+            refDataReader = null;
+            try
+            {
+                if (executeSql == "")
+                    return false;
+                else
+                {
+                    if (activeconnection != null)
+                    {
+                        if (activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
+                        {
+                            SqlCommand cmd = new SqlCommand(executeSql);
+                            cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
+                            refDataReader = new class_data_PlatformDBDataReader();
+                            refDataReader.activeDatabaseType = enum_DatabaseType.SqlServer;
+                            ((class_data_SqlServerDataReader)refDataReader).ActiveDataReader = cmd.ExecuteReader();
+                            return true;
+                        }
+                        else if (activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
+                        {
+                            MySqlCommand cmd = new MySqlCommand(executeSql);
+                            cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                            refDataReader = new class_data_PlatformDBDataReader();
+                            refDataReader.activeDatabaseType = enum_DatabaseType.MySql;
+                            ((class_data_MySqlDataReader)refDataReader).ActiveDataReader = cmd.ExecuteReader();
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }                        
+                    }
+                    else
+                        return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool ActionExecuteStoreProcedureForDR(class_data_PlatformDBConnection activeconnection, class_Data_SqlSPEntry activeSPEntry, out class_data_PlatformDBDataReader refDataReader)
+        {
+            refDataReader = null;
+            try
+            {
+                if (activeSPEntry == null)
+                    return false;
+                else
+                {
+                    if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
+                    {
+                        SqlCommand cmd = new SqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
+                        refDataReader = new class_data_PlatformDBDataReader();
+                        refDataReader.activeDatabaseType = enum_DatabaseType.SqlServer;
+                        ((class_data_SqlServerDataReader)refDataReader).ActiveDataReader = cmd.ExecuteReader();
+                        return true;
+                    }
+                    else if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
+                    {
+                        MySqlCommand cmd = new MySqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                        refDataReader = new class_data_PlatformDBDataReader();
+                        refDataReader.activeDatabaseType = enum_DatabaseType.MySql;
+                        ((class_data_MySqlDataReader)refDataReader).ActiveDataReader = cmd.ExecuteReader();
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool ActionExecuteStoreProcedureForDS(class_data_PlatformDBConnection activeconnection, class_Data_SqlSPEntry activeSPEntry, out DataSet resultDS)
         {
             resultDS = null;
             try
@@ -179,58 +223,32 @@ namespace iKCoder_Platform_SDK_Kit
                     return false;
                 else
                 {
-                    if (activeconnection != null)
-                    {
-                        SqlCommand cmd = new SqlCommand();
-                        cmd.CommandText = activeSPEntry.SPName;
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())                        
-                            cmd.Parameters.Add(activeParameter);                        
-                        cmd.Connection = activeconnection;                        
-                        SqlDataAdapter sda = new SqlDataAdapter(cmd);
-                        resultDS = new DataSet();
-                        sda.Fill(resultDS);
-                        return true;
-                    }
-                    else
-                        return false;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public static bool ActionExecuteStoreProcedureForDT(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
-        {
-            resultDT = null;
-            try
-            {
-                if (activeSPEntry == null)
-                    return false;
-                else
-                {
-                    if (activeconnection != null)
+                    if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                     {
                         SqlCommand cmd = new SqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
                         foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
-                        {
-                            SqlParameter newParameter = cmd.CreateParameter();
-                            newParameter.ParameterName = activeParameter.ParameterName;
-                            newParameter.DbType = activeParameter.DbType;
-                            newParameter.Direction = activeParameter.Direction;
-                            newParameter.Value = activeParameter.Value;
-                            cmd.Parameters.Add(newParameter);
-                        }
-                        cmd.Connection = activeconnection;             
-                        SqlDataAdapter sda = new SqlDataAdapter(cmd);                        
-                        resultDT = new DataTable();
-                        sda.Fill(resultDT);
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
+                        SqlDataAdapter sda = new SqlDataAdapter(cmd);
+                        resultDS = new DataSet();
+                        sda.Fill(resultDS);
                         return true;
                     }
+                    else if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
+                    {
+                        MySqlCommand cmd = new MySqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                        MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
+                        resultDS = new DataSet();
+                        sda.Fill(resultDS);
+                        return true;
+                     }
                     else
                         return false;
                 }
@@ -241,7 +259,53 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static bool ActionExecuteSQLForDT(SqlConnection activeconnection,string executeSql, out DataTable resultDT)
+        public static bool ActionExecuteStoreProcedureForDT(class_data_PlatformDBConnection activeconnection, class_Data_SqlSPEntry activeSPEntry, out DataTable resultDT)
+        {
+            resultDT = null;
+            try
+            {
+                if (activeSPEntry == null)
+                    return false;
+                else
+                {
+
+                    if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
+                    {
+                        SqlCommand cmd = new SqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
+                        SqlDataAdapter sda = new SqlDataAdapter(cmd);
+                        resultDT = new DataTable();
+                        sda.Fill(resultDT);
+                        return true;
+                    }
+                    else if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
+                    {
+                        MySqlCommand cmd = new MySqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                        MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
+                        resultDT = new DataTable();
+                        sda.Fill(resultDT);
+                        return true;
+                     }
+                    else
+                        return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool ActionExecuteSQLForDT(class_data_PlatformDBConnection activeconnection, string executeSql, out DataTable resultDT)
         {
             resultDT = null;
             try
@@ -250,17 +314,27 @@ namespace iKCoder_Platform_SDK_Kit
                     return false;
                 else
                 {
-                    if (activeconnection != null)
+                    if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                     {
                         SqlCommand cmd = new SqlCommand(executeSql);
-                        cmd.Connection = activeconnection;
+                        cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
                         SqlDataAdapter sda = new SqlDataAdapter(cmd);
+                        resultDT = new DataTable();
+                        sda.Fill(resultDT);
+                        return true;
+                    }
+                    else if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
+                    {
+                        MySqlCommand cmd = new MySqlCommand(executeSql);
+                        cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                        MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
                         resultDT = new DataTable();
                         sda.Fill(resultDT);
                         return true;
                     }
                     else
                         return false;
+
                 }
             }
             catch
@@ -269,7 +343,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public static bool ActionExecuteSPForNonQuery(SqlConnection activeconnection,class_Data_SqlSPEntry activeSPEntry)
+        public static bool ActionExecuteSPForNonQuery(class_data_PlatformDBConnection activeconnection, class_Data_SqlSPEntry activeSPEntry)
         {
             try
             {
@@ -277,41 +351,41 @@ namespace iKCoder_Platform_SDK_Kit
                     return false;
                 else
                 {
-                    if (activeconnection != null)
+                    if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                     {
-                        if (activeconnection != null)
-                        {
-                            SqlCommand cmd = new SqlCommand();
-                            cmd.CommandText = activeSPEntry.SPName;
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
-                            {
-                                SqlParameter newParameter = new SqlParameter();
-                                newParameter.ParameterName = activeParameter.ParameterName;
-                                newParameter.SqlDbType = activeParameter.SqlDbType;
-                                newParameter.DbType = activeParameter.DbType;
-                                newParameter.Direction = activeParameter.Direction;
-                                newParameter.Value = activeParameter.Value;
-                                cmd.Parameters.Add(newParameter);
-                            }
-                            cmd.Connection = activeconnection;         
-                            cmd.ExecuteNonQuery();
-                            return true;
-                        }
-                        else
-                            return false;
+                        SqlCommand cmd = new SqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                    else if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
+                    {
+                        MySqlCommand cmd = new MySqlCommand();
+                        cmd.CommandText = activeSPEntry.SPName;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                            cmd.Parameters.Add(activeParameter);
+                        cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                        MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
+                        cmd.ExecuteNonQuery();
+                        return true;
                     }
                     else
                         return false;
+
                 }
             }
-            catch(class_Base_AppExceptions err)
+            catch
             {
                 return false;
             }
         }
 
-        public static bool ActionExecuteForNonQuery(SqlConnection activeconnection,string executeSql)
+        public static bool ActionExecuteForNonQuery(class_data_PlatformDBConnection activeconnection, string executeSql)
         {
             try
             {
@@ -319,17 +393,20 @@ namespace iKCoder_Platform_SDK_Kit
                     return false;
                 else
                 {
-                    if (activeconnection != null)
+                    if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                     {
-                        if (activeconnection != null)
-                        {
-                            SqlCommand cmd = new SqlCommand(executeSql);
-                            cmd.Connection = activeconnection;
-                            cmd.ExecuteNonQuery();
-                            return true;
-                        }
-                        else
-                            return false;
+                        SqlCommand cmd = new SqlCommand(executeSql);
+                        cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                    else if (activeconnection != null && activeconnection.activeDatabaseType == enum_DatabaseType.MySql)
+                    {
+                        MySqlCommand cmd = new MySqlCommand(executeSql);
+                        cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
+                        MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
+                        cmd.ExecuteNonQuery();
+                        return true;
                     }
                     else
                         return false;
