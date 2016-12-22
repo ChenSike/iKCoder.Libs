@@ -207,9 +207,11 @@ namespace iKCoder_Platform_SDK_Kit
                 {
                     class_data_MySqlConnectionItem mysqlActiveConnectionItem = (class_data_MySqlConnectionItem)ActiveConnection;
                     string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);
-                    string sql_getALLColumns = "Select COLLATION_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA from INFORMATION_SCHEMA.COLUMNS Where table_schema = '{schemaname}' and table_name = '{tablename}'";
+                    string sql_getALLColumns = "Select COLUMN_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA from INFORMATION_SCHEMA.COLUMNS Where table_schema = '{schemaname}' and table_name = '{tablename}'";
+                    string name_sp = "spa_operation_";
                     sql_getALLColumns = sql_getALLColumns.Replace("{schemaname}", ((class_data_MySqlConnectionItem) ActiveConnection).ActiveConnection.Database);                    
-                    DataTable TableInfo = new DataTable();                     
+                    DataTable TableInfo = new DataTable();     
+                    StringBuilder sql_CreateNewSp = new StringBuilder();
                     if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TableInfo))
                     {
                         foreach (DataRow activeTable in TableInfo.Rows)
@@ -224,17 +226,56 @@ namespace iKCoder_Platform_SDK_Kit
                                 foreach(DataRow activeSP in TableSPInfos.Rows)
                                 {
                                     string spname = "";
-                                    class_Data_SqlDataHelper.GetColumnData(activeTable, "name", out spname);
+                                    class_Data_SqlDataHelper.GetColumnData(activeSP, "name", out spname);
                                     string sql_dropProcedure = "drop procedure " + spname;
                                     class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_dropProcedure);
                                 }
                                 if (tableName != "")
-                                {
+                                {                                    
                                     sql_getALLColumns = sql_getALLColumns.Replace("{tablename}", tableName);
                                     DataTable TableColumnsInfo = new DataTable();
                                     if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableColumnsInfo))
                                     {
-                                        //foreach(DataRow )
+                                        sql_CreateNewSp.AppendLine("create procedure " + name_sp + tableName);
+                                        if (TableColumnsInfo.Rows.Count > 0)
+                                        {
+                                            sql_CreateNewSp.AppendLine("(");
+                                            sql_CreateNewSp.AppendLine("@operation,varchar(40),");
+                                            foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
+                                            {
+                                                string column_name = "";
+                                                string column_type = "";
+                                                string column_extra = "";
+                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
+                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_TYPE", out column_type);
+                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
+
+                                                sql_CreateNewSp.AppendLine("@" + column_name + " " + column_type + ",");
+                                            }
+                                            sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
+                                            sql_CreateNewSp.AppendLine(")");
+                                        }
+                                        sql_CreateNewSp.AppendLine("begin");
+                                        sql_CreateNewSp.AppendLine("if @operation='select' then");
+                                        sql_CreateNewSp.AppendLine("select * from " + tableName);
+                                        sql_CreateNewSp.AppendLine("else if @operation='insert' then");
+                                        sql_CreateNewSp.AppendLine("insert into " + ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database + "." + tableName + "(");
+                                        foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
+                                        {
+                                            string column_name = "";
+                                            string column_type = "";
+                                            string column_extra = "";
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_TYPE", out column_type);
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
+                                            if (column_extra != "auto_increment")
+                                                sql_CreateNewSp.AppendLine(column_name + " " + column_type + ",");
+                                        }
+                                        sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
+                                        sql_CreateNewSp.AppendLine(")");
+                                        sql_CreateNewSp.AppendLine(" values(");
+                                        sql_CreateNewSp.AppendLine("end");
+
                                     }
                                 }
                             }
