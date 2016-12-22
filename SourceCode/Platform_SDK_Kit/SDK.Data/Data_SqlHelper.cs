@@ -262,18 +262,27 @@ namespace iKCoder_Platform_SDK_Kit
                                         sql_CreateNewSp.AppendLine("insert into " + ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database + "." + tableName + "(");
                                         foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
                                         {
-                                            string column_name = "";
-                                            string column_type = "";
+                                            string column_name = "";                                            
                                             string column_extra = "";
-                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
-                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_TYPE", out column_type);
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);                                            
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
                                             if (column_extra != "auto_increment")
-                                                sql_CreateNewSp.AppendLine(column_name + " " + column_type + ",");
+                                                sql_CreateNewSp.AppendLine(column_name + ",");
                                         }
                                         sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
                                         sql_CreateNewSp.AppendLine(")");
                                         sql_CreateNewSp.AppendLine(" values(");
+                                        foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
+                                        {
+                                            string column_name = "";                                            
+                                            string column_extra = "";
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);                                            
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
+                                            if (column_extra != "auto_increment")
+                                                sql_CreateNewSp.AppendLine("@"+column_name + ",");
+                                        }
+                                        sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
+                                        sql_CreateNewSp.AppendLine(")");
                                         sql_CreateNewSp.AppendLine("end");
 
                                     }
