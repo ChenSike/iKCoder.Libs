@@ -56,15 +56,15 @@ namespace iKCoder_Platform_SDK_Kit
                                         List<string> filterTypeList = new List<string>();
                                         if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out ColumnInfo))
                                         {
-                                            StringBuilder sql_CreateNewSp = new StringBuilder("IF OBJECTPROPERTY(OBJECT_ID(N'SPA_Operation_" + tableName + "'), N'IsProcedure') = 1");
+                                            StringBuilder sql_CreateNewSp = new StringBuilder("IF OBJECTPROPERTY(OBJECT_ID(N'spa_peration_" + tableName + "'), N'IsProcedure') = 1");
                                             sql_CreateNewSp.AppendLine();
-                                            sql_CreateNewSp.AppendLine("DROP PROCEDURE SPA_Operation_" + tableName);
+                                            sql_CreateNewSp.AppendLine("DROP PROCEDURE spa_operation_" + tableName);
                                             class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
                                             sql_CreateNewSp.Clear();
                                             sql_CreateNewSp.AppendLine("CREATE PROCEDURE {SPNAME}");
                                             StringBuilder sql_insertSourceColumns = new StringBuilder();
                                             StringBuilder sql_insertValueColumns = new StringBuilder();
-                                            sql_CreateNewSp.Replace("{SPNAME}", "SPA_Operation_" + tableName);
+                                            sql_CreateNewSp.Replace("{SPNAME}", "spa_operation_" + tableName);
                                             sql_CreateNewSp.AppendLine("(");
                                             sql_CreateNewSp.AppendLine("@operation nvarchar(20) = '',");
                                             foreach (DataRow activeDR_2 in ColumnInfo.Rows)
@@ -207,13 +207,39 @@ namespace iKCoder_Platform_SDK_Kit
                 {
                     class_data_MySqlConnectionItem mysqlActiveConnectionItem = (class_data_MySqlConnectionItem)ActiveConnection;
                     string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);
-                    DataTable TablesInfo = new DataTable();
-                    //Select * from INFORMATION_SCHEMA.COLUMNS Where table_schema = 'platformdata'
-                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TablesInfo))
+                    string sql_getALLColumns = "Select COLLATION_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA from INFORMATION_SCHEMA.COLUMNS Where table_schema = '{schemaname}' and table_name = '{tablename}'";
+                    sql_getALLColumns = sql_getALLColumns.Replace("{schemaname}", ((class_data_MySqlConnectionItem) ActiveConnection).ActiveConnection.Database);                    
+                    DataTable TableInfo = new DataTable();                     
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TableInfo))
                     {
-                        foreach(DataRow activeTable in TablesInfo.Rows)
+                        foreach (DataRow activeTable in TableInfo.Rows)
                         {
-
+                            string sql_getALLSPInfo = "select * from mysql.proc where db = '{schemaname}' and 'type' = 'PROCEDURE'";
+                            string tableName = "";
+                            class_Data_SqlDataHelper.GetColumnData(activeTable, "name", out tableName);
+                            sql_getALLSPInfo = sql_getALLSPInfo.Replace("{schemaname}",((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);
+                            DataTable TableSPInfos = new DataTable();
+                            if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableSPInfos))
+                            {
+                                foreach(DataRow activeSP in TableSPInfos.Rows)
+                                {
+                                    string spname = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeTable, "name", out spname);
+                                    string sql_dropProcedure = "drop procedure " + spname;
+                                    class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_dropProcedure);
+                                }
+                                if (tableName != "")
+                                {
+                                    sql_getALLColumns = sql_getALLColumns.Replace("{tablename}", tableName);
+                                    DataTable TableColumnsInfo = new DataTable();
+                                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableColumnsInfo))
+                                    {
+                                        //foreach(DataRow )
+                                    }
+                                }
+                            }
+                            else
+                                return false;
                         }
                     }
                     return true;
