@@ -283,6 +283,10 @@ namespace iKCoder_Platform_SDK_Kit
                                         }
                                         sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
                                         sql_CreateNewSp.AppendLine(")");
+                                        sql_CreateNewSp.AppendLine("else if @operation='update' then");
+                                        
+                                        sql_CreateNewSp.AppendLine("update " + tableName);
+                                        
                                         sql_CreateNewSp.AppendLine("end");
 
                                     }
