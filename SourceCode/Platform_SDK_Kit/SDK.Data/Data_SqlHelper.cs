@@ -221,6 +221,8 @@ namespace iKCoder_Platform_SDK_Kit
                             class_Data_SqlDataHelper.GetColumnData(activeTable, "name", out tableName);
                             sql_getALLSPInfo = sql_getALLSPInfo.Replace("{schemaname}",((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);
                             DataTable TableSPInfos = new DataTable();
+                            List<string> tmpSelectedColumsLst = new List<string>();
+                            Dictionary<string, string> tmpSelectedKeyColumnsDirc = new Dictionary<string, string>();
                             if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableSPInfos))
                             {
                                 foreach(DataRow activeSP in TableSPInfos.Rows)
@@ -246,11 +248,18 @@ namespace iKCoder_Platform_SDK_Kit
                                                 string column_name = "";
                                                 string column_type = "";
                                                 string column_extra = "";
+                                                string column_key = "";
                                                 class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
                                                 class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_TYPE", out column_type);
+                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_KEY", out column_key);
                                                 class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
-
+                                                if (column_key == "PRI")
+                                                    tmpSelectedKeyColumnsDirc.Add(column_name, column_type);
+                                                if (column_extra == "auto_increment")
+                                                    continue;
                                                 sql_CreateNewSp.AppendLine("@" + column_name + " " + column_type + ",");
+                                                if (!tmpSelectedColumsLst.Contains(column_name))
+                                                    tmpSelectedColumsLst.Add(column_name);
                                             }
                                             sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
                                             sql_CreateNewSp.AppendLine(")");
@@ -262,9 +271,9 @@ namespace iKCoder_Platform_SDK_Kit
                                         sql_CreateNewSp.AppendLine("insert into " + ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database + "." + tableName + "(");
                                         foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
                                         {
-                                            string column_name = "";                                            
+                                            string column_name = "";
                                             string column_extra = "";
-                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);                                            
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
                                             if (column_extra != "auto_increment")
                                                 sql_CreateNewSp.AppendLine(column_name + ",");
@@ -274,19 +283,56 @@ namespace iKCoder_Platform_SDK_Kit
                                         sql_CreateNewSp.AppendLine(" values(");
                                         foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
                                         {
-                                            string column_name = "";                                            
+                                            string column_name = "";
                                             string column_extra = "";
-                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);                                            
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
                                             if (column_extra != "auto_increment")
-                                                sql_CreateNewSp.AppendLine("@"+column_name + ",");
+                                                sql_CreateNewSp.AppendLine("@" + column_name + ",");
                                         }
                                         sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
                                         sql_CreateNewSp.AppendLine(")");
-                                        sql_CreateNewSp.AppendLine("else if @operation='update' then");
-                                        
-                                        sql_CreateNewSp.AppendLine("update " + tableName);
-                                        
+                                        foreach (string activeSelectedColumn in tmpSelectedColumsLst)
+                                        {
+                                            sql_CreateNewSp.AppendLine("else if @operation='update' and @" + activeSelectedColumn + "IS NULL then");
+                                            sql_CreateNewSp.AppendLine("update " + tableName);
+                                            sql_CreateNewSp.AppendLine("set " + activeSelectedColumn + " = " + "@" + activeSelectedColumn);
+                                            if (tmpSelectedKeyColumnsDirc.Keys.Count > 0)
+                                            {
+                                                sql_CreateNewSp.AppendLine("where ");
+                                                foreach (string keyColumn in tmpSelectedKeyColumnsDirc.Keys)
+                                                    sql_CreateNewSp.AppendLine(keyColumn + " = @" + keyColumn + " and ");
+                                                sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                            }
+                                        }
+                                        sql_CreateNewSp.AppendLine("else if @operation='delete' then");
+                                        sql_CreateNewSp.AppendLine("delete from " + tableName);
+                                        if (tmpSelectedKeyColumnsDirc.Keys.Count > 0)
+                                        {
+                                            sql_CreateNewSp.AppendLine(" where ");
+                                            foreach (string keyColumn in tmpSelectedKeyColumnsDirc.Keys)
+                                                sql_CreateNewSp.AppendLine(keyColumn + " = @" + keyColumn + " and ");
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                        }
+                                        sql_CreateNewSp.AppendLine("else if @operation='selectkey' then");
+                                        sql_CreateNewSp.AppendLine("select * from " + tableName);
+                                        if (tmpSelectedKeyColumnsDirc.Keys.Count > 0)
+                                        {
+                                            sql_CreateNewSp.AppendLine(" where ");
+                                            foreach (string keyColumn in tmpSelectedKeyColumnsDirc.Keys)
+                                                sql_CreateNewSp.AppendLine(keyColumn + " = @" + keyColumn + " and ");
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                        }
+                                        sql_CreateNewSp.AppendLine("else if @operation='selectcondition' then");
+                                        sql_CreateNewSp.AppendLine("select * from " + tableName);
+                                        if(tmpSelectedColumsLst.Count>0)
+                                        {
+                                            sql_CreateNewSp.AppendLine(" where ");
+                                            foreach(string activeSelectedColumn in tmpSelectedColumsLst)
+                                                sql_CreateNewSp.AppendLine(activeSelectedColumn + " = @" + activeSelectedColumn + " or ");
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                        }
+                                        sql_CreateNewSp.AppendLine("end if");
                                         sql_CreateNewSp.AppendLine("end");
 
                                     }
