@@ -73,6 +73,7 @@ namespace iKCoder_Platform_SDK_Kit
                 if(activeDBType == enum_DatabaseType.SqlServer)
                 {                    
                     newEntry.ActiveConnection = new class_data_SqlServerConnectionItem();
+                    newEntry.ActiveConnection.activeDatabaseType = activeDBType;
                     ((class_data_SqlServerConnectionItem)newEntry.ActiveConnection).ActiveConnection = new SqlConnection(newEntry.ConnectionString);
                     try
                     {
@@ -88,6 +89,7 @@ namespace iKCoder_Platform_SDK_Kit
                 else if(activeDBType == enum_DatabaseType.MySql)
                 {
                     newEntry.ActiveConnection = new class_data_MySqlConnectionItem();
+                    newEntry.ActiveConnection.activeDatabaseType = activeDBType;
                     ((class_data_MySqlConnectionItem)newEntry.ActiveConnection).ActiveConnection = new MySqlConnection(newEntry.ConnectionString);
                     try
                     {

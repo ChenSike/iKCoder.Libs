@@ -13,7 +13,7 @@ namespace iKCoder_Platform_SDK_Kit
     {             
         public static string SQL_GETALLTABLES_FOR_SQL2008 = "select * from sys.tables where (type = 'U')";
         public static string SQL_GETALLTABLES_FOR_SQL2005 = "select * from sys.all_objects where (type = 'U')";
-        private static string SQL_GETALLTABLES_FOR_MYSQL = "select table_name from information_schema.tables where table_schema = {schemaname}";
+        private static string SQL_GETALLTABLES_FOR_MYSQL = "select table_name from information_schema.tables where table_schema = '{schemaname}'";
 
         public static string Get_SQL_GETALLTABLES_FOR_MYSQL(string schemaname)
         {
@@ -218,7 +218,7 @@ namespace iKCoder_Platform_SDK_Kit
                         {
                             string sql_getALLSPInfo = "select * from mysql.proc where db = '{schemaname}' and 'type' = 'PROCEDURE'";
                             string tableName = "";
-                            class_Data_SqlDataHelper.GetColumnData(activeTable, "name", out tableName);
+                            class_Data_SqlDataHelper.GetColumnData(activeTable, "table_name", out tableName);
                             sql_getALLSPInfo = sql_getALLSPInfo.Replace("{schemaname}",((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);
                             DataTable TableSPInfos = new DataTable();
                             List<string> tmpSelectedColumsLst = new List<string>();
@@ -236,7 +236,7 @@ namespace iKCoder_Platform_SDK_Kit
                                 {                                    
                                     sql_getALLColumns = sql_getALLColumns.Replace("{tablename}", tableName);
                                     DataTable TableColumnsInfo = new DataTable();
-                                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableColumnsInfo))
+                                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out TableColumnsInfo))
                                     {
                                         sql_CreateNewSp.AppendLine("create procedure " + name_sp + tableName);
                                         if (TableColumnsInfo.Rows.Count > 0)
