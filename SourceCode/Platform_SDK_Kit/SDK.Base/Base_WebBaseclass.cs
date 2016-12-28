@@ -133,7 +133,10 @@ namespace iKCoder_Platform_SDK_Kit
             APPFOLDERPATH = Server.MapPath("~/");;
             DoAction();
             if (ISRESPONSEDOC)
+            {
+                Response.AddHeader("Access-Control-Allow-Origin", "*");
                 Response.Write(RESPONSEDOCUMENT.OuterXml);
+            }
         }       
     }
 }

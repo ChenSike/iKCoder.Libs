@@ -213,16 +213,15 @@ namespace iKCoder_Platform_SDK_Kit
                     DataTable TableInfo = new DataTable();     
                     StringBuilder sql_CreateNewSp = new StringBuilder();
                     if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TableInfo))
-                    {
+                    {                     
                         foreach (DataRow activeTable in TableInfo.Rows)
                         {
-                            string sql_getALLSPInfo = "select * from mysql.proc where db = '{schemaname}' and 'type' = 'PROCEDURE'";
+                            sql_CreateNewSp.Clear();                            
                             string tableName = "";
-                            class_Data_SqlDataHelper.GetColumnData(activeTable, "table_name", out tableName);
-                            sql_getALLSPInfo = sql_getALLSPInfo.Replace("{schemaname}",((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);
+                            class_Data_SqlDataHelper.GetColumnData(activeTable, "table_name", out tableName);                            
                             DataTable TableSPInfos = new DataTable();
                             List<string> tmpSelectedColumsLst = new List<string>();
-                            Dictionary<string, string> tmpSelectedKeyColumnsDirc = new Dictionary<string, string>();
+                            List<string> tmpSelectedKeyColumnsLst = new List<string>();
                             if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableSPInfos))
                             {
                                 foreach(DataRow activeSP in TableSPInfos.Rows)
@@ -238,11 +237,11 @@ namespace iKCoder_Platform_SDK_Kit
                                     DataTable TableColumnsInfo = new DataTable();
                                     if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out TableColumnsInfo))
                                     {
-                                        sql_CreateNewSp.AppendLine("create procedure " + name_sp + tableName);
+                                        sql_CreateNewSp.AppendLine("CREATE PROCEDURE " + name_sp + tableName);
+                                        sql_CreateNewSp.Append("(");
+                                        sql_CreateNewSp.Append("_operation varchar(40),");
                                         if (TableColumnsInfo.Rows.Count > 0)
-                                        {
-                                            sql_CreateNewSp.AppendLine("(");
-                                            sql_CreateNewSp.AppendLine("@operation,varchar(40),");
+                                        {                                                            
                                             foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
                                             {
                                                 string column_name = "";
@@ -254,21 +253,19 @@ namespace iKCoder_Platform_SDK_Kit
                                                 class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_KEY", out column_key);
                                                 class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
                                                 if (column_key == "PRI")
-                                                    tmpSelectedKeyColumnsDirc.Add(column_name, column_type);
-                                                if (column_extra == "auto_increment")
-                                                    continue;
-                                                sql_CreateNewSp.AppendLine("@" + column_name + " " + column_type + ",");
+                                                    tmpSelectedKeyColumnsLst.Add(column_name);                                                
+                                                sql_CreateNewSp.Append("_" + column_name + " " + column_type + ",");
                                                 if (!tmpSelectedColumsLst.Contains(column_name))
                                                     tmpSelectedColumsLst.Add(column_name);
-                                            }
-                                            sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
-                                            sql_CreateNewSp.AppendLine(")");
+                                            }                                                                                       
                                         }
-                                        sql_CreateNewSp.AppendLine("begin");
-                                        sql_CreateNewSp.AppendLine("if @operation='select' then");
-                                        sql_CreateNewSp.AppendLine("select * from " + tableName);
-                                        sql_CreateNewSp.AppendLine("else if @operation='insert' then");
-                                        sql_CreateNewSp.AppendLine("insert into " + ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database + "." + tableName + "(");
+                                        sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);   
+                                        sql_CreateNewSp.AppendLine(")");
+                                        sql_CreateNewSp.AppendLine("BEGIN");
+                                        sql_CreateNewSp.AppendLine("if _operation='select' then");
+                                        sql_CreateNewSp.AppendLine("select * from " + tableName+";");
+                                        sql_CreateNewSp.AppendLine("elseif _operation='insert' then");
+                                        sql_CreateNewSp.Append("insert into " + ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database + "." + tableName + "(");
                                         foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
                                         {
                                             string column_name = "";
@@ -276,11 +273,11 @@ namespace iKCoder_Platform_SDK_Kit
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
                                             if (column_extra != "auto_increment")
-                                                sql_CreateNewSp.AppendLine(column_name + ",");
+                                                sql_CreateNewSp.Append(column_name + ",");
                                         }
                                         sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
-                                        sql_CreateNewSp.AppendLine(")");
-                                        sql_CreateNewSp.AppendLine(" values(");
+                                        sql_CreateNewSp.Append(")");
+                                        sql_CreateNewSp.Append(" values(");
                                         foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
                                         {
                                             string column_name = "";
@@ -288,53 +285,57 @@ namespace iKCoder_Platform_SDK_Kit
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
                                             if (column_extra != "auto_increment")
-                                                sql_CreateNewSp.AppendLine("@" + column_name + ",");
+                                                sql_CreateNewSp.Append("_" + column_name + ",");
                                         }
                                         sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
-                                        sql_CreateNewSp.AppendLine(")");
+                                        sql_CreateNewSp.AppendLine(");");
                                         foreach (string activeSelectedColumn in tmpSelectedColumsLst)
                                         {
-                                            sql_CreateNewSp.AppendLine("else if @operation='update' and @" + activeSelectedColumn + "IS NULL then");
-                                            sql_CreateNewSp.AppendLine("update " + tableName);
-                                            sql_CreateNewSp.AppendLine("set " + activeSelectedColumn + " = " + "@" + activeSelectedColumn);
-                                            if (tmpSelectedKeyColumnsDirc.Keys.Count > 0)
+                                            sql_CreateNewSp.AppendLine("elseif _operation='update' and _" + activeSelectedColumn + " IS NOT NULL then");
+                                            sql_CreateNewSp.Append("update " + tableName);
+                                            sql_CreateNewSp.Append(" set " + activeSelectedColumn + " = " + "_" + activeSelectedColumn);
+                                            if (tmpSelectedKeyColumnsLst.Count > 0)
                                             {
-                                                sql_CreateNewSp.AppendLine("where ");
-                                                foreach (string keyColumn in tmpSelectedKeyColumnsDirc.Keys)
-                                                    sql_CreateNewSp.AppendLine(keyColumn + " = @" + keyColumn + " and ");
-                                                sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                                sql_CreateNewSp.Append(" where ");
+                                                foreach (string keyColumn in tmpSelectedKeyColumnsLst)
+                                                    sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
+                                                sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
+                                                sql_CreateNewSp.AppendLine(";");
                                             }
                                         }
-                                        sql_CreateNewSp.AppendLine("else if @operation='delete' then");
-                                        sql_CreateNewSp.AppendLine("delete from " + tableName);
-                                        if (tmpSelectedKeyColumnsDirc.Keys.Count > 0)
+                                        sql_CreateNewSp.AppendLine("elseif _operation='delete' then");
+                                        sql_CreateNewSp.Append("delete from " + tableName);
+                                        if (tmpSelectedKeyColumnsLst.Count > 0)
                                         {
-                                            sql_CreateNewSp.AppendLine(" where ");
-                                            foreach (string keyColumn in tmpSelectedKeyColumnsDirc.Keys)
-                                                sql_CreateNewSp.AppendLine(keyColumn + " = @" + keyColumn + " and ");
-                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                            sql_CreateNewSp.Append(" where ");
+                                            foreach (string keyColumn in tmpSelectedKeyColumnsLst)
+                                                sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
                                         }
-                                        sql_CreateNewSp.AppendLine("else if @operation='selectkey' then");
-                                        sql_CreateNewSp.AppendLine("select * from " + tableName);
-                                        if (tmpSelectedKeyColumnsDirc.Keys.Count > 0)
+                                        sql_CreateNewSp.AppendLine(";");
+                                        sql_CreateNewSp.AppendLine("elseif _operation='selectkey' then");
+                                        sql_CreateNewSp.Append("select * from " + tableName);
+                                        if (tmpSelectedKeyColumnsLst.Count > 0)
                                         {
-                                            sql_CreateNewSp.AppendLine(" where ");
-                                            foreach (string keyColumn in tmpSelectedKeyColumnsDirc.Keys)
-                                                sql_CreateNewSp.AppendLine(keyColumn + " = @" + keyColumn + " and ");
-                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                            sql_CreateNewSp.Append(" where ");
+                                            foreach (string keyColumn in tmpSelectedKeyColumnsLst)
+                                                sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
                                         }
-                                        sql_CreateNewSp.AppendLine("else if @operation='selectcondition' then");
-                                        sql_CreateNewSp.AppendLine("select * from " + tableName);
+                                        sql_CreateNewSp.AppendLine(";");
+                                        sql_CreateNewSp.AppendLine("elseif _operation='selectcondition' then");
+                                        sql_CreateNewSp.Append("select * from " + tableName);
                                         if(tmpSelectedColumsLst.Count>0)
                                         {
-                                            sql_CreateNewSp.AppendLine(" where ");
+                                            sql_CreateNewSp.Append(" where ");
                                             foreach(string activeSelectedColumn in tmpSelectedColumsLst)
-                                                sql_CreateNewSp.AppendLine(activeSelectedColumn + " = @" + activeSelectedColumn + " or ");
-                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 6, 5);
+                                                sql_CreateNewSp.Append(activeSelectedColumn + " = _" + activeSelectedColumn + " or ");
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
                                         }
-                                        sql_CreateNewSp.AppendLine("end if");
-                                        sql_CreateNewSp.AppendLine("end");
-
+                                        sql_CreateNewSp.AppendLine(";");
+                                        sql_CreateNewSp.AppendLine("END IF;");
+                                        sql_CreateNewSp.AppendLine("END");
+                                        class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
                                     }
                                 }
                             }
@@ -462,75 +463,85 @@ namespace iKCoder_Platform_SDK_Kit
         public Dictionary<string, class_Data_SqlSPEntry> ActionAutoLoadingAllSPS(class_data_PlatformDBConnection activeConnection, string SPType)
         {
             if (activeConnection != null)
-            {                               
-                string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0)";
-                DataTable activeSPSDT=new DataTable();
-                Dictionary<string, class_Data_SqlSPEntry> result = new Dictionary<string,class_Data_SqlSPEntry>();
-                if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_getallsps, out activeSPSDT))
+            {
+                Dictionary<string, class_Data_SqlSPEntry> result = new Dictionary<string, class_Data_SqlSPEntry>();
+                if (activeConnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                 {
-                    foreach (DataRow activeRow in activeSPSDT.Rows)
+                    string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0)";
+                    DataTable activeSPSDT = new DataTable();                    
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_getallsps, out activeSPSDT))
                     {
-                        class_Data_SqlSPEntry newSPEntry = new class_Data_SqlSPEntry();
-                        string spName = "";
-                        class_Data_SqlDataHelper.GetColumnData(activeRow, "name", out spName);
-                        if (SPType != "")
+                        foreach (DataRow activeRow in activeSPSDT.Rows)
                         {
-                            if (SPType == class_Data_SqlSPEntryType.SelectAction)
+                            class_Data_SqlSPEntry newSPEntry = new class_Data_SqlSPEntry(activeConnection.activeDatabaseType);
+                            string spName = "";
+                            class_Data_SqlDataHelper.GetColumnData(activeRow, "name", out spName);
+                            if (SPType != "")
                             {
-                                if (!spName.StartsWith(class_Data_SqlSPEntryNameFiler.StartNamed_SelectAction))
-                                    continue;
-                            }
-                            else if (SPType == class_Data_SqlSPEntryType.UpdateAction)
-                            {
-                                if (!spName.StartsWith(class_Data_SqlSPEntryNameFiler.StartNamed_Update))
-                                    continue;
-                            }
-                        }
-                        newSPEntry.SPName = spName;
-                        newSPEntry.KeyName = spName;                        
-                        string spObjectID = "";
-                        class_Data_SqlDataHelper.GetColumnData(activeRow, "object_id", out spObjectID);
-                        string sql_paramters = "select * from sys.all_parameters where object_id = " + spObjectID;
-                        DataTable activeSPParametersDT=new DataTable();
-                        string sql_paramstype = "select * from sys.types";
-                        DataTable paramstypeDT=new DataTable();
-                        if (!class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramstype, out paramstypeDT))
-                        {
-                            return null;
-                        }
-                        if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramters, out activeSPParametersDT))
-                        {
-                            foreach (DataRow activeParamterRow in activeSPParametersDT.Rows)
-                            {
-                                string activeSystemType_ID = "";
-                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "system_type_id", out activeSystemType_ID);
-                                string activeUserType_ID = "";
-                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "user_type_id", out activeUserType_ID);
-                                string activeParamsMaxLength = "";
-                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out activeParamsMaxLength);
-                                string activeParamsName = "";
-                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "name", out activeParamsName);
-                                string activeIsOutPut = "";
-                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "is_output", out activeIsOutPut);
-                                string max_length = "";
-                                class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out max_length);
-                                string activeDBType="";
-                                DataRow[] dbtyps = paramstypeDT.Select("system_type_id=" + activeSystemType_ID + " and user_type_id=" + activeUserType_ID);
-                                if (dbtyps.Length > 0)
+                                if (SPType == class_Data_SqlSPEntryType.SelectAction)
                                 {
-                                    class_Data_SqlDataHelper.GetColumnData(dbtyps[0], "name", out activeDBType);
-                                    newSPEntry.SetNewParameter(activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);                                    
+                                    if (!spName.StartsWith(class_Data_SqlSPEntryNameFiler.StartNamed_SelectAction))
+                                        continue;
                                 }
-                                else
-                                    continue;
+                                else if (SPType == class_Data_SqlSPEntryType.UpdateAction)
+                                {
+                                    if (!spName.StartsWith(class_Data_SqlSPEntryNameFiler.StartNamed_Update))
+                                        continue;
+                                }
                             }
+                            newSPEntry.SPName = spName;
+                            newSPEntry.KeyName = spName;
+                            string spObjectID = "";
+                            class_Data_SqlDataHelper.GetColumnData(activeRow, "object_id", out spObjectID);
+                            string sql_paramters = "select * from sys.all_parameters where object_id = " + spObjectID;
+                            DataTable activeSPParametersDT = new DataTable();
+                            string sql_paramstype = "select * from sys.types";
+                            DataTable paramstypeDT = new DataTable();
+                            if (!class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramstype, out paramstypeDT))
+                            {
+                                return null;
+                            }
+                            if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramters, out activeSPParametersDT))
+                            {
+                                foreach (DataRow activeParamterRow in activeSPParametersDT.Rows)
+                                {
+                                    string activeSystemType_ID = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "system_type_id", out activeSystemType_ID);
+                                    string activeUserType_ID = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "user_type_id", out activeUserType_ID);
+                                    string activeParamsMaxLength = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out activeParamsMaxLength);
+                                    string activeParamsName = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "name", out activeParamsName);
+                                    string activeIsOutPut = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "is_output", out activeIsOutPut);
+                                    string max_length = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out max_length);
+                                    string activeDBType = "";
+                                    DataRow[] dbtyps = paramstypeDT.Select("system_type_id=" + activeSystemType_ID + " and user_type_id=" + activeUserType_ID);
+                                    if (dbtyps.Length > 0)
+                                    {
+                                        class_Data_SqlDataHelper.GetColumnData(dbtyps[0], "name", out activeDBType);
+                                        newSPEntry.SetNewParameter(activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);
+                                    }
+                                    else
+                                        continue;
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            result.Add(newSPEntry.KeyName, newSPEntry);
                         }
-                        else
-                        {
-                            continue;
-                        }
-                        result.Add(newSPEntry.KeyName, newSPEntry);
                     }
+                }
+                else if(activeConnection.activeDatabaseType == enum_DatabaseType.MySql)
+                {
+                    string sql_getALLSPInfo = "select * from mysql.proc where db = '{schemaname}' and 'type' = 'PROCEDURE'";
+                    sql_getALLSPInfo = sql_getALLSPInfo.Replace("{schemaname}", ((class_data_MySqlConnectionItem)activeConnection).ActiveConnection.Database);
+                    DataTable dtALLSPInfo = new DataTable();
+
                 }
                 return result;
             }
@@ -543,7 +554,10 @@ namespace iKCoder_Platform_SDK_Kit
             DataTable dt = new DataTable();
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "select");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "select");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "select");       
                 class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
@@ -557,7 +571,10 @@ namespace iKCoder_Platform_SDK_Kit
             DataTable dt = new DataTable();
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "selectkey");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "selectkey");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "selectkey");                
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
@@ -571,7 +588,10 @@ namespace iKCoder_Platform_SDK_Kit
             DataTable dt = new DataTable();
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "selectcondition");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "selectcondition");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "selectcondition");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
@@ -584,8 +604,11 @@ namespace iKCoder_Platform_SDK_Kit
         {            
            class_data_PlatformDBDataReader activeDataReader = null;
             if (activeEntry != null)
-            {
-                activeEntry.ModifyParameterValue("@operation", "selectcondition");
+            {                
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "selectcondition");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "selectcondition");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
                 return activeDataReader;
@@ -599,7 +622,10 @@ namespace iKCoder_Platform_SDK_Kit
             class_data_PlatformDBDataReader activeDataReader = null;
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "selectkey");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "selectkey");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "selectkey");                
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
                 return activeDataReader;
@@ -613,7 +639,10 @@ namespace iKCoder_Platform_SDK_Kit
             class_data_PlatformDBDataReader activeDataReader = null;
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "select");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "select");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "select");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
                 return activeDataReader;
@@ -626,7 +655,10 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "insert");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "insert");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "insert");
                 class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
@@ -638,7 +670,10 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "update");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "update");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "update");
                 class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
@@ -650,8 +685,10 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (activeEntry != null)
             {
-                activeEntry.ModifyParameterValue("@operation", "delete");
-
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType==enum_DatabaseType.SqlServer)
+                    activeEntry.ModifyParameterValue("@operation", "delete");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    activeEntry.ModifyParameterValue("_operation", "delete");
                 class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }

@@ -28,6 +28,17 @@ namespace iKCoder_Platform_SDK_Kit
     public class class_Data_SqlSPEntry:ICloneable
     {
 
+        public class_Data_SqlSPEntry(enum_DatabaseType activeDBType)
+        {
+            this.ActiveDBType = activeDBType;
+        }
+
+        public enum_DatabaseType ActiveDBType
+        {
+            set;
+            get;
+        }
+
         public string SPName
         {
             set;
@@ -54,9 +65,9 @@ namespace iKCoder_Platform_SDK_Kit
 
         public Dictionary<string, SqlParameter> ParametersCollection = new Dictionary<string, SqlParameter>();
 
-        public static class_Data_SqlSPEntry CreateInstance(string SPName, SqlDbType SPType, string EntryType)
+        public static class_Data_SqlSPEntry CreateInstance(string SPName, SqlDbType SPType, string EntryType,enum_DatabaseType activeDBType)
         {
-            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry();
+            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry(activeDBType);
             newEntry.SPName = SPName;
             newEntry.SPType = SPType;
             newEntry.EntryType = EntryType;
@@ -77,7 +88,10 @@ namespace iKCoder_Platform_SDK_Kit
             if (!ParametersCollection.ContainsKey(Paraname))
             {
                 SqlParameter activeParameter = new SqlParameter();
-                activeParameter.ParameterName = Paraname;
+                if (ActiveDBType == enum_DatabaseType.SqlServer)
+                    activeParameter.ParameterName = Paraname.StartsWith("@") ? Paraname : "@" + Paraname;
+                else if (ActiveDBType == enum_DatabaseType.MySql)
+                    activeParameter.ParameterName = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
                 activeParameter.Direction = SPDirection;
                 activeParameter.SqlDbType = SPType;
                 activeParameter.Value = SPValue;
@@ -135,7 +149,7 @@ namespace iKCoder_Platform_SDK_Kit
             
         public object Clone()
         {
-            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry();
+            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry(this.ActiveDBType);
             newEntry.ParametersCollection = this.ParametersCollection;
             newEntry.EntryType = this.EntryType;
             newEntry.KeyName = this.KeyName;
