@@ -538,10 +538,10 @@ namespace iKCoder_Platform_SDK_Kit
                 }
                 else if(activeConnection.activeDatabaseType == enum_DatabaseType.MySql)
                 {
-                    string sql_getALLSPInfo = "select * from mysql.proc where db = '{schemaname}' and 'type' = 'PROCEDURE'";
+                    string sql_getALLSPInfo = "select name,param_list from mysql.proc where db = '{schemaname}' and 'type' = 'PROCEDURE'";
                     sql_getALLSPInfo = sql_getALLSPInfo.Replace("{schemaname}", ((class_data_MySqlConnectionItem)activeConnection).ActiveConnection.Database);
                     DataTable dtALLSPInfo = new DataTable();
-
+                    //if(class_Data_SqlDataHelper.ActionExecuteSQLForDT()
                 }
                 return result;
             }

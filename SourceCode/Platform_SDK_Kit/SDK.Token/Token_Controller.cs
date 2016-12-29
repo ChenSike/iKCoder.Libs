@@ -40,7 +40,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         public class_Token_Controller(System.Web.SessionState.HttpSessionState refPageSession)
         {
-            _refPageSession = refPageSession;
+            _refPageSession = refPageSession;            
         }
        
         public bool FlushToken(string tokenGuid)
@@ -51,6 +51,7 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 try
                 {
+                    
                     if (_refPageSession[tokenGuid] != null)
                     {
                         class_TokenItem activeToken = (class_TokenItem)_refPageSession[tokenGuid];
@@ -119,7 +120,8 @@ namespace iKCoder_Platform_SDK_Kit
                             registriedToken.registryID = newGuid;
                             registriedToken.expireMinutes = _benchmarkTokensList[activeToken.productName].expireMinutes;
                             registriedToken.isBenchmark = false;
-                            _refPageSession.Add(newGuid, registriedToken);
+                            _refPageSession.Add(newGuid, registriedToken);                          
+                            
                             return newGuid;                            
                         }
                         else

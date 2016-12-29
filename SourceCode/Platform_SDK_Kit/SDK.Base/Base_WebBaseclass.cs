@@ -70,6 +70,11 @@ namespace iKCoder_Platform_SDK_Kit
            
         }
 
+        protected virtual void InitAction()
+        {
+
+        }
+
         protected void AddErrMessageToResponseDOC(string header, string message,string link)
         {
             XmlNode errNode = class_XmlHelper.CreateNode(RESPONSEDOCUMENT, "err", "");
@@ -95,12 +100,15 @@ namespace iKCoder_Platform_SDK_Kit
             class_XmlHelper.SetAttribute(newNode, "header", header);
             class_XmlHelper.SetAttribute(newNode, "code", code);
             foreach(string attrName in attrsList.Keys)            
-                class_XmlHelper.SetAttribute(newNode, attrName, attrsList[attrName]);            
+                class_XmlHelper.SetAttribute(newNode, attrName, attrsList[attrName]);  
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(newNode);
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {            
+        {
+            InitAction();
+            Response.AddHeader("Access-Control-Allow-Origin", "http://carl.morningstar.com");
+            Response.AddHeader("Access-Control-Allow-Credentials", "true");
             REQUESTIP = Page.Request.UserHostAddress;
             if(string.IsNullOrEmpty(REQUESTIP))
                 REQUESTIP = "127.0.0.1";
@@ -134,7 +142,6 @@ namespace iKCoder_Platform_SDK_Kit
             DoAction();
             if (ISRESPONSEDOC)
             {
-                Response.AddHeader("Access-Control-Allow-Origin", "*");
                 Response.Write(RESPONSEDOCUMENT.OuterXml);
             }
         }       
