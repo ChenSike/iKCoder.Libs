@@ -75,6 +75,9 @@ namespace iKCoder_Platform_SDK_Kit
 
         }
 
+        public Dictionary<string, string> RSDoamin;
+       
+
         protected void AddErrMessageToResponseDOC(string header, string message,string link)
         {
             XmlNode errNode = class_XmlHelper.CreateNode(RESPONSEDOCUMENT, "err", "");
@@ -106,9 +109,8 @@ namespace iKCoder_Platform_SDK_Kit
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            InitAction();
-            Response.AddHeader("Access-Control-Allow-Origin", "http://carl.morningstar.com");
-            Response.AddHeader("Access-Control-Allow-Credentials", "true");
+            this.RSDoamin = new Dictionary<string, string>();
+            InitAction();            
             REQUESTIP = Page.Request.UserHostAddress;
             if(string.IsNullOrEmpty(REQUESTIP))
                 REQUESTIP = "127.0.0.1";
@@ -140,6 +142,14 @@ namespace iKCoder_Platform_SDK_Kit
             }
             APPFOLDERPATH = Server.MapPath("~/");;
             DoAction();
+            if (this.RSDoamin.Count > 0)
+            {
+                foreach (string activeDoamin in this.RSDoamin.Keys)
+                {
+                    Response.AddHeader("Access-Control-Allow-Origin", this.RSDoamin[activeDoamin]);
+                }
+                Response.AddHeader("Access-Control-Allow-Credentials", "true");
+            }
             if (ISRESPONSEDOC)
             {
                 Response.Write(RESPONSEDOCUMENT.OuterXml);

@@ -140,6 +140,29 @@ namespace iKCoder_Platform_SDK_Kit
             return newEntry;
         }
 
+        public virtual bool ModifyParameterSize(string Paraname, int SPSize)
+        {
+            return true;
+        }
+
+        public virtual bool ModifyParameterValue(string Paraname, object SPValue)
+        {
+            return true;
+        }
+
+        public virtual bool ModifyParameterDirection(string Paraname, ParameterDirection SPDirection)
+        {
+            return true;
+        }
+
+        public virtual void ClearAllParams()
+        {            
+        }
+
+        public virtual void ClearAllParamsValues()
+        {
+        }
+
     }       
     
 

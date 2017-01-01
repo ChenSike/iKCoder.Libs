@@ -77,7 +77,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ModifyParameterValue(string Paraname,object SPValue)
+        public override bool ModifyParameterValue(string Paraname,object SPValue)
         {
             if (ParametersCollection.ContainsKey(Paraname))
             {
@@ -99,7 +99,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ModifyParameterDirection(string Paraname,ParameterDirection SPDirection)
+        public override bool ModifyParameterDirection(string Paraname,ParameterDirection SPDirection)
         {
             if (ParametersCollection.ContainsKey(Paraname))
             {
@@ -110,7 +110,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ModifyParameterSize(string Paraname,int SPSize)
+        public override bool ModifyParameterSize(string Paraname,int SPSize)
         {
             if (ParametersCollection.ContainsKey(Paraname))
             {
@@ -132,12 +132,12 @@ namespace iKCoder_Platform_SDK_Kit
             return newEntry;
         }
 
-        public void ClearAllParams()
+        public override void ClearAllParams()
         {
             this.ParametersCollection.Clear();
         }
 
-        public void ClearAllParamsValues()
+        public override void ClearAllParamsValues()
         {
             foreach (string paramName in ParametersCollection.Keys)
             {
@@ -194,10 +194,7 @@ namespace iKCoder_Platform_SDK_Kit
             if (!ParametersCollection.ContainsKey(Paraname))
             {
                 SqlParameter activeParameter = new SqlParameter();
-                if (ActiveDBType == enum_DatabaseType.SqlServer)
-                    activeParameter.ParameterName = Paraname.StartsWith("@") ? Paraname : "@" + Paraname;
-                else if (ActiveDBType == enum_DatabaseType.MySql)
-                    activeParameter.ParameterName = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
+                activeParameter.ParameterName = Paraname.StartsWith("@") ? Paraname : "@" + Paraname;                
                 activeParameter.Direction = SPDirection;
                 activeParameter.SqlDbType = SPType;
                 activeParameter.Value = SPValue;
@@ -209,7 +206,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ModifyParameterValue(string Paraname,object SPValue)
+        public override bool ModifyParameterValue(string Paraname,object SPValue)
         {
             if (ParametersCollection.ContainsKey(Paraname))
             {
@@ -231,7 +228,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ModifyParameterDirection(string Paraname,ParameterDirection SPDirection)
+        public override bool ModifyParameterDirection(string Paraname,ParameterDirection SPDirection)
         {
             if (ParametersCollection.ContainsKey(Paraname))
             {
@@ -242,7 +239,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
 
-        public bool ModifyParameterSize(string Paraname,int SPSize)
+        public override bool ModifyParameterSize(string Paraname,int SPSize)
         {
             if (ParametersCollection.ContainsKey(Paraname))
             {
@@ -264,12 +261,12 @@ namespace iKCoder_Platform_SDK_Kit
             return newEntry;
         }
 
-        public void ClearAllParams()
+        public override void ClearAllParams()
         {
             this.ParametersCollection.Clear();
         }
 
-        public void ClearAllParamsValues()
+        public override void ClearAllParamsValues()
         {
             foreach (string paramName in ParametersCollection.Keys)
             {
