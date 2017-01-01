@@ -5,6 +5,9 @@ using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using System.Xml;
+using MySql.Data;
+using MySql;
+using MySql.Data.MySqlClient;
 
 namespace iKCoder_Platform_SDK_Kit
 {
@@ -22,27 +25,143 @@ namespace iKCoder_Platform_SDK_Kit
         public const string SelectAction = "Select";
         public const string InsertAction = "Insert";
         public const string DeleteAction = "Delete";
-        public const string AllAction = "All";
+        public const string AllAction = "All";        
     }
 
-    public class class_Data_SqlSPEntry:ICloneable
+    public class class_data_MySqlSPEntry : class_Data_SqlSPEntry
     {
-
-        public class_Data_SqlSPEntry(enum_DatabaseType activeDBType)
+        public class_data_MySqlSPEntry(enum_DatabaseType activeDBType):base(activeDBType)
         {
-            this.ActiveDBType = activeDBType;
+            this.ActiveDBType = activeDBType;     
         }
 
-        public enum_DatabaseType ActiveDBType
+        public MySqlDbType SPType
         {
             set;
             get;
         }
+        
+        public Dictionary<string, MySqlParameter> ParametersCollection = new Dictionary<string, MySqlParameter>();
 
-        public string SPName
+        public static class_data_MySqlSPEntry CreateInstance(string SPName, MySqlDbType SPType, string EntryType,enum_DatabaseType activeDBType)
         {
-            set;
-            get;
+            class_data_MySqlSPEntry newEntry = new class_data_MySqlSPEntry(activeDBType);
+            newEntry.SPName = SPName;
+            newEntry.SPType = SPType;
+            newEntry.EntryType = EntryType;
+            return newEntry;
+        }             
+       
+        public List<MySqlParameter> GetActiveParametersList()
+        {
+            List<MySqlParameter> result = new List<MySqlParameter>();
+            foreach (string parameterName in ParametersCollection.Keys)
+                result.Add(ParametersCollection[parameterName]);
+            return result;
+        }
+
+        public bool SetNewParameter(string Paraname, MySqlDbType SPType, ParameterDirection SPDirection,int size,object SPValue)
+        {
+            if (!ParametersCollection.ContainsKey(Paraname))
+            {
+                MySqlParameter activeParameter = new MySqlParameter();
+                activeParameter.ParameterName = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
+                activeParameter.Direction = SPDirection;
+                activeParameter.MySqlDbType = SPType;
+                activeParameter.Value = SPValue;
+                activeParameter.Size = size;
+                ParametersCollection.Add(Paraname, activeParameter);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ModifyParameterValue(string Paraname,object SPValue)
+        {
+            if (ParametersCollection.ContainsKey(Paraname))
+            {
+                ParametersCollection[Paraname].Value = SPValue;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ModifyParameterType(string Paraname, MySqlDbType SPType)
+        {
+            if (ParametersCollection.ContainsKey(Paraname))
+            {
+                ParametersCollection[Paraname].MySqlDbType = SPType;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ModifyParameterDirection(string Paraname,ParameterDirection SPDirection)
+        {
+            if (ParametersCollection.ContainsKey(Paraname))
+            {
+                ParametersCollection[Paraname].Direction = SPDirection;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ModifyParameterSize(string Paraname,int SPSize)
+        {
+            if (ParametersCollection.ContainsKey(Paraname))
+            {
+                ParametersCollection[Paraname].Size = SPSize;
+                return true;
+            }
+            else
+                return false;
+        }
+            
+        public object Clone()
+        {
+            class_data_MySqlSPEntry newEntry = new class_data_MySqlSPEntry(this.ActiveDBType);
+            newEntry.ParametersCollection = this.ParametersCollection;
+            newEntry.EntryType = this.EntryType;
+            newEntry.KeyName = this.KeyName;
+            newEntry.SPName = this.SPName;
+            newEntry.SPType = this.SPType;
+            return newEntry;
+        }
+
+        public void ClearAllParams()
+        {
+            this.ParametersCollection.Clear();
+        }
+
+        public void ClearAllParamsValues()
+        {
+            foreach (string paramName in ParametersCollection.Keys)
+            {
+                this.ParametersCollection[paramName].Value = string.Empty;
+            }
+        }
+
+        public bool RemoveParam(string Paraname)
+        {
+            if (ParametersCollection.ContainsKey(Paraname))
+            {
+                ParametersCollection.Remove(Paraname);
+                return true;
+            }
+            else
+                return false;
+        }
+    }
+
+    public class class_data_SqlServerSPEntry : class_Data_SqlSPEntry
+    {
+        public class_data_SqlServerSPEntry(enum_DatabaseType activeDBType):base(activeDBType)
+        {
+            this.ActiveDBType = activeDBType;     
         }
 
         public SqlDbType SPType
@@ -50,31 +169,18 @@ namespace iKCoder_Platform_SDK_Kit
             set;
             get;
         }
-
-        public string KeyName
-        {
-            set;
-            get;
-        }
-
-        public string EntryType
-        {
-            set;
-            get;
-        }
-
+        
         public Dictionary<string, SqlParameter> ParametersCollection = new Dictionary<string, SqlParameter>();
 
-        public static class_Data_SqlSPEntry CreateInstance(string SPName, SqlDbType SPType, string EntryType,enum_DatabaseType activeDBType)
+        public static class_data_SqlServerSPEntry CreateInstance(string SPName, SqlDbType SPType, string EntryType,enum_DatabaseType activeDBType)
         {
-            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry(activeDBType);
+            class_data_SqlServerSPEntry newEntry = new class_data_SqlServerSPEntry(activeDBType);
             newEntry.SPName = SPName;
             newEntry.SPType = SPType;
             newEntry.EntryType = EntryType;
             return newEntry;
-        }              
+        }             
        
-
         public List<SqlParameter> GetActiveParametersList()
         {
             List<SqlParameter> result = new List<SqlParameter>();
@@ -149,7 +255,7 @@ namespace iKCoder_Platform_SDK_Kit
             
         public object Clone()
         {
-            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry(this.ActiveDBType);
+            class_data_SqlServerSPEntry newEntry = new class_data_SqlServerSPEntry(this.ActiveDBType);
             newEntry.ParametersCollection = this.ParametersCollection;
             newEntry.EntryType = this.EntryType;
             newEntry.KeyName = this.KeyName;
@@ -181,7 +287,7 @@ namespace iKCoder_Platform_SDK_Kit
             else
                 return false;
         }
-
     }
-
+       
+   
 }

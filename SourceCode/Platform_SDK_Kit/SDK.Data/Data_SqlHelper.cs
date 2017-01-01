@@ -522,7 +522,7 @@ namespace iKCoder_Platform_SDK_Kit
                                     if (dbtyps.Length > 0)
                                     {
                                         class_Data_SqlDataHelper.GetColumnData(dbtyps[0], "name", out activeDBType);
-                                        newSPEntry.SetNewParameter(activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);
+                                        ((class_data_SqlServerSPEntry) newSPEntry).SetNewParameter(activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);
                                     }
                                     else
                                         continue;
@@ -556,9 +556,14 @@ namespace iKCoder_Platform_SDK_Kit
                             foreach(string activeParam in activeParams)
                             {
                                 string[] activeParamInfo = activeParam.Split(' ');
-                                if(activeParamInfo.Length==2)
+                                if(activeParamInfo.Length>=2)
                                 {
-                                    //newSPEntry.SetNewParameter()
+                                    string parameterName = activeParamInfo[0];
+                                    string parameterType = activeParamInfo[1].Split('(')[0];
+                                    string parameterLength = activeParamInfo[1].Split('(')[1].Replace(")","");
+                                    int activeParameterLength = 0;
+                                    int.TryParse(parameterLength,out activeParameterLength);
+                                    ((class_data_MySqlSPEntry)newSPEntry).SetNewParameter(activeParamInfo[0], Data_Util.ConventStrTOMySqlDbtye(parameterType), ParameterDirection.Input, activeParameterLength, null);
                                 }
                             }
                         }
@@ -576,9 +581,9 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "select");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "select");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "select");       
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "select");
                 class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
@@ -593,9 +598,9 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "selectkey");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "selectkey");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "selectkey");                
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "selectkey");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
@@ -610,9 +615,9 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "selectcondition");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "selectcondition");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "selectcondition");
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "selectcondition");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
                 return dt;
@@ -625,11 +630,11 @@ namespace iKCoder_Platform_SDK_Kit
         {            
            class_data_PlatformDBDataReader activeDataReader = null;
             if (activeEntry != null)
-            {                
+            {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "selectcondition");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "selectcondition");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "selectcondition");
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "selectcondition");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
                 return activeDataReader;
@@ -644,9 +649,9 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "selectkey");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "selectkey");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "selectkey");                
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "selectkey");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
                 return activeDataReader;
@@ -661,9 +666,9 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "select");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "select");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "select");
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "select");
                 class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
                 class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
                 return activeDataReader;
@@ -677,9 +682,9 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "insert");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "insert");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "insert");
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "insert");
                 class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
@@ -692,9 +697,9 @@ namespace iKCoder_Platform_SDK_Kit
             if (activeEntry != null)
             {
                 if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "update");
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "update");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "update");
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "update");
                 class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
@@ -706,10 +711,10 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (activeEntry != null)
             {
-                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType==enum_DatabaseType.SqlServer)
-                    activeEntry.ModifyParameterValue("@operation", "delete");
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "delete");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    activeEntry.ModifyParameterValue("_operation", "delete");
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "delete");
                 class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }

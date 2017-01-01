@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Xml;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using MySql;
 
 namespace iKCoder_Platform_SDK_Kit
 {
@@ -183,7 +184,7 @@ namespace iKCoder_Platform_SDK_Kit
                         SqlCommand cmd = new SqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (SqlParameter activeParameter in ((class_data_SqlServerSPEntry)activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
                         refDataReader = new class_data_PlatformDBDataReader();
@@ -196,7 +197,7 @@ namespace iKCoder_Platform_SDK_Kit
                         MySqlCommand cmd = new MySqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (MySqlParameter activeParameter in ((class_data_MySqlSPEntry)activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
                         refDataReader = new class_data_PlatformDBDataReader();
@@ -228,7 +229,7 @@ namespace iKCoder_Platform_SDK_Kit
                         SqlCommand cmd = new SqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (SqlParameter activeParameter in ((class_data_SqlServerSPEntry) activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
                         SqlDataAdapter sda = new SqlDataAdapter(cmd);
@@ -241,14 +242,14 @@ namespace iKCoder_Platform_SDK_Kit
                         MySqlCommand cmd = new MySqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (MySqlParameter activeParameter in ((class_data_MySqlSPEntry)activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
                         MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
                         resultDS = new DataSet();
                         sda.Fill(resultDS);
                         return true;
-                     }
+                    }
                     else
                         return false;
                 }
@@ -274,7 +275,7 @@ namespace iKCoder_Platform_SDK_Kit
                         SqlCommand cmd = new SqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (SqlParameter activeParameter in ((class_data_SqlServerSPEntry)activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
                         SqlDataAdapter sda = new SqlDataAdapter(cmd);
@@ -287,14 +288,14 @@ namespace iKCoder_Platform_SDK_Kit
                         MySqlCommand cmd = new MySqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (MySqlParameter activeParameter in ((class_data_MySqlSPEntry) activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
                         MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
                         resultDT = new DataTable();
                         sda.Fill(resultDT);
                         return true;
-                     }
+                    }
                     else
                         return false;
                 }
@@ -356,7 +357,7 @@ namespace iKCoder_Platform_SDK_Kit
                         SqlCommand cmd = new SqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (SqlParameter activeParameter in ((class_data_SqlServerSPEntry) activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_SqlServerConnectionItem)activeconnection).ActiveConnection;
                         cmd.ExecuteNonQuery();
@@ -367,7 +368,7 @@ namespace iKCoder_Platform_SDK_Kit
                         MySqlCommand cmd = new MySqlCommand();
                         cmd.CommandText = activeSPEntry.SPName;
                         cmd.CommandType = CommandType.StoredProcedure;
-                        foreach (SqlParameter activeParameter in activeSPEntry.GetActiveParametersList())
+                        foreach (MySqlParameter activeParameter in ((class_data_MySqlSPEntry)activeSPEntry).GetActiveParametersList())
                             cmd.Parameters.Add(activeParameter);
                         cmd.Connection = ((class_data_MySqlConnectionItem)activeconnection).ActiveConnection;
                         MySqlDataAdapter sda = new MySqlDataAdapter(cmd);

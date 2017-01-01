@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
+using MySql;
+using MySql.Data.MySqlClient;
+
 
 namespace iKCoder_Platform_SDK_Kit
 {
@@ -29,7 +32,7 @@ namespace iKCoder_Platform_SDK_Kit
                     return DbType.DateTime;
                 case "float":
                     return DbType.Single;
-                case "varchar":
+                case "varchar":           
                 case "nvarchar":
                     return DbType.String;
                 case "bit":
@@ -39,6 +42,52 @@ namespace iKCoder_Platform_SDK_Kit
                     return DbType.Binary;
                 default:
                     return DbType.String;
+            }
+        }
+
+        public static MySqlDbType ConventStrTOMySqlDbtye(string DBType)
+        {
+            string avtiveDBtype = DBType.ToLower();
+            switch (DBType)
+            {
+                case "text":
+                    return MySqlDbType.Text;
+                case "tinytext":
+                    return MySqlDbType.TinyText;
+                case "longtext":
+                    return MySqlDbType.LongText;
+                case "mediumtext":
+                    return MySqlDbType.MediumText;
+                case "date":
+                    return MySqlDbType.Date;
+                case "datetime":
+                    return MySqlDbType.DateTime;
+                case "int":
+                    return MySqlDbType.Int64;
+                case "int32":
+                    return MySqlDbType.Int32;
+                case "double":
+                    return MySqlDbType.Double;
+                case "decimal":
+                    return MySqlDbType.Decimal;
+                case "float":
+                    return MySqlDbType.Float;
+                case "varchar":
+                    return MySqlDbType.VarChar;
+                case "blob":
+                    return MySqlDbType.Blob;
+                case "tinyblob":
+                    return MySqlDbType.TinyBlob;
+                case "mediumblob":
+                    return MySqlDbType.MediumBlob;
+                case "longblob":
+                    return MySqlDbType.LongBlob;
+                case "byte":
+                    return MySqlDbType.Byte;
+                case "binary":
+                    return MySqlDbType.VarBinary;                   
+                default:
+                    return MySqlDbType.VarChar;
             }
         }
 
@@ -64,6 +113,7 @@ namespace iKCoder_Platform_SDK_Kit
                 case "float":
                     return SqlDbType.Float;
                 case "varchar":
+                    return SqlDbType.VarChar;
                 case "nvarchar":
                     return SqlDbType.NVarChar;
                 case "bit":
