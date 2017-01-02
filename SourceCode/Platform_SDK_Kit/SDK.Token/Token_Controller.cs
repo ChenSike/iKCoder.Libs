@@ -42,6 +42,19 @@ namespace iKCoder_Platform_SDK_Kit
         {
             _refPageSession = refPageSession;            
         }
+
+        public class_TokenItem GetActiveToken(string tokenGuid)
+        {
+            if (!string.IsNullOrEmpty(tokenGuid))
+            {
+                if (_refPageSession[tokenGuid] != null)
+                    return (class_TokenItem)_refPageSession[tokenGuid];
+                else
+                    return null;
+            }
+            else
+                return null;
+        }
        
         public bool FlushToken(string tokenGuid)
         {

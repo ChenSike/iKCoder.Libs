@@ -14,10 +14,16 @@ namespace iKCoder_Platform_SDK_Kit
         public static string SQL_GETALLTABLES_FOR_SQL2008 = "select * from sys.tables where (type = 'U')";
         public static string SQL_GETALLTABLES_FOR_SQL2005 = "select * from sys.all_objects where (type = 'U')";
         private static string SQL_GETALLTABLES_FOR_MYSQL = "select table_name from information_schema.tables where table_schema = '{schemaname}'";
+        private static string SQL_GETALLSPS_FOR_MYSQL = "select `name` from MySQL.proc where db = '{schemaname}'";
 
         public static string Get_SQL_GETALLTABLES_FOR_MYSQL(string schemaname)
         {
             return SQL_GETALLTABLES_FOR_MYSQL.Replace("{schemaname}", schemaname);
+        }
+
+        public static string Get_SQL_GETALLSPS_FOR_MYSQL(string schemaname)
+        {
+            return SQL_GETALLSPS_FOR_MYSQL.Replace("{schemaname}", schemaname);
         }
     }
 
@@ -206,33 +212,37 @@ namespace iKCoder_Platform_SDK_Kit
                 else if (ActiveConnection != null && ActiveConnection.activeDatabaseType == enum_DatabaseType.MySql)
                 {
                     class_data_MySqlConnectionItem mysqlActiveConnectionItem = (class_data_MySqlConnectionItem)ActiveConnection;
-                    string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);
-                    string sql_getALLColumns = "Select COLUMN_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA from INFORMATION_SCHEMA.COLUMNS Where table_schema = '{schemaname}' and table_name = '{tablename}'";
-                    string name_sp = "spa_operation_";
-                    sql_getALLColumns = sql_getALLColumns.Replace("{schemaname}", ((class_data_MySqlConnectionItem) ActiveConnection).ActiveConnection.Database);                    
+                    string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);                    
+                    string name_sp = "spa_operation_";                                        
                     DataTable TableInfo = new DataTable();     
                     StringBuilder sql_CreateNewSp = new StringBuilder();
                     if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TableInfo))
-                    {                     
+                    {
+                        DataTable TableSPInfos = new DataTable();
+                        string sql_getALLSPInfos = class_Data_SqlStringHelper.Get_SQL_GETALLSPS_FOR_MYSQL(((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);
+                        if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLSPInfos, out TableSPInfos))
+                        {
+                            foreach (DataRow activeSP in TableSPInfos.Rows)
+                            {
+                                string spname = "";
+                                class_Data_SqlDataHelper.GetColumnData(activeSP, "name", out spname);
+                                string sql_dropProcedure = "drop procedure " + spname;
+                                class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_dropProcedure);
+                            }
+                        }
                         foreach (DataRow activeTable in TableInfo.Rows)
                         {
+                            string sql_getALLColumns = "Select COLUMN_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA from INFORMATION_SCHEMA.COLUMNS Where table_schema = '{schemaname}' and table_name = '{tablename}'";
+                            sql_getALLColumns = sql_getALLColumns.Replace("{schemaname}", ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);  
                             sql_CreateNewSp.Clear();                            
-                            string tableName = "";
-                            class_Data_SqlDataHelper.GetColumnData(activeTable, "table_name", out tableName);                            
-                            DataTable TableSPInfos = new DataTable();
+                            string tableName = ""; 
+                            class_Data_SqlDataHelper.GetColumnData(activeTable, "table_name", out tableName);                        
                             List<string> tmpSelectedColumsLst = new List<string>();
                             List<string> tmpSelectedKeyColumnsLst = new List<string>();
-                            if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableSPInfos))
-                            {
-                                foreach(DataRow activeSP in TableSPInfos.Rows)
-                                {
-                                    string spname = "";
-                                    class_Data_SqlDataHelper.GetColumnData(activeSP, "name", out spname);
-                                    string sql_dropProcedure = "drop procedure " + spname;
-                                    class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_dropProcedure);
-                                }
+                           
                                 if (tableName != "")
                                 {                                    
+
                                     sql_getALLColumns = sql_getALLColumns.Replace("{tablename}", tableName);
                                     DataTable TableColumnsInfo = new DataTable();
                                     if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out TableColumnsInfo))
@@ -338,9 +348,7 @@ namespace iKCoder_Platform_SDK_Kit
                                         class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
                                     }
                                 }
-                            }
-                            else
-                                return false;
+
                         }
                     }
                     return true;
