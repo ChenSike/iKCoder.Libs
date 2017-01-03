@@ -141,7 +141,6 @@ namespace iKCoder_Platform_SDK_Kit
                 REQUESTDOCUMENT.LoadXml(requestStrDoc);            
             }
             APPFOLDERPATH = Server.MapPath("~/");;
-            DoAction();
             if (this.RSDoamin.Count > 0)
             {
                 foreach (string activeDoamin in this.RSDoamin.Keys)
@@ -150,6 +149,7 @@ namespace iKCoder_Platform_SDK_Kit
                 }
                 Response.AddHeader("Access-Control-Allow-Credentials", "true");
             }
+            DoAction();           
             if (ISRESPONSEDOC)
             {
                 Response.Write(RESPONSEDOCUMENT.OuterXml);
