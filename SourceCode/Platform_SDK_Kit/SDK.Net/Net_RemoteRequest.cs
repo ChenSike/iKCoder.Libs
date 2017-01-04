@@ -12,7 +12,17 @@ namespace iKCoder_Platform_SDK_Kit
     public class class_Net_RemoteRequest
     {
 
-        public static CookieContainer active_Cookies = new CookieContainer();
+        public CookieContainer active_Cookies;
+
+        public class_Net_RemoteRequest(ref CookieContainer refActiveCookieContainer)
+        {
+            this.active_Cookies = refActiveCookieContainer;
+        }
+
+        public class_Net_RemoteRequest()
+        {
+
+        }
 
         public byte[] getRemoteRequestToByteWithCookieHeader(string input, string remoteurl, int requestTimeOut, int buffersize)
         {

@@ -353,6 +353,15 @@ namespace iKCoder_Platform_SDK_Kit
             return "";
         }
 
+        public static string GetNodeValue(XmlNode node)
+        {
+            if (node != null)
+            {
+                return node.InnerText;
+            }
+            return "";
+        }
+
         public static void TraverseNodes(XmlNode Node,ActionForNode degActionForNode)
         {
             degActionForNode(Node);

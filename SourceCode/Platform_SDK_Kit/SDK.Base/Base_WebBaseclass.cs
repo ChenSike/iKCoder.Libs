@@ -13,9 +13,11 @@ namespace iKCoder_Platform_SDK_Kit
     {
 
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
+        protected byte[] RESPONSEBUFFER;
         public XmlDocument REQUESTDOCUMENT;        
         protected int REQUESTSPANTIME = 100;        
         protected bool ISRESPONSEDOC = false;
+        protected bool ISBINRESPONSE = false;
         
         public string APPFOLDERPATH
         {
@@ -110,17 +112,17 @@ namespace iKCoder_Platform_SDK_Kit
         protected void Page_Load(object sender, EventArgs e)
         {
             this.RSDoamin = new Dictionary<string, string>();
-            InitAction();            
+            InitAction();
             REQUESTIP = Page.Request.UserHostAddress;
-            if(string.IsNullOrEmpty(REQUESTIP))
+            if (string.IsNullOrEmpty(REQUESTIP))
                 REQUESTIP = "127.0.0.1";
-            if(Session[REQUESTIP]!=null)
+            if (Session[REQUESTIP] != null)
             {
-                DateTime lastRequestTime =  DateTime.Now;
-                if(Session[REQUESTIP].ToString()=="")
+                DateTime lastRequestTime = DateTime.Now;
+                if (Session[REQUESTIP].ToString() == "")
                 {
-                    DateTime.TryParse(Session[REQUESTIP].ToString(),out lastRequestTime);
-                    if((lastRequestTime - DateTime.Now).Milliseconds < REQUESTSPANTIME)
+                    DateTime.TryParse(Session[REQUESTIP].ToString(), out lastRequestTime);
+                    if ((lastRequestTime - DateTime.Now).Milliseconds < REQUESTSPANTIME)
                     {
                         AddErrMessageToResponseDOC("Request too often from client", "Sending request document too ofter.", "");
                         Response.Write(RESPONSEDOCUMENT.OuterXml);
@@ -129,7 +131,7 @@ namespace iKCoder_Platform_SDK_Kit
                 }
                 Session[REQUESTIP] = DateTime.Now.ToString();
             }
-            else            
+            else
                 Session.Add(REQUESTIP, DateTime.Now.ToString());
             BeforeLoad();
             if (Request.InputStream != null && Request.InputStream.Length > 0)
@@ -138,9 +140,9 @@ namespace iKCoder_Platform_SDK_Kit
                 string requestStrDoc = streamReaderObj.ReadToEnd();
                 streamReaderObj.Close();
                 REQUESTDOCUMENT = new XmlDocument();
-                REQUESTDOCUMENT.LoadXml(requestStrDoc);            
+                REQUESTDOCUMENT.LoadXml(requestStrDoc);
             }
-            APPFOLDERPATH = Server.MapPath("~/");;
+            APPFOLDERPATH = Server.MapPath("~/"); ;
             if (this.RSDoamin.Count > 0)
             {
                 foreach (string activeDoamin in this.RSDoamin.Keys)
@@ -149,10 +151,13 @@ namespace iKCoder_Platform_SDK_Kit
                 }
                 Response.AddHeader("Access-Control-Allow-Credentials", "true");
             }
-            DoAction();           
-            if (ISRESPONSEDOC)
-            {
+            DoAction();
+            if (ISRESPONSEDOC && !ISBINRESPONSE)
                 Response.Write(RESPONSEDOCUMENT.OuterXml);
+            else if (ISRESPONSEDOC && ISBINRESPONSE)
+            {
+                Response.BinaryWrite(RESPONSEBUFFER);
+                Response.Flush();
             }
         }       
     }

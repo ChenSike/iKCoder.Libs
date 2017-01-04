@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-
+        
     public class Store_DomainPersistanceItem
     {
         public string DomainKeyName
@@ -38,7 +38,41 @@ namespace iKCoder_Platform_SDK_Kit
     public class Store_DomainPersistance
     {
         
-        public static Dictionary<string, Dictionary<string, Store_DomainPersistanceItem>> DataBuffer = new Dictionary<string, Dictionary<string, Store_DomainPersistanceItem>>();
+        public Dictionary<string, Dictionary<string, Store_DomainPersistanceItem>> DataBuffer = new Dictionary<string, Dictionary<string, Store_DomainPersistanceItem>>();
+               
+        public Store_DomainPersistance()
+        {            
+            
+        }
+
+        public string GetKeyName(string hostaddress,string producename)
+        {
+            return hostaddress + "_" + producename;
+        }
+
+        public void AddSingle(string key,string domainKeyName,int storeExpeired,object data)
+        {
+            if (key != "")
+            {
+                Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = null;
+                if (!DataBuffer.ContainsKey(key))
+                {
+                    activeStoreItem = new Dictionary<string, Store_DomainPersistanceItem>();
+                    DataBuffer.Add(key, activeStoreItem);
+                }
+                else
+                    activeStoreItem = DataBuffer[key];
+                if (!activeStoreItem.ContainsKey(domainKeyName))
+                {
+                    Store_DomainPersistanceItem newItem = new Store_DomainPersistanceItem();
+                    newItem.DomainKeyName = domainKeyName;
+                    newItem.Created = DateTime.Now;
+                    newItem.Data = data;
+                    newItem.Expeired = storeExpeired > 0 ? storeExpeired : 60;
+                    activeStoreItem.Add(domainKeyName, newItem);
+                }                
+            }
+        }
 
         public void Add(string key, string domainKeyName,int storeExpeired,object data)
         {
@@ -46,13 +80,13 @@ namespace iKCoder_Platform_SDK_Kit
             if (key != "")
             {
                 Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = null;
-                if (!Store_DomainPersistance.DataBuffer.ContainsKey(key))
+                if (!DataBuffer.ContainsKey(key))
                 {
                     activeStoreItem = new Dictionary<string, Store_DomainPersistanceItem>();
-                    Store_DomainPersistance.DataBuffer.Add(key, activeStoreItem);
+                    DataBuffer.Add(key, activeStoreItem);
                 }
                 else
-                    activeStoreItem = Store_DomainPersistance.DataBuffer[key];
+                    activeStoreItem = DataBuffer[key];
                 if (!activeStoreItem.ContainsKey(domainKeyName))
                 {
                     Store_DomainPersistanceItem newItem = new Store_DomainPersistanceItem();
@@ -75,9 +109,9 @@ namespace iKCoder_Platform_SDK_Kit
         public object Get(string key,string domainKeyName)
         {
             ClearBuffer();
-            if (Store_DomainPersistance.DataBuffer.ContainsKey(key))
+            if (DataBuffer.ContainsKey(key))
             {
-                Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = Store_DomainPersistance.DataBuffer[key];
+                Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
                 if (activeStoreItem.ContainsKey(domainKeyName))
                     return activeStoreItem[domainKeyName].Data;
                 else
@@ -89,9 +123,9 @@ namespace iKCoder_Platform_SDK_Kit
 
         public void Remove(string key,string domainKeyName)
         {
-            if (Store_DomainPersistance.DataBuffer.ContainsKey(key))
+            if (DataBuffer.ContainsKey(key))
             {
-                Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = Store_DomainPersistance.DataBuffer[key];
+                Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
                 if (activeStoreItem.ContainsKey(domainKeyName))                
                     activeStoreItem.Remove(domainKeyName);                
             }
@@ -100,9 +134,9 @@ namespace iKCoder_Platform_SDK_Kit
 
         public void Flush(string key,string domainKeyName)
         {
-            if (Store_DomainPersistance.DataBuffer.ContainsKey(key))
+            if (DataBuffer.ContainsKey(key))
             {
-                Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = Store_DomainPersistance.DataBuffer[key];
+                Dictionary<string, Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
                 if (activeStoreItem.ContainsKey(domainKeyName))
                 {
                     activeStoreItem[domainKeyName].Created = DateTime.Now;
@@ -120,6 +154,8 @@ namespace iKCoder_Platform_SDK_Kit
                 foreach(string keyName in DataBuffer[activeUrl].Keys)
                 {                    
                     Store_DomainPersistanceItem tmpItem = DataBuffer[activeUrl][keyName];
+                    if(tmpItem.Expeired == -999)                    
+                        continue;                    
                     if ((DateTime.Now - tmpItem.Created).Minutes >= tmpItem.Expeired)
                         removeLst.Add(keyName);                                               
                 }
@@ -130,6 +166,11 @@ namespace iKCoder_Platform_SDK_Kit
             }
             foreach (string activeRemovedUrl in removedUrlLst)
                 DataBuffer.Remove(activeRemovedUrl);
+        }
+
+        public void ClearAll()
+        {
+            DataBuffer.Clear();            
         }
         
     }

@@ -50,6 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SDK.Base\Base_AppRuuningLogServices.cs" />
     <Compile Include="SDK.Base\Base_iInternalPlugin.cs" />
+    <Compile Include="SDK.Base\Base_MultyLanguagesController.cs" />
     <Compile Include="SDK.Base\Base_XmlHelper.cs" />
     <Compile Include="SDK.Base\Base_Config.cs" />
     <Compile Include="SDK.Base\Base_EmailServices.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="SDK.Plugin\Plugin_AllBase.cs" />
     <Compile Include="SDK.Pools\Pools_Security.cs" />
     <Compile Include="SDK.Security\Security_BaseItem.cs" />
+    <Compile Include="SDK.Security\Security_CheckCode.cs" />
     <Compile Include="SDK.Security\Security_DES.cs" />
     <Compile Include="SDK.Store\Store_DomainPersistance.cs" />
     <Compile Include="SDK.Token\Token_Controller.cs" />
