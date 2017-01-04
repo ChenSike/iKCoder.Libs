@@ -11,6 +11,76 @@ namespace iKCoder_Platform_SDK_Kit
 {
     public class class_Net_RemoteRequest
     {
+
+        public static CookieContainer active_Cookies = new CookieContainer();
+
+        public byte[] getRemoteRequestToByteWithCookieHeader(string input, string remoteurl, int requestTimeOut, int buffersize)
+        {
+            try
+            {
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if(active_Cookies.Count>0)                
+                    request.CookieContainer = active_Cookies;
+                request.Timeout = 1000 * 20;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                Stream responseStream = ((HttpWebResponse)request.GetResponse()).GetResponseStream();
+                string cookieheader = request.CookieContainer.GetCookieHeader(new Uri(remoteurl));
+                active_Cookies.SetCookies(new Uri(remoteurl), cookieheader);                
+                foreach(Cookie activeCookieInRequest in request.CookieContainer.GetCookies(new Uri(remoteurl)))           
+                    active_Cookies.Add(activeCookieInRequest);                
+                byte[] buffer2 = null;
+                BinaryReader reader = new BinaryReader(responseStream);
+                buffer2 = reader.ReadBytes(buffersize);
+                reader.Close();
+                responseStream.Close();
+                return buffer2;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public string getRemoteRequestToStringWithCookieHeader(string input, string remoteurl, int requestTimeOut, int buffersize )
+        {
+            try
+            {
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if (active_Cookies.Count > 0)
+                    request.CookieContainer = active_Cookies;
+                request.Timeout = 0x1b7740;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.Default);
+                string cookieheader = request.CookieContainer.GetCookieHeader(new Uri(remoteurl));
+                active_Cookies.SetCookies(new Uri(remoteurl), cookieheader);                
+                    foreach (Cookie activeCookieInRequest in request.CookieContainer.GetCookies(new Uri(remoteurl)))
+                        active_Cookies.Add(activeCookieInRequest); 
+                string result = "";                
+                result = responseStream.ReadToEnd();
+                return result;
+            }
+            catch (Exception err)
+            {
+                return err.Message;
+            }
+        }
+
         public byte[] getRemoteRequestToByte(string input, string remoteurl, int requestTimeOut, int buffersize, List<Cookie> activeCookies)
         {
             try
