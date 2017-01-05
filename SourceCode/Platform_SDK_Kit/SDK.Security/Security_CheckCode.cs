@@ -49,10 +49,10 @@ namespace iKCoder_Platform_SDK_Kit
 
                 g.DrawLine(new Pen(Color.LightGray), x1, y1, x2, y2);
             }
-            Font font = new Font("Arial", 15, FontStyle.Bold | FontStyle.Italic);
+            Font font = new Font("Arial", 20, FontStyle.Bold | FontStyle.Italic);
             System.Drawing.Drawing2D.LinearGradientBrush brush = new System.Drawing.Drawing2D.LinearGradientBrush(
                 new Rectangle(0, 0, image.Width, image.Height), Color.Blue, Color.Gray, 1.2f, true);
-            g.DrawString(this.CheckCode, font, brush, 0, 0);            
+            g.DrawString(this.CheckCode, font, brush, 0, (height-20)/4);            
             for (int i = 0; i < 10; i++)
             {
                 int x = random.Next(image.Width);

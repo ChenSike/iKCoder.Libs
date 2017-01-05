@@ -18,7 +18,7 @@ namespace iKCoder_Platform_SDK_Kit
         protected int REQUESTSPANTIME = 100;        
         protected bool ISRESPONSEDOC = false;
         protected bool ISBINRESPONSE = false;
-        
+                
         public string APPFOLDERPATH
         {
             set;
@@ -29,6 +29,34 @@ namespace iKCoder_Platform_SDK_Kit
         {
             set;
             get;
+        }
+
+        public string GetClientIPAddr()
+        {
+
+            string userHostAddress = "";
+            try
+            {
+                userHostAddress = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"].ToString().Split(',')[0].Trim();
+            }
+            catch
+            {
+                
+            }
+            if (string.IsNullOrEmpty(userHostAddress))
+            {
+                userHostAddress = HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+            }
+            if (string.IsNullOrEmpty(userHostAddress))
+            {
+                userHostAddress = HttpContext.Current.Request.UserHostAddress;
+            }
+            if (!string.IsNullOrEmpty(userHostAddress))
+            {
+                return userHostAddress;
+            }
+            return "127.0.0.1";
+
         }
 
         public class_Base_WebBaseclass()
@@ -111,9 +139,10 @@ namespace iKCoder_Platform_SDK_Kit
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            this.REQUESTIP = GetClientIPAddr();
             this.RSDoamin = new Dictionary<string, string>();
             InitAction();
-            REQUESTIP = Page.Request.UserHostAddress;
+            //REQUESTIP = Page.Request.UserHostAddress;
             if (string.IsNullOrEmpty(REQUESTIP))
                 REQUESTIP = "127.0.0.1";
             if (Session[REQUESTIP] != null)

@@ -82,6 +82,7 @@
     <Compile Include="SDK.Token\Token_Controller.cs" />
     <Compile Include="SDK.Token\Token_TokenItem.cs" />
     <Compile Include="SDK.Util\Util_Common.cs" />
+    <Compile Include="SDK.Util\Util_LabelsController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SDK.Forms\Forms_NoBorderBaseform.resx">
