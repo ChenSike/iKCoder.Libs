@@ -7,13 +7,7 @@ using System.Xml;
 
 
 namespace iKCoder_Platform_SDK_Kit
-{
-
-    public enum enum_Language
-    {
-        Chinese = 1,
-        English =2
-    }
+{  
 
     public class class_Util_LabelsController
     {

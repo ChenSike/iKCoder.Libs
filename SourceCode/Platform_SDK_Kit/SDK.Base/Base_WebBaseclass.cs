@@ -108,7 +108,7 @@ namespace iKCoder_Platform_SDK_Kit
         public Dictionary<string, string> RSDoamin;
        
 
-        protected void AddErrMessageToResponseDOC(string header, string message,string link)
+        protected void AddErrMessageToResponseDOC(string header, string message,string link,enum_MessageType activeMessageType = enum_MessageType.Message)
         {
             XmlNode errNode = class_XmlHelper.CreateNode(RESPONSEDOCUMENT, "err", "");
             class_XmlHelper.SetAttribute(errNode, "header", header);

@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SDK.Base\Base_AppRuuningLogServices.cs" />
+    <Compile Include="SDK.Base\Base_CommonEnum.cs" />
     <Compile Include="SDK.Base\Base_iInternalPlugin.cs" />
     <Compile Include="SDK.Base\Base_MultyLanguagesController.cs" />
     <Compile Include="SDK.Base\Base_XmlHelper.cs" />
