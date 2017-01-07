@@ -79,6 +79,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         public override bool ModifyParameterValue(string Paraname,object SPValue)
         {
+            Paraname = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection[Paraname].Value = SPValue;
@@ -90,6 +91,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         public bool ModifyParameterType(string Paraname, MySqlDbType SPType)
         {
+            Paraname = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection[Paraname].MySqlDbType = SPType;
@@ -101,6 +103,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         public override bool ModifyParameterDirection(string Paraname,ParameterDirection SPDirection)
         {
+            Paraname = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection[Paraname].Direction = SPDirection;
@@ -112,6 +115,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         public override bool ModifyParameterSize(string Paraname,int SPSize)
         {
+            Paraname = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection[Paraname].Size = SPSize;
@@ -141,12 +145,13 @@ namespace iKCoder_Platform_SDK_Kit
         {
             foreach (string paramName in ParametersCollection.Keys)
             {
-                this.ParametersCollection[paramName].Value = string.Empty;
+                this.ParametersCollection[paramName].Value = null;
             }
         }
 
         public bool RemoveParam(string Paraname)
         {
+            Paraname = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection.Remove(Paraname);

@@ -21,7 +21,29 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 try
                 {
+                    
                     result = activeDR[activeColumnName].ToString();
+
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            else
+                return false;
+        }
+
+        public static bool GetArrByteColumnDataToString(DataRow activeDR, string activeColumnName, out string result)
+        {
+            result = "";
+            if (activeDR != null)
+            {
+                try
+                {
+                    byte[] buffer = (byte[])activeDR[activeColumnName];
+                    result = System.Text.Encoding.Default.GetString(buffer);
                     return true;
                 }
                 catch

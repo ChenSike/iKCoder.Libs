@@ -340,7 +340,7 @@ namespace iKCoder_Platform_SDK_Kit
                                             sql_CreateNewSp.Append(" where ");
                                             foreach(string activeSelectedColumn in tmpSelectedColumsLst)
                                                 sql_CreateNewSp.Append(activeSelectedColumn + " = _" + activeSelectedColumn + " or ");
-                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
                                         }
                                         sql_CreateNewSp.AppendLine(";");
                                         sql_CreateNewSp.AppendLine("END IF;");
@@ -553,13 +553,13 @@ namespace iKCoder_Platform_SDK_Kit
                     {
                         foreach(DataRow activeDR in dtALLSPInfo.Rows)
                         {
-                            class_Data_SqlSPEntry newSPEntry = new class_Data_SqlSPEntry(activeConnection.activeDatabaseType);
+                            class_data_MySqlSPEntry newSPEntry = new class_data_MySqlSPEntry(activeConnection.activeDatabaseType);
                             string spName = "";
                             class_Data_SqlDataHelper.GetColumnData(activeDR, "name", out spName);                            
                             newSPEntry.SPName = spName;
                             newSPEntry.KeyName = spName;
                             string tmpParamsFromDB = "";
-                            class_Data_SqlDataHelper.GetColumnData(activeDR, "param_list", out tmpParamsFromDB);
+                            class_Data_SqlDataHelper.GetArrByteColumnDataToString(activeDR, "param_list", out tmpParamsFromDB);
                             string[] activeParams = tmpParamsFromDB.Split(',');
                             foreach(string activeParam in activeParams)
                             {
@@ -568,12 +568,21 @@ namespace iKCoder_Platform_SDK_Kit
                                 {
                                     string parameterName = activeParamInfo[0];
                                     string parameterType = activeParamInfo[1].Split('(')[0];
-                                    string parameterLength = activeParamInfo[1].Split('(')[1].Replace(")","");
+                                    string parameterLength = "0";
+                                    try
+                                    {
+                                        parameterLength = activeParamInfo[1].Split('(')[1].Replace(")", "");
+                                    }
+                                    catch
+                                    {
+
+                                    }
                                     int activeParameterLength = 0;
                                     int.TryParse(parameterLength,out activeParameterLength);
                                     ((class_data_MySqlSPEntry)newSPEntry).SetNewParameter(activeParamInfo[0], Data_Util.ConventStrTOMySqlDbtye(parameterType), ParameterDirection.Input, activeParameterLength, null);
                                 }
                             }
+                            result.Add(newSPEntry.KeyName, newSPEntry);
                         }
                     }
                 }

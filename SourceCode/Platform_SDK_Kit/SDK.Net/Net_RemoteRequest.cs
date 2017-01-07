@@ -76,7 +76,7 @@ namespace iKCoder_Platform_SDK_Kit
                 requestStream.Write(bytes, 0, bytes.Length);
                 requestStream.Flush();
                 requestStream.Close();
-                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.Default);
+                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.UTF8); 
                 string cookieheader = request.CookieContainer.GetCookieHeader(new Uri(remoteurl));
                 active_Cookies.SetCookies(new Uri(remoteurl), cookieheader);                
                     foreach (Cookie activeCookieInRequest in request.CookieContainer.GetCookies(new Uri(remoteurl)))
@@ -88,6 +88,76 @@ namespace iKCoder_Platform_SDK_Kit
             catch (Exception err)
             {
                 return err.Message;
+            }
+        }
+
+        public List<Cookie> getRemoteServerCookieFillCookieContainerByGet(string remoteurl)
+        {
+            try
+            {
+                List<Cookie> result = new List<Cookie>();
+                HttpWebResponse response = null;
+                HttpWebRequest request = null;                           
+                request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.Timeout = 1000 * 60 * 2;
+                request.Method = "get";                
+                Thread.Sleep(1000);                
+                response = (HttpWebResponse)request.GetResponse();
+                Uri newUri = new Uri(remoteurl);
+                if (response != null && request != null && response.StatusCode == HttpStatusCode.OK && request.CookieContainer.GetCookies(newUri).Count > 0)
+                {
+                    List<string> tmpstrCookiesList = new List<string>();
+                    foreach (Cookie activeCookie in request.CookieContainer.GetCookies(newUri))
+                    {
+                        tmpstrCookiesList.Add(activeCookie.Domain + ":" + activeCookie.Name + "=" + activeCookie.Value);
+                        active_Cookies.Add(activeCookie);
+                        result.Add(activeCookie);
+                    }                   
+                }
+                return result;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<Cookie> getRemoteServerCookieFillCookieContainer(string remoteurl, string input)
+        {
+            try
+            {
+                List<Cookie> result = new List<Cookie>();
+                HttpWebResponse response = null;
+                HttpWebRequest request = null;
+                Stream requestStream = null;
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                request = (HttpWebRequest)WebRequest.Create(remoteurl);                
+                request.Timeout = 1000 * 60 * 2;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = bytes.Length;
+                Thread.Sleep(1000);
+                requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                response = (HttpWebResponse)request.GetResponse();
+                Uri newUri = new Uri(remoteurl);
+                if (response != null && request != null && requestStream != null && response.StatusCode == HttpStatusCode.OK && request.CookieContainer.GetCookies(newUri).Count > 0)
+                {
+                    List<string> tmpstrCookiesList = new List<string>();                    
+                    foreach (Cookie activeCookie in request.CookieContainer.GetCookies(newUri))
+                    {
+                        tmpstrCookiesList.Add(activeCookie.Domain + ":" + activeCookie.Name + "=" + activeCookie.Value);
+                        active_Cookies.Add(activeCookie);
+                        result.Add(activeCookie);
+                    }
+                    requestStream.Close();
+                }
+                return result;
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -104,6 +174,38 @@ namespace iKCoder_Platform_SDK_Kit
                 request.Timeout = 0x1b7740;
                 request.Method = "post";
                 request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                Stream responseStream = ((HttpWebResponse)request.GetResponse()).GetResponseStream();
+                byte[] buffer2 = null;
+                BinaryReader reader = new BinaryReader(responseStream);
+                buffer2 = reader.ReadBytes(buffersize);
+                reader.Close();
+                responseStream.Close();
+                return buffer2;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public byte[] getRemoteXMLRequestToByte(string input, string remoteurl, int requestTimeOut, int buffersize, List<Cookie> activeCookies)
+        {
+            try
+            {
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if (activeCookies != null && activeCookies.Count > 0)
+                    foreach (Cookie activeCookie in activeCookies)
+                        request.CookieContainer.Add(activeCookie);
+                request.Timeout = 0x1b7740;
+                request.Method = "post";
+                request.ContentType = "text/xml";
                 request.ContentLength = bytes.Length;
                 Stream requestStream = request.GetRequestStream();
                 requestStream.Write(bytes, 0, bytes.Length);
@@ -140,13 +242,42 @@ namespace iKCoder_Platform_SDK_Kit
                 Stream requestStream = request.GetRequestStream();
                 requestStream.Write(bytes, 0, bytes.Length);
                 requestStream.Flush();
-                requestStream.Close();
-                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.Default);
+                requestStream.Close();                
+                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.UTF8);                
                 string result = "";
                 result = responseStream.ReadToEnd();
                 return result;
             }
             catch(Exception err)
+            {
+                return err.Message;
+            }
+        }
+
+        public string getRemoteXMLRequestToString(string input, string remoteurl, int requestTimeOut, int buffersize, List<Cookie> activeCookies)
+        {
+            try
+            {
+                byte[] bytes = Encoding.Default.GetBytes(input);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if (activeCookies != null && activeCookies.Count > 0)
+                    foreach (Cookie activeCookie in activeCookies)
+                        request.CookieContainer.Add(activeCookie);
+                request.Timeout = 0x1b7740;
+                request.Method = "post";
+                request.ContentType = "text/xml";
+                request.ContentLength = bytes.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(bytes, 0, bytes.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.UTF8); 
+                string result = "";
+                result = responseStream.ReadToEnd();
+                return result;
+            }
+            catch (Exception err)
             {
                 return err.Message;
             }

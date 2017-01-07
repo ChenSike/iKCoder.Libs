@@ -139,6 +139,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            APPFOLDERPATH = Server.MapPath("~/");
             this.REQUESTIP = GetClientIPAddr();
             this.RSDoamin = new Dictionary<string, string>();
             InitAction();
@@ -171,7 +172,6 @@ namespace iKCoder_Platform_SDK_Kit
                 REQUESTDOCUMENT = new XmlDocument();
                 REQUESTDOCUMENT.LoadXml(requestStrDoc);
             }
-            APPFOLDERPATH = Server.MapPath("~/"); ;
             if (this.RSDoamin.Count > 0)
             {
                 foreach (string activeDoamin in this.RSDoamin.Keys)
@@ -182,7 +182,10 @@ namespace iKCoder_Platform_SDK_Kit
             }
             DoAction();
             if (ISRESPONSEDOC && !ISBINRESPONSE)
+            {
+                Response.ContentType = "text/xml; characterset=utf-8";
                 Response.Write(RESPONSEDOCUMENT.OuterXml);
+            }
             else if (ISRESPONSEDOC && ISBINRESPONSE)
             {
                 Response.BinaryWrite(RESPONSEBUFFER);
