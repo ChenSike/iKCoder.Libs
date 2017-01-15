@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gma.QrCodeNet.Encoding.Net45">
+      <HintPath>..\..\..\BinaryPackage\Gma.QrCodeNet.Encoding.Net45.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\MySQL\Connector.NET 6.9\Assemblies\v4.5\MySql.Data.dll</HintPath>
@@ -84,6 +87,7 @@
     <Compile Include="SDK.Token\Token_TokenItem.cs" />
     <Compile Include="SDK.Util\Util_Common.cs" />
     <Compile Include="SDK.Util\Util_LabelsController.cs" />
+    <Compile Include="SDK.Util\Util_QRCoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SDK.Forms\Forms_NoBorderBaseform.resx">
