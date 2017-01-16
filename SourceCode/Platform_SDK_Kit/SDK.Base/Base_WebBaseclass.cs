@@ -59,6 +59,12 @@ namespace iKCoder_Platform_SDK_Kit
 
         }
 
+        public string ClientSymbol
+        {
+            set;
+            get;
+        }
+
         public class_Base_WebBaseclass()
         {
             RESPONSEDOCUMENT.LoadXml("<root></root>");
@@ -163,6 +169,8 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 Session.Add(REQUESTIP, DateTime.Now.ToString());
+            if (GetQuerystringParam("cid") != "" || GetQuerystringParam("CID") != "")
+                ClientSymbol = GetQuerystringParam("cid");
             BeforeLoad();
             if (Request.InputStream != null && Request.InputStream.Length > 0)
             {
