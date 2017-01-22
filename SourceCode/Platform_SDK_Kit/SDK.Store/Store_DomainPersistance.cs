@@ -45,9 +45,12 @@ namespace iKCoder_Platform_SDK_Kit
             
         }
 
-        public string GetKeyName(string hostaddress,string producename)
+        public string GetKeyName(string hostaddress,string producename,string clientsymbol = "")
         {
-            return hostaddress + "_" + producename;
+            if (clientsymbol != "")
+                return hostaddress + "_" + producename + "_" + clientsymbol;
+            else
+                return hostaddress + "_" + producename;
         }
 
         public void AddSingle(string key,string domainKeyName,int storeExpeired,object data)
