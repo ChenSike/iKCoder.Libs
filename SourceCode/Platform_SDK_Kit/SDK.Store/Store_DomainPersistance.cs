@@ -77,6 +77,24 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
+        public void FlushValue(string key,string domainKeyName,object data)
+        {
+
+            if (key != "")
+            {
+                Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = null;
+                if (!DataBuffer.ContainsKey(key))
+                {
+                    activeStoreItem = new Dictionary<string, class_Store_DomainPersistanceItem>();
+                    DataBuffer.Add(key, activeStoreItem);
+                }
+                else
+                    activeStoreItem = DataBuffer[key];
+                if (activeStoreItem.ContainsKey(domainKeyName))                
+                    activeStoreItem[domainKeyName].Data = data;                         
+            }
+        }
+
         public void Add(string key, string domainKeyName,int storeExpeired,object data)
         {
             ClearBuffer();

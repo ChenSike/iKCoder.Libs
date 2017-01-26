@@ -122,6 +122,25 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
+        public bool getRemoteRequestByGet(string remoteurl)
+        {
+            try
+            {                
+                HttpWebResponse response = null;
+                HttpWebRequest request = null;
+                request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.Timeout = 1000 * 60 * 2;
+                request.Method = "get";
+                Thread.Sleep(1000);
+                response = (HttpWebResponse)request.GetResponse();
+                return true;                
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public List<Cookie> getRemoteServerCookieFillCookieContainer(string remoteurl, string input)
         {
             try

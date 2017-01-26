@@ -18,6 +18,7 @@ namespace iKCoder_Platform_SDK_Kit
         protected int REQUESTSPANTIME = 100;        
         protected bool ISRESPONSEDOC = false;
         protected bool ISBINRESPONSE = false;
+        protected static class_Store_DomainPersistance Object_DomainPersistance = new class_Store_DomainPersistance();
                 
         public string APPFOLDERPATH
         {
@@ -111,7 +112,11 @@ namespace iKCoder_Platform_SDK_Kit
 
         }
 
-        public Dictionary<string, string> RSDoamin;
+        public string RSDoamin
+        {
+            set;
+            get;
+        }
        
 
         protected void AddErrMessageToResponseDOC(string header, string message,string link,enum_MessageType activeMessageType = enum_MessageType.Message)
@@ -120,6 +125,16 @@ namespace iKCoder_Platform_SDK_Kit
             class_XmlHelper.SetAttribute(errNode, "header", header);
             class_XmlHelper.SetAttribute(errNode, "msg", message);
             class_XmlHelper.SetAttribute(errNode, "link", link);
+            RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(errNode);
+        }
+
+        protected void AddErrMessageToResponseDOC(string header, string message, Dictionary<string, string> attrsList, enum_MessageType activeMessageType = enum_MessageType.Message)
+        {
+            XmlNode errNode = class_XmlHelper.CreateNode(RESPONSEDOCUMENT, "err", "");
+            class_XmlHelper.SetAttribute(errNode, "header", header);
+            class_XmlHelper.SetAttribute(errNode, "msg", message);
+            foreach (string attrName in attrsList.Keys)
+                class_XmlHelper.SetAttribute(errNode, attrName, attrsList[attrName]);
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(errNode);
         }
 
@@ -147,13 +162,11 @@ namespace iKCoder_Platform_SDK_Kit
         {
             APPFOLDERPATH = Server.MapPath("~/");
             this.REQUESTIP = GetClientIPAddr();
-            this.RSDoamin = new Dictionary<string, string>();
-            InitAction();
-            //REQUESTIP = Page.Request.UserHostAddress;
+            InitAction();                   
             if (string.IsNullOrEmpty(REQUESTIP))
                 REQUESTIP = "127.0.0.1";
             if (Session[REQUESTIP] != null)
-            {
+            {                
                 DateTime lastRequestTime = DateTime.Now;
                 if (Session[REQUESTIP].ToString() == "")
                 {
@@ -180,14 +193,11 @@ namespace iKCoder_Platform_SDK_Kit
                 REQUESTDOCUMENT = new XmlDocument();
                 REQUESTDOCUMENT.LoadXml(requestStrDoc);
             }
-            if (this.RSDoamin.Count > 0)
+            if (!string.IsNullOrEmpty(RSDoamin))
             {
-                foreach (string activeDoamin in this.RSDoamin.Keys)
-                {
-                    Response.AddHeader("Access-Control-Allow-Origin", this.RSDoamin[activeDoamin]);
-                }
                 Response.AddHeader("Access-Control-Allow-Credentials", "true");
-            }
+                Response.AddHeader("Access-Control-Allow-Origin", this.RSDoamin);                          
+            }           
             DoAction();
             if (ISRESPONSEDOC && !ISBINRESPONSE)
             {
