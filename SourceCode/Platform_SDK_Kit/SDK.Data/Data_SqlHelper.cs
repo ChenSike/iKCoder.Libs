@@ -199,6 +199,17 @@ namespace iKCoder_Platform_SDK_Kit
                                             sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
                                             sql_CreateNewSp.AppendLine("");
                                             sql_CreateNewSp.AppendLine("end");
+                                            sql_CreateNewSp.AppendLine("else if @operation='selectmixed'");
+                                            sql_CreateNewSp.AppendLine("begin");
+                                            sql_CreateNewSp.AppendLine("select * from [" + tableName + "] where ");
+                                            foreach (string selectColumn in activeColumn)
+                                            {
+                                                if (!filterTypeList.Contains(selectColumn))
+                                                    sql_CreateNewSp.Append(selectColumn + "=ISNULL(@" + selectColumn + "," + selectColumn + ") and ");
+                                            }
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
+                                            sql_CreateNewSp.AppendLine("");
+                                            sql_CreateNewSp.AppendLine("end");
                                             class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
 
                                         }
@@ -272,6 +283,7 @@ namespace iKCoder_Platform_SDK_Kit
                                         sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);   
                                         sql_CreateNewSp.AppendLine(")");
                                         sql_CreateNewSp.AppendLine("BEGIN");
+                                        sql_CreateNewSp.AppendLine("DECLARE tmpsql VARCHAR(800);");                                       
                                         sql_CreateNewSp.AppendLine("if _operation='select' then");
                                         sql_CreateNewSp.AppendLine("select * from " + tableName+";");
                                         sql_CreateNewSp.AppendLine("elseif _operation='insert' then");
@@ -301,6 +313,8 @@ namespace iKCoder_Platform_SDK_Kit
                                         sql_CreateNewSp.AppendLine(");");
                                         foreach (string activeSelectedColumn in tmpSelectedColumsLst)
                                         {
+                                            if (tmpSelectedKeyColumnsLst.Contains(activeSelectedColumn))
+                                                continue;
                                             sql_CreateNewSp.AppendLine("elseif _operation='update' and _" + activeSelectedColumn + " IS NOT NULL then");
                                             sql_CreateNewSp.Append("update " + tableName);
                                             sql_CreateNewSp.Append(" set " + activeSelectedColumn + " = " + "_" + activeSelectedColumn);
@@ -313,6 +327,16 @@ namespace iKCoder_Platform_SDK_Kit
                                                 sql_CreateNewSp.AppendLine(";");
                                             }
                                         }
+                                        sql_CreateNewSp.AppendLine("elseif _operation='selectmixed'then");
+                                        sql_CreateNewSp.Append("select * from " + tableName + " where ");
+                                        for(int i=0;i<tmpSelectedColumsLst.Count;i++)
+                                        {
+                                            if (i == 0)
+                                                sql_CreateNewSp.Append(tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");
+                                            else
+                                                sql_CreateNewSp.Append(" and " + tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");                                           
+                                        }
+                                        sql_CreateNewSp.AppendLine(";");
                                         sql_CreateNewSp.AppendLine("elseif _operation='delete' then");
                                         sql_CreateNewSp.Append("delete from " + tableName);
                                         if (tmpSelectedKeyColumnsLst.Count > 0)
@@ -661,6 +685,40 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;      
         }
 
+        public DataTable ExecuteSelectSPMixedConditionsForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            DataTable dt = new DataTable();
+            if (activeEntry != null)
+            {
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "selectmixed");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "selectmixed");
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
+                return dt;
+            }
+            else
+                return null;
+        }
+
+        public class_data_PlatformDBDataReader ExecuteSelectSPMixedConditionsForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            class_data_PlatformDBDataReader activeDataReader = null;
+            if (activeEntry != null)
+            {
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "selectmixed");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "selectmixed");
+                class_Data_SqlDataHelper activeSqlSPHelper = new class_Data_SqlDataHelper();
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDR(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out activeDataReader);
+                return activeDataReader;
+            }
+            else
+                return null;
+        }
+                    
         public class_data_PlatformDBDataReader ExecuteSelectSPKeyForDR(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             class_data_PlatformDBDataReader activeDataReader = null;
