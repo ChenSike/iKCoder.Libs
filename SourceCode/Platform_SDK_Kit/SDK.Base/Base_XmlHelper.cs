@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Xml;
+using System.Text;
+using System.Collections.Generic;
 
 namespace iKCoder_Platform_SDK_Kit
 {    
@@ -351,6 +353,36 @@ namespace iKCoder_Platform_SDK_Kit
                 }
             }
             return "";
+        }
+
+        public static string BuiuldXpath(XmlNode node)
+        {
+            if (node != null)
+            {
+                string returnXpath = string.Empty;
+                returnXpath = "/" + node.Name;
+                while(node.ParentNode!=null)
+                {
+                    node = node.ParentNode;
+                    returnXpath = "/" + node.Name + returnXpath;
+                }
+                return returnXpath;
+            }
+            else
+                return string.Empty;
+        }
+
+        public static List<XmlNode> BuildAllNodesFromDocument(XmlNode rootNode)
+        {
+            List<XmlNode> result = new List<XmlNode>();
+        }
+
+        public static void TraverseAllNodes(XmlNode rootNode,ref List<XmlNode> result)
+        {
+            if(rootNode==null)
+                return;
+            if(rootNode!==null && rootNode.ChildNodes.Count==0)
+                result.Add(rootNode);
         }
 
         public static string GetNodeValue(XmlNode node)
