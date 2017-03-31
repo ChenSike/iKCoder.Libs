@@ -43,7 +43,7 @@ namespace iKCoder_Platform_SDK_Kit
                 try
                 {
                     byte[] buffer = (byte[])activeDR[activeColumnName];
-                    result = System.Text.Encoding.Default.GetString(buffer);
+                    result = System.Text.Encoding.UTF8.GetString(buffer);                    
                     return true;
                 }
                 catch

@@ -146,7 +146,7 @@ namespace iKCoder_Platform_SDK_Kit
             class_XmlHelper.SetAttribute(newNode, "msg", message);
             class_XmlHelper.SetAttribute(newNode, "link", link);
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(newNode);
-        }
+        }       
 
         protected void AddResponseMessageToResponseDOC(string header, string code,Dictionary<string,string> attrsList)
         {
