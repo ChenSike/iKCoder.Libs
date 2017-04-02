@@ -160,6 +160,30 @@ namespace iKCoder_Platform_SDK_Kit
             return ("<" + tagName + "></" + tagName + ">");
         }
 
+        public static XmlNode CreateNodeByXpath(XmlDocument xd,string nodeTag, string nodeValue)
+        {
+            if (xd == null)
+            {
+                return null;
+            }
+            string[] levelNodes = nodeTag.Split('/');
+            string xpath = "";
+            XmlNode exsitedNode = null;
+            foreach(string activeNode in levelNodes)
+            {
+                xpath=xpath+ "/"+activeNode;
+                exsitedNode = xd.SelectSingleNode(xpath);
+                if(exsitedNode==null)
+                {
+                    XmlNode newNode = CreateNode(xd,activeNode,nodeValue);
+                    XmlNode parentNode = xd.SelectSingleNode( xpath.Replace("/"+activeNode,""));
+                    parentNode.AppendChild(newNode);
+                    exsitedNode = newNode;
+                }
+            }
+            return exsitedNode;
+        }
+
         public static string CreateNode(string tagName, XmlNode node)
         {
             string str = "";
@@ -355,7 +379,7 @@ namespace iKCoder_Platform_SDK_Kit
             return "";
         }
 
-        public static string BuiuldXpath(XmlNode node)
+        public static string BuildXpath(XmlNode node)
         {
             if (node != null)
             {
@@ -363,8 +387,11 @@ namespace iKCoder_Platform_SDK_Kit
                 returnXpath = "/" + node.Name;
                 while(node.ParentNode!=null)
                 {
+                    if (node.Name != "#document")
+                    {                        
+                        returnXpath = "/" + node.Name + returnXpath;
+                    }
                     node = node.ParentNode;
-                    returnXpath = "/" + node.Name + returnXpath;
                 }
                 return returnXpath;
             }
@@ -372,17 +399,53 @@ namespace iKCoder_Platform_SDK_Kit
                 return string.Empty;
         }
 
-        public static List<XmlNode> BuildAllNodesFromDocument(XmlNode rootNode)
+        public static Dictionary<string,string> BuildNodeAttributes(XmlNode node)
         {
-            List<XmlNode> result = new List<XmlNode>();
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            foreach(XmlAttribute activeAttr in node.Attributes)
+            {
+                if (!result.ContainsKey(activeAttr.Name))
+                    result.Add(activeAttr.Name, activeAttr.Value);
+            }
+            return result;
         }
 
-        public static void TraverseAllNodes(XmlNode rootNode,ref List<XmlNode> result)
+        public static string BuildParentXpath(XmlNode node)
         {
-            if(rootNode==null)
+            if (node != null)
+            {
+                string returnXpath = string.Empty;
+                while (node.ParentNode != null)
+                {
+                    if (node.Name != "#document")
+                    {
+                        returnXpath = "/" + node.Name + returnXpath;
+                    }
+                    node = node.ParentNode;
+                }
+                if (string.IsNullOrEmpty(returnXpath))
+                {
+                    returnXpath = "/" + node.Name;
+                }
+                return returnXpath;
+            }
+            else
+                return string.Empty;
+        }
+
+        public static void TraverseAllNodes(XmlNode rootNode, ref List<XmlNode> result)
+        {
+            if (rootNode == null)
                 return;
-            if(rootNode!==null && rootNode.ChildNodes.Count==0)
+            if (rootNode != null && rootNode.ChildNodes.Count == 0)
                 result.Add(rootNode);
+            else
+            {
+                foreach (XmlNode activeChildNode in rootNode.ChildNodes)
+                    TraverseAllNodes(activeChildNode, ref result);
+                result.Add(rootNode);
+            }
+
         }
 
         public static string GetNodeValue(XmlNode node)
