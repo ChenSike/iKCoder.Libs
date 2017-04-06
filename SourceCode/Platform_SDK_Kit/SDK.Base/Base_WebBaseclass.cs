@@ -185,13 +185,17 @@ namespace iKCoder_Platform_SDK_Kit
             if (GetQuerystringParam("cid") != "" || GetQuerystringParam("CID") != "")
                 ClientSymbol = GetQuerystringParam("cid");
             BeforeLoad();
+            bool isSumitData = GetQuerystringParam("sumitdata") == "1" ? true : false;
             if (Request.InputStream != null && Request.InputStream.Length > 0)
             {
-                StreamReader streamReaderObj = new StreamReader(Request.InputStream);
-                string requestStrDoc = streamReaderObj.ReadToEnd();
-                streamReaderObj.Close();
-                REQUESTDOCUMENT = new XmlDocument();
-                REQUESTDOCUMENT.LoadXml(requestStrDoc);
+                if (!isSumitData)
+                {
+                    StreamReader streamReaderObj = new StreamReader(Request.InputStream);
+                    string requestStrDoc = streamReaderObj.ReadToEnd();
+                    streamReaderObj.Close();
+                    REQUESTDOCUMENT = new XmlDocument();
+                    REQUESTDOCUMENT.LoadXml(requestStrDoc);
+                }                
             }
             if (!string.IsNullOrEmpty(RSDoamin))
             {
@@ -199,12 +203,12 @@ namespace iKCoder_Platform_SDK_Kit
                 Response.AddHeader("Access-Control-Allow-Origin", this.RSDoamin);                          
             }           
             DoAction();
-            if (ISRESPONSEDOC && !ISBINRESPONSE)
+            if (ISRESPONSEDOC)
             {
                 Response.ContentType = "text/xml; characterset=utf-8";
                 Response.Write(RESPONSEDOCUMENT.OuterXml);
             }
-            else if (ISRESPONSEDOC && ISBINRESPONSE)
+            else if (ISBINRESPONSE)
             {
                 Response.BinaryWrite(RESPONSEBUFFER);
                 Response.Flush();
