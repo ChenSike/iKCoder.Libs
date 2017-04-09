@@ -15,7 +15,7 @@ namespace iKCoder_Platform_SDK_Kit
     {       
 
         public static bool GetColumnData(DataRow activeDR, string activeColumnName,out string result)
-        {
+        {            
             result = "";
             if (activeDR != null)
             {

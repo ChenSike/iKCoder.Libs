@@ -40,5 +40,5 @@ namespace iKCoder_Platform_SDK_Kit
             newFS.Close();
         }
 
-    }
+    }    
 }
