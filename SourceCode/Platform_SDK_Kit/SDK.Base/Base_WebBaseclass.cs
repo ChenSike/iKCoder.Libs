@@ -162,8 +162,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             APPFOLDERPATH = Server.MapPath("~/");
             this.REQUESTIP = GetClientIPAddr();
-            if (GetQuerystringParam("cid") != "" || GetQuerystringParam("CID") != "")
-                ClientSymbol = GetQuerystringParam("cid");
+            ClientSymbol = GetQuerystringParam("cid");
             InitAction();                   
             if (string.IsNullOrEmpty(REQUESTIP))
                 REQUESTIP = "127.0.0.1";
