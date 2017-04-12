@@ -25,7 +25,7 @@ namespace iKCoder_Platform_SDK_Kit
                 else if (activeType.FullName.Contains("ListView"))
                     ((ListView)activeControl).Items.Clear();
             }
-        }
+        }       
 
         public static string Encoder_Base64(string data)
         {

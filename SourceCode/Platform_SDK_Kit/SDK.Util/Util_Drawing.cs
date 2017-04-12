@@ -8,9 +8,9 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 
-namespace iKCoder_Platform_SDK_Kit.SDK.Util
+namespace iKCoder_Platform_SDK_Kit
 {
-    public class Util_Drawing
+    public class class_Util_Drawing
     {
 
         public static Bitmap CreateImage(string imageFilePath)
