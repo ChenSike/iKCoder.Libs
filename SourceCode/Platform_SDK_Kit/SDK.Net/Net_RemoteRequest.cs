@@ -301,6 +301,37 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
+        public string sendBinDataToRemoteServer(string remoteurl, byte[] data,int timeout = 1000 * 10)
+        {
+            try
+            {                
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if (active_Cookies.Count > 0)
+                    request.CookieContainer = active_Cookies;
+                request.Timeout = 0x1b7740;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = data.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(data, 0, data.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.UTF8);
+                string cookieheader = request.CookieContainer.GetCookieHeader(new Uri(remoteurl));
+                active_Cookies.SetCookies(new Uri(remoteurl), cookieheader);
+                foreach (Cookie activeCookieInRequest in request.CookieContainer.GetCookies(new Uri(remoteurl)))
+                    active_Cookies.Add(activeCookieInRequest);
+                string result = "";
+                result = responseStream.ReadToEnd();
+                return result;
+            }
+            catch (Exception err)
+            {
+                return err.Message;
+            }
+        }
+
         public List<Cookie> getRemoteServerCookie(string remoteurl, string input, int timeout = 1000 * 10)
         {
             try
