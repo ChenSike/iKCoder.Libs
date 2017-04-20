@@ -384,7 +384,6 @@ namespace iKCoder_Platform_SDK_Kit
             if (node != null)
             {
                 string returnXpath = string.Empty;
-                returnXpath = "/" + node.Name;
                 while(node.ParentNode!=null)
                 {
                     if (node.Name != "#document")
