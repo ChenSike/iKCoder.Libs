@@ -87,6 +87,7 @@
     <Compile Include="SDK.Token\Token_Controller.cs" />
     <Compile Include="SDK.Token\Token_TokenItem.cs" />
     <Compile Include="SDK.Util\Util_Common.cs" />
+    <Compile Include="SDK.Util\Util_Drawing.cs" />
     <Compile Include="SDK.Util\Util_LabelsController.cs" />
     <Compile Include="SDK.Util\Util_QRCoder.cs" />
   </ItemGroup>
