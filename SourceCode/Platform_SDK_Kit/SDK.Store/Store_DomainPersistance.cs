@@ -95,7 +95,10 @@ namespace iKCoder_Platform_SDK_Kit
                     else
                         activeStoreItem = DataBuffer[key];
                     if (activeStoreItem.ContainsKey(domainKeyName))
+                    {
                         activeStoreItem[domainKeyName].Data = data;
+                        activeStoreItem[domainKeyName].Created = DateTime.Now;
+                    }
                 }
             }
         }
@@ -176,30 +179,36 @@ namespace iKCoder_Platform_SDK_Kit
 
         public void ClearBuffer()
         {
-            List<string> removedUrlLst =new List<string>();
-            foreach(string activeUrl in DataBuffer.Keys)
+            lock (DataBuffer)
             {
-                List<string> removeLst = new List<string>();
-                foreach(string keyName in DataBuffer[activeUrl].Keys)
-                {                    
-                    class_Store_DomainPersistanceItem tmpItem = DataBuffer[activeUrl][keyName];
-                    if(tmpItem.Expeired == -999)                    
-                        continue;                    
-                    if ((DateTime.Now - tmpItem.Created).Minutes >= tmpItem.Expeired)
-                        removeLst.Add(keyName);                                               
+                List<string> removedUrlLst = new List<string>();
+                foreach (string activeUrl in DataBuffer.Keys)
+                {
+                    List<string> removeLst = new List<string>();
+                    foreach (string keyName in DataBuffer[activeUrl].Keys)
+                    {
+                        class_Store_DomainPersistanceItem tmpItem = DataBuffer[activeUrl][keyName];
+                        if (tmpItem.Expeired == 99999)
+                            continue;
+                        if ((DateTime.Now - tmpItem.Created).Minutes >= tmpItem.Expeired)
+                            removeLst.Add(keyName);
+                    }
+                    foreach (string removeKeyName in removeLst)
+                        DataBuffer[activeUrl].Remove(removeKeyName);
+                    if (DataBuffer[activeUrl].Count == 0)
+                        removedUrlLst.Add(activeUrl);
                 }
-                foreach (string removeKeyName in removeLst)
-                    DataBuffer[activeUrl].Remove(removeKeyName);
-                if (DataBuffer[activeUrl].Count == 0)
-                    removedUrlLst.Add(activeUrl);
+                foreach (string activeRemovedUrl in removedUrlLst)
+                    DataBuffer.Remove(activeRemovedUrl);
             }
-            foreach (string activeRemovedUrl in removedUrlLst)
-                DataBuffer.Remove(activeRemovedUrl);
         }
 
         public void ClearAll()
         {
-            DataBuffer.Clear();            
+            lock (DataBuffer)
+            {
+                DataBuffer.Clear();
+            }
         }
         
     }

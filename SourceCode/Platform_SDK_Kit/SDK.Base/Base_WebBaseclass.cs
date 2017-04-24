@@ -197,7 +197,12 @@ namespace iKCoder_Platform_SDK_Kit
 
             APPFOLDERPATH = Server.MapPath("~/");
             this.REQUESTIP = GetClientIPAddr();
-            ClientSymbol = GetQuerystringParam("cid");
+
+            if (Session["ClientSymbol"] == null)
+                Session.Add("ClientSymbol", Guid.NewGuid().ToString());
+            else
+                ClientSymbol = Session["ClientSymbol"].ToString();
+
             InitAction();                         
             BeforeLoad();
             bool isSumitData = GetQuerystringParam("sumitdata") == "1" ? true : false;

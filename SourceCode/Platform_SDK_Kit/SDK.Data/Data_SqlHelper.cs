@@ -617,6 +617,113 @@ namespace iKCoder_Platform_SDK_Kit
         }
 
 
+        public class_Data_SqlSPEntry ActionLoadingActiveSPS(class_data_PlatformDBConnection activeConnection, string activeSPName)
+        {
+            if (activeConnection != null)
+            {
+                if (activeConnection.activeDatabaseType == enum_DatabaseType.SqlServer)
+                {
+                    string sql_getallsps = "select * from sys.all_objects where (type = 'P') AND (is_ms_shipped = 0) AND (name='" + activeSPName + "')";
+                    DataTable activeSPSDT = new DataTable();
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_getallsps, out activeSPSDT))
+                    {
+                        if (activeSPSDT != null && activeSPSDT.Rows.Count > 0)
+                        {
+                            class_Data_SqlSPEntry newSPEntry = new class_Data_SqlSPEntry(activeConnection.activeDatabaseType);
+                            string spName = "";
+                            class_Data_SqlDataHelper.GetColumnData(activeSPSDT.Rows[0], "name", out spName);
+                            newSPEntry.SPName = spName;
+                            newSPEntry.KeyName = spName;
+                            string spObjectID = "";
+                            class_Data_SqlDataHelper.GetColumnData(activeSPSDT.Rows[0], "object_id", out spObjectID);
+                            string sql_paramters = "select * from sys.all_parameters where object_id = " + spObjectID;
+                            DataTable activeSPParametersDT = new DataTable();
+                            string sql_paramstype = "select * from sys.types";
+                            DataTable paramstypeDT = new DataTable();
+                            if (!class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramstype, out paramstypeDT))
+                            {
+                                return null;
+                            }
+                            if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(activeConnection, sql_paramters, out activeSPParametersDT))
+                            {
+                                foreach (DataRow activeParamterRow in activeSPParametersDT.Rows)
+                                {
+                                    string activeSystemType_ID = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "system_type_id", out activeSystemType_ID);
+                                    string activeUserType_ID = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "user_type_id", out activeUserType_ID);
+                                    string activeParamsMaxLength = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out activeParamsMaxLength);
+                                    string activeParamsName = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "name", out activeParamsName);
+                                    string activeIsOutPut = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "is_output", out activeIsOutPut);
+                                    string max_length = "";
+                                    class_Data_SqlDataHelper.GetColumnData(activeParamterRow, "max_length", out max_length);
+                                    string activeDBType = "";
+                                    DataRow[] dbtyps = paramstypeDT.Select("system_type_id=" + activeSystemType_ID + " and user_type_id=" + activeUserType_ID);
+                                    if (dbtyps.Length > 0)
+                                    {
+                                        class_Data_SqlDataHelper.GetColumnData(dbtyps[0], "name", out activeDBType);
+                                        ((class_data_SqlServerSPEntry)newSPEntry).SetNewParameter(activeParamsName, Data_Util.ConventStrTODbtye(activeDBType), ParameterDirection.Input, int.Parse(max_length), null);
+                                    }
+                                    else
+                                        continue;
+                                }
+                            }
+                            return newSPEntry;
+                        }
+                    }
+                }
+                else if (activeConnection.activeDatabaseType == enum_DatabaseType.MySql)
+                {
+                    string sql_getALLSPInfo = "select name,param_list from mysql.proc where db = '{schemaname}' and type = 'PROCEDURE' and name='" + activeSPName + "'";
+                    sql_getALLSPInfo = sql_getALLSPInfo.Replace("{schemaname}", ((class_data_MySqlConnectionItem)activeConnection).ActiveConnection.Database);
+                    DataTable dtALLSPInfo = new DataTable();
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT((class_data_MySqlConnectionItem)activeConnection, sql_getALLSPInfo, out dtALLSPInfo))
+                    {
+                        if (dtALLSPInfo != null && dtALLSPInfo.Rows.Count > 0)
+                        {
+                            class_data_MySqlSPEntry newSPEntry = new class_data_MySqlSPEntry(activeConnection.activeDatabaseType);
+                            string spName = "";
+                            class_Data_SqlDataHelper.GetColumnData(dtALLSPInfo.Rows[0], "name", out spName);
+                            newSPEntry.SPName = spName;
+                            newSPEntry.KeyName = spName;
+                            string tmpParamsFromDB = "";
+                            class_Data_SqlDataHelper.GetArrByteColumnDataToString(dtALLSPInfo.Rows[0], "param_list", out tmpParamsFromDB);
+                            string[] activeParams = tmpParamsFromDB.Split(',');
+                            foreach (string activeParam in activeParams)
+                            {
+                                string[] activeParamInfo = activeParam.Split(' ');
+                                if (activeParamInfo.Length >= 2)
+                                {
+                                    string parameterName = activeParamInfo[0];
+                                    string parameterType = activeParamInfo[1].Split('(')[0];
+                                    string parameterLength = "0";
+                                    try
+                                    {
+                                        parameterLength = activeParamInfo[1].Split('(')[1].Replace(")", "");
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                    int activeParameterLength = 0;
+                                    int.TryParse(parameterLength, out activeParameterLength);
+                                    ((class_data_MySqlSPEntry)newSPEntry).SetNewParameter(activeParamInfo[0], Data_Util.ConventStrTOMySqlDbtye(parameterType), ParameterDirection.Input, activeParameterLength, null);
+                                }
+                            }
+                            return newSPEntry;
+                        }
+                    }
+                }
+                return null;
+            }
+            else
+                return null;
+        }
+
+
         public DataTable ExecuteSelectSPForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             DataTable dt = new DataTable();
