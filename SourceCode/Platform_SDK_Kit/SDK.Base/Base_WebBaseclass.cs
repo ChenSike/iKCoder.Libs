@@ -15,7 +15,7 @@ namespace iKCoder_Platform_SDK_Kit
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
         protected byte[] RESPONSEBUFFER;
         public XmlDocument REQUESTDOCUMENT;        
-        protected int REQUESTSPANTIME = 100;        
+        protected int REQUESTSPANTIME = 2;        
         protected bool ISRESPONSEDOC = false;
         protected bool ISBINRESPONSE = false;
         protected static class_Store_DomainPersistance Object_DomainPersistance = new class_Store_DomainPersistance();
@@ -36,13 +36,9 @@ namespace iKCoder_Platform_SDK_Kit
         {
 
             string userHostAddress = "";
-            try
+            if (HttpContext.Current.Request.ServerVariables.AllKeys.Contains("HTTP_X_FORWARDED_FOR"))
             {
                 userHostAddress = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"].ToString().Split(',')[0].Trim();
-            }
-            catch
-            {
-                
             }
             if (string.IsNullOrEmpty(userHostAddress))
             {
@@ -117,6 +113,12 @@ namespace iKCoder_Platform_SDK_Kit
             set;
             get;
         }
+
+        protected enum enumResponseMode
+        {
+            bin = 1,
+            text = 2            
+        }
        
 
         protected void AddErrMessageToResponseDOC(string header, string message,string link,enum_MessageType activeMessageType = enum_MessageType.Message)
@@ -158,19 +160,28 @@ namespace iKCoder_Platform_SDK_Kit
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(newNode);
         }
 
+        protected void switchResponseMode(enumResponseMode activeResponseMode)
+        {
+            switch(activeResponseMode)
+            {
+                case enumResponseMode.bin:
+                    ISBINRESPONSE = true;
+                    ISRESPONSEDOC = false;
+                    break;
+                case enumResponseMode.text:
+                    ISBINRESPONSE = false;
+                    ISRESPONSEDOC = true;
+                    break;                
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            APPFOLDERPATH = Server.MapPath("~/");
-            this.REQUESTIP = GetClientIPAddr();
-            ClientSymbol = GetQuerystringParam("cid");
-            InitAction();                   
-            if (string.IsNullOrEmpty(REQUESTIP))
-                REQUESTIP = "127.0.0.1";
             if (Session[REQUESTIP] != null)
-            {                
-                DateTime lastRequestTime = DateTime.Now;
+            {
                 if (Session[REQUESTIP].ToString() == "")
                 {
+                    DateTime lastRequestTime = DateTime.Now;
                     DateTime.TryParse(Session[REQUESTIP].ToString(), out lastRequestTime);
                     if ((lastRequestTime - DateTime.Now).Milliseconds < REQUESTSPANTIME)
                     {
@@ -183,6 +194,16 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 Session.Add(REQUESTIP, DateTime.Now.ToString());
+
+            APPFOLDERPATH = Server.MapPath("~/");
+            this.REQUESTIP = GetClientIPAddr();
+
+            if (Session["ClientSymbol"] == null)
+                Session.Add("ClientSymbol", Guid.NewGuid().ToString());
+            else
+                ClientSymbol = Session["ClientSymbol"].ToString();
+
+            InitAction();                         
             BeforeLoad();
             bool isSumitData = GetQuerystringParam("sumitdata") == "1" ? true : false;
             if (Request.InputStream != null && Request.InputStream.Length > 0)
