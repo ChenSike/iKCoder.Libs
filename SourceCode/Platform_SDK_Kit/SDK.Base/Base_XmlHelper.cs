@@ -169,17 +169,22 @@ namespace iKCoder_Platform_SDK_Kit
             string[] levelNodes = nodeTag.Split('/');
             string xpath = "";
             XmlNode exsitedNode = null;
+            int index = 1;
             foreach(string activeNode in levelNodes)
             {
                 xpath=xpath+ "/"+activeNode;
                 exsitedNode = xd.SelectSingleNode(xpath);
                 if(exsitedNode==null)
                 {
-                    XmlNode newNode = CreateNode(xd,activeNode,nodeValue);
+                    string activeNodeValue = "";
+                    if (index == levelNodes.Length)
+                        activeNodeValue = nodeValue;
+                    XmlNode newNode = CreateNode(xd, activeNode, activeNodeValue);
                     XmlNode parentNode = xd.SelectSingleNode( xpath.Replace("/"+activeNode,""));
                     parentNode.AppendChild(newNode);
                     exsitedNode = newNode;
                 }
+                index++;
             }
             return exsitedNode;
         }
@@ -386,11 +391,16 @@ namespace iKCoder_Platform_SDK_Kit
                 string returnXpath = string.Empty;
                 while(node.ParentNode!=null)
                 {
-                    if (node.Name != "#document")
-                    {                        
-                        returnXpath = "/" + node.Name + returnXpath;
+                    if (node.Name == "#document" || node.Name =="#text")
+                    {
+                        node = node.ParentNode;
+                        continue;
                     }
-                    node = node.ParentNode;
+                    else
+                    {
+                        returnXpath = "/" + node.Name + returnXpath;
+                        node = node.ParentNode;
+                    }                    
                 }
                 return returnXpath;
             }
@@ -401,10 +411,17 @@ namespace iKCoder_Platform_SDK_Kit
         public static Dictionary<string,string> BuildNodeAttributes(XmlNode node)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
-            foreach(XmlAttribute activeAttr in node.Attributes)
+            try
             {
-                if (!result.ContainsKey(activeAttr.Name))
-                    result.Add(activeAttr.Name, activeAttr.Value);
+                foreach (XmlAttribute activeAttr in node.Attributes)
+                {
+                    if (!result.ContainsKey(activeAttr.Name))
+                        result.Add(activeAttr.Name, activeAttr.Value);
+                }
+            }
+            catch
+            {
+
             }
             return result;
         }
@@ -449,9 +466,15 @@ namespace iKCoder_Platform_SDK_Kit
 
         public static string GetNodeValue(XmlNode node)
         {
-            if (node != null)
+            if (node.ChildNodes.Count==1)
             {
-                return node.InnerText;
+                if (node.ChildNodes[0].Name == "#text")
+                {
+                    if (node != null)
+                    {
+                        return node.InnerText;
+                    }
+                }
             }
             return "";
         }
