@@ -220,6 +220,8 @@ namespace iKCoder_Platform_SDK_Kit
             if (!string.IsNullOrEmpty(RSDoamin))
             {
                 Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                Response.AddHeader("Access-Control-Allow-Headers", "Content-Type,x-requested-with");
+                Response.AddHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE");
                 Response.AddHeader("Access-Control-Allow-Origin", this.RSDoamin);                          
             }           
             DoAction();
@@ -233,6 +235,7 @@ namespace iKCoder_Platform_SDK_Kit
                 Response.BinaryWrite(RESPONSEBUFFER);
                 Response.Flush();
             }
+            
         }       
     }
 }
