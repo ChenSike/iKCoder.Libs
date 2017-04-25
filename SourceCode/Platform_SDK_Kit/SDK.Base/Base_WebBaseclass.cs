@@ -16,7 +16,7 @@ namespace iKCoder_Platform_SDK_Kit
         protected byte[] RESPONSEBUFFER;
         public XmlDocument REQUESTDOCUMENT;        
         protected int REQUESTSPANTIME = 2;        
-        protected bool ISRESPONSEDOC = false;
+        protected bool ISRESPONSEDOC = true;
         protected bool ISBINRESPONSE = false;
         protected static class_Store_DomainPersistance Object_DomainPersistance = new class_Store_DomainPersistance();
                 
@@ -198,10 +198,14 @@ namespace iKCoder_Platform_SDK_Kit
             APPFOLDERPATH = Server.MapPath("~/");
             this.REQUESTIP = GetClientIPAddr();
 
-            if (Session["ClientSymbol"] == null)
-                Session.Add("ClientSymbol", Guid.NewGuid().ToString());
-            else
-                ClientSymbol = Session["ClientSymbol"].ToString();
+            ClientSymbol = GetQuerystringParam("cid");
+            if (string.IsNullOrEmpty(ClientSymbol))
+            {
+                if (Session["ClientSymbol"] == null)
+                    Session.Add("ClientSymbol", Guid.NewGuid().ToString());
+                else
+                    ClientSymbol = Session["ClientSymbol"].ToString();
+            }
 
             InitAction();                         
             BeforeLoad();
