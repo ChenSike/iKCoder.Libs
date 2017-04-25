@@ -54,6 +54,25 @@ namespace iKCoder_Platform_SDK_Kit
             else
                 return false;
         }
+        
+
+        public static byte[] GetArrBytesColumnData(DataRow activeDR, string activeColumnName)
+        {            
+            if (activeDR != null)
+            {
+                try
+                {
+                    byte[] buffer = (byte[])activeDR[activeColumnName];
+                    return buffer;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            else
+                return null;
+        }
 
         public static bool GetColumnsFromDT(DataTable activeDT, out List<string> result)
         {
