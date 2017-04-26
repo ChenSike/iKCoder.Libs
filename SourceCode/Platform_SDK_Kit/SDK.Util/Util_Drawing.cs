@@ -10,7 +10,7 @@ using System.IO;
 
 namespace iKCoder_Platform_SDK_Kit
 {
-    public class class_Util_Drawing
+    public class class_Util_DrawingServices
     {
 
         public static Bitmap CreateImage(string imageFilePath)
