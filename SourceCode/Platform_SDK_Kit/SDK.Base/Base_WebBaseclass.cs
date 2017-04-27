@@ -14,7 +14,8 @@ namespace iKCoder_Platform_SDK_Kit
 
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
         protected byte[] RESPONSEBUFFER;
-        public XmlDocument REQUESTDOCUMENT;        
+        public XmlDocument REQUESTDOCUMENT;
+        public string REQUESTCONTENT = string.Empty; 
         protected int REQUESTSPANTIME = 2;        
         protected bool ISRESPONSEDOC = true;
         protected bool ISBINRESPONSE = false;
@@ -199,6 +200,7 @@ namespace iKCoder_Platform_SDK_Kit
             this.REQUESTIP = GetClientIPAddr();
 
             ClientSymbol = GetQuerystringParam("cid");
+            string isTextRequest = GetQuerystringParam("istextreq");
             if (string.IsNullOrEmpty(ClientSymbol))
             {
                 if (Session["ClientSymbol"] == null)
@@ -217,8 +219,20 @@ namespace iKCoder_Platform_SDK_Kit
                     StreamReader streamReaderObj = new StreamReader(Request.InputStream);
                     string requestStrDoc = streamReaderObj.ReadToEnd();
                     streamReaderObj.Close();
-                    REQUESTDOCUMENT = new XmlDocument();
-                    REQUESTDOCUMENT.LoadXml(requestStrDoc);
+                    try
+                    {
+                        if (isTextRequest == "1")
+                            REQUESTCONTENT = requestStrDoc;
+                        else
+                        {
+                            REQUESTDOCUMENT = new XmlDocument();
+                            REQUESTDOCUMENT.LoadXml(requestStrDoc);
+                        }
+                    }
+                    catch
+                    {
+                        REQUESTCONTENT = requestStrDoc;
+                    }
                 }                
             }
             if (!string.IsNullOrEmpty(RSDoamin))
