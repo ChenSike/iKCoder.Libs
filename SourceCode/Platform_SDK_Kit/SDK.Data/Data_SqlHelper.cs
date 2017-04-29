@@ -723,24 +723,7 @@ namespace iKCoder_Platform_SDK_Kit
                 return null;
         }
 
-
-        public DataTable ExecuteSelectSPForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
-        {
-            DataTable dt = new DataTable();
-            if (activeEntry != null)
-            {
-                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
-                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "select");
-                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
-                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "select");
-                class_Data_SqlDataHelper activeSqlSPHelper = new  class_Data_SqlDataHelper();
-                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out dt);
-                return dt;
-            }
-            else
-                return null;
-        }
-
+               
         public DataTable ExecuteSelectSPKeyForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
         {
             DataTable dt = new DataTable();
@@ -858,6 +841,22 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 return null;             
+        }
+
+        public DataTable ExecuteSelectSPForDT(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            if (activeEntry != null)
+            {
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "select");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "select");
+                DataTable resultDT = null;
+                class_Data_SqlDataHelper.ActionExecuteStoreProcedureForDT(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry, out resultDT);
+                return resultDT;
+            }
+            else
+                return null;
         }
 
         public bool ExecuteInsertSP(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)

@@ -35,7 +35,7 @@ namespace iKCoder_Platform_SDK_Kit
             {
                 try
                 {
-                    byte[] bytes = Encoding.Default.GetBytes(data);
+                    byte[] bytes = Encoding.UTF8.GetBytes(data);
                     string str = Convert.ToBase64String(bytes);
                     return str;
                 }
@@ -106,7 +106,7 @@ namespace iKCoder_Platform_SDK_Kit
                 try
                 {
                     byte[] outputb = Convert.FromBase64String(data);
-                    string orgStr = Encoding.Default.GetString(outputb);
+                    string orgStr = Encoding.UTF8.GetString(outputb);
                     return orgStr;
                 }
                 catch

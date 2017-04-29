@@ -19,6 +19,7 @@ namespace iKCoder_Platform_SDK_Kit
         protected int REQUESTSPANTIME = 2;        
         protected bool ISRESPONSEDOC = true;
         protected bool ISBINRESPONSE = false;
+        protected bool ISTEXTREQUEST = false;
         protected static class_Store_DomainPersistance Object_DomainPersistance = new class_Store_DomainPersistance();
                 
         public string APPFOLDERPATH
@@ -105,6 +106,11 @@ namespace iKCoder_Platform_SDK_Kit
         }
 
         protected virtual void InitAction()
+        {
+
+        }
+
+        protected virtual void CheckRegDomain()
         {
 
         }
@@ -200,7 +206,7 @@ namespace iKCoder_Platform_SDK_Kit
             this.REQUESTIP = GetClientIPAddr();
 
             ClientSymbol = GetQuerystringParam("cid");
-            string isTextRequest = GetQuerystringParam("istextreq");
+            ISTEXTREQUEST = GetQuerystringParam("istextreq") == "1" ? true : false;
             if (string.IsNullOrEmpty(ClientSymbol))
             {
                 if (Session["ClientSymbol"] == null)
@@ -211,6 +217,8 @@ namespace iKCoder_Platform_SDK_Kit
 
             InitAction();                         
             BeforeLoad();
+            CheckRegDomain();
+
             bool isSumitData = GetQuerystringParam("sumitdata") == "1" ? true : false;
             if (Request.InputStream != null && Request.InputStream.Length > 0)
             {
@@ -221,7 +229,7 @@ namespace iKCoder_Platform_SDK_Kit
                     streamReaderObj.Close();
                     try
                     {
-                        if (isTextRequest == "1")
+                        if (ISTEXTREQUEST)
                             REQUESTCONTENT = requestStrDoc;
                         else
                         {

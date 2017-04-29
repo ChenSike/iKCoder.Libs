@@ -466,17 +466,24 @@ namespace iKCoder_Platform_SDK_Kit
 
         public static string GetNodeValue(XmlNode node)
         {
-            if (node.ChildNodes.Count==1)
+            if (node != null)
             {
-                if (node.ChildNodes[0].Name == "#text")
+                if (node.ChildNodes.Count == 1)
                 {
-                    if (node != null)
+                    if (node.ChildNodes[0].Name == "#text")
                     {
-                        return node.InnerText;
+                        if (node != null)
+                        {
+                            return node.InnerText;
+                        }
                     }
                 }
+                return string.Empty;
             }
-            return "";
+            else
+            {
+                return string.Empty;
+            }
         }
 
         public static void TraverseNodes(XmlNode Node,ActionForNode degActionForNode)

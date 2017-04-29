@@ -63,7 +63,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             try
             {
-                byte[] bytes = Encoding.Default.GetBytes(input);
+                byte[] bytes = Encoding.UTF8.GetBytes(input);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
                 request.CookieContainer = new CookieContainer();
                 if (active_Cookies.Count > 0)
@@ -183,7 +183,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             try
             {
-                byte[] bytes = Encoding.Default.GetBytes(input);
+                byte[] bytes = Encoding.UTF8.GetBytes(input);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
                 request.CookieContainer = new CookieContainer();
                 if (activeCookies != null && activeCookies.Count > 0)
@@ -215,7 +215,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             try
             {
-                byte[] bytes = Encoding.Default.GetBytes(input);
+                byte[] bytes = Encoding.UTF8.GetBytes(input);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
                 request.CookieContainer = new CookieContainer();
                 if (activeCookies != null && activeCookies.Count > 0)
@@ -247,7 +247,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             try
             {
-                byte[] bytes = Encoding.Default.GetBytes(input);
+                byte[] bytes = Encoding.UTF8.GetBytes(input);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
                 request.CookieContainer = new CookieContainer();
                 if (activeCookies != null && activeCookies.Count > 0)
@@ -276,7 +276,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             try
             {
-                byte[] bytes = Encoding.Default.GetBytes(input);
+                byte[] bytes = Encoding.UTF8.GetBytes(input);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
                 request.CookieContainer = new CookieContainer();
                 if (activeCookies != null && activeCookies.Count > 0)

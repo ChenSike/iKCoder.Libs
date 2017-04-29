@@ -150,6 +150,11 @@ namespace iKCoder_Platform_SDK_Kit
             return true;
         }
 
+        public virtual bool ModifyParameterValue(string Paraname, object SPValue,int Size)
+        {
+            return true;
+        }
+
         public virtual bool ModifyParameterDirection(string Paraname, ParameterDirection SPDirection)
         {
             return true;

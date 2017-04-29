@@ -83,7 +83,19 @@ namespace iKCoder_Platform_SDK_Kit
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection[Paraname].Value = SPValue;
-                ParametersCollection[Paraname].Size = SPValue.ToString().Length;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public override bool ModifyParameterValue(string Paraname, object SPValue,int Size)
+        {
+            Paraname = Paraname.StartsWith("@") ? Paraname.Replace("@", "_") : (Paraname.StartsWith("_") ? Paraname : "_" + Paraname);
+            if (ParametersCollection.ContainsKey(Paraname))
+            {
+                ParametersCollection[Paraname].Value = SPValue;
+                ParametersCollection[Paraname].Size = Size;
                 return true;
             }
             else
