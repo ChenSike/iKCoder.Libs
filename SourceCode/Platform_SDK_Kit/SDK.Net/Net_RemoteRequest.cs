@@ -122,16 +122,15 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public bool getRemoteRequestByGet(string remoteurl)
+        public bool getRemoteRequestByGet(string remoteurl,int timeout = 1000*5)
         {
             try
             {                
                 HttpWebResponse response = null;
                 HttpWebRequest request = null;
                 request = (HttpWebRequest)WebRequest.Create(remoteurl);
-                request.Timeout = 1000 * 60 * 2;
+                request.Timeout = timeout;
                 request.Method = "get";
-                Thread.Sleep(1000);
                 response = (HttpWebResponse)request.GetResponse();
                 return true;                
             }
@@ -141,7 +140,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public List<Cookie> getRemoteServerCookieFillCookieContainer(string remoteurl, string input)
+        public List<Cookie> getRemoteServerCookieFillCookieContainer(string remoteurl, string input,int timeout = 1000 * 10)
         {
             try
             {
@@ -150,8 +149,8 @@ namespace iKCoder_Platform_SDK_Kit
                 HttpWebRequest request = null;
                 Stream requestStream = null;
                 byte[] bytes = Encoding.Default.GetBytes(input);
-                request = (HttpWebRequest)WebRequest.Create(remoteurl);                
-                request.Timeout = 1000 * 60 * 2;
+                request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.Timeout = timeout;
                 request.Method = "post";
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.ContentLength = bytes.Length;
@@ -302,7 +301,38 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-        public List<Cookie> getRemoteServerCookie(string remoteurl, string input)
+        public string sendBinDataToRemoteServer(string remoteurl, byte[] data,int timeout = 1000 * 10)
+        {
+            try
+            {                
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.CookieContainer = new CookieContainer();
+                if (active_Cookies.Count > 0)
+                    request.CookieContainer = active_Cookies;
+                request.Timeout = 0x1b7740;
+                request.Method = "post";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = data.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(data, 0, data.Length);
+                requestStream.Flush();
+                requestStream.Close();
+                StreamReader responseStream = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream(), Encoding.UTF8);
+                string cookieheader = request.CookieContainer.GetCookieHeader(new Uri(remoteurl));
+                active_Cookies.SetCookies(new Uri(remoteurl), cookieheader);
+                foreach (Cookie activeCookieInRequest in request.CookieContainer.GetCookies(new Uri(remoteurl)))
+                    active_Cookies.Add(activeCookieInRequest);
+                string result = "";
+                result = responseStream.ReadToEnd();
+                return result;
+            }
+            catch (Exception err)
+            {
+                return err.Message;
+            }
+        }
+
+        public List<Cookie> getRemoteServerCookie(string remoteurl, string input, int timeout = 1000 * 10)
         {
             try
             {
@@ -313,7 +343,7 @@ namespace iKCoder_Platform_SDK_Kit
                 byte[] bytes = Encoding.Default.GetBytes(input);
                 request = (HttpWebRequest)WebRequest.Create(remoteurl);
                 CookieContainer cookies = new CookieContainer();
-                request.Timeout = 1000 * 60 * 2;
+                request.Timeout = timeout;
                 request.Method = "post";
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.ContentLength = bytes.Length;

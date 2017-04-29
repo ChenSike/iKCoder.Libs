@@ -83,6 +83,7 @@ namespace iKCoder_Platform_SDK_Kit
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection[Paraname].Value = SPValue;
+                ParametersCollection[Paraname].Size = SPValue.ToString().Length;
                 return true;
             }
             else
@@ -216,6 +217,7 @@ namespace iKCoder_Platform_SDK_Kit
             if (ParametersCollection.ContainsKey(Paraname))
             {
                 ParametersCollection[Paraname].Value = SPValue;
+                ParametersCollection[Paraname].Size = SPValue.ToString().Length;
                 return true;
             }
             else

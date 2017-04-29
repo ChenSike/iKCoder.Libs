@@ -54,7 +54,7 @@ namespace iKCoder_Platform_SDK_Kit
                 PropertyInfo activeProperty = this.GetType().GetProperty(propertyName);
                 if (activeProperty != null)
                 {
-                    activeProperty.SetValue(this, value);
+                    //activeProperty.SetValue(this, value);                        
                     return true;
                 }
                 else

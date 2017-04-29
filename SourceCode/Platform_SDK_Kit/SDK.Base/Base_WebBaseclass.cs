@@ -14,9 +14,10 @@ namespace iKCoder_Platform_SDK_Kit
 
         protected XmlDocument RESPONSEDOCUMENT = new XmlDocument();
         protected byte[] RESPONSEBUFFER;
-        public XmlDocument REQUESTDOCUMENT;        
-        protected int REQUESTSPANTIME = 100;        
-        protected bool ISRESPONSEDOC = false;
+        public XmlDocument REQUESTDOCUMENT;
+        public string REQUESTCONTENT = string.Empty; 
+        protected int REQUESTSPANTIME = 2;        
+        protected bool ISRESPONSEDOC = true;
         protected bool ISBINRESPONSE = false;
         protected static class_Store_DomainPersistance Object_DomainPersistance = new class_Store_DomainPersistance();
                 
@@ -36,13 +37,9 @@ namespace iKCoder_Platform_SDK_Kit
         {
 
             string userHostAddress = "";
-            try
+            if (HttpContext.Current.Request.ServerVariables.AllKeys.Contains("HTTP_X_FORWARDED_FOR"))
             {
                 userHostAddress = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"].ToString().Split(',')[0].Trim();
-            }
-            catch
-            {
-                
             }
             if (string.IsNullOrEmpty(userHostAddress))
             {
@@ -117,6 +114,12 @@ namespace iKCoder_Platform_SDK_Kit
             set;
             get;
         }
+
+        protected enum enumResponseMode
+        {
+            bin = 1,
+            text = 2            
+        }
        
 
         protected void AddErrMessageToResponseDOC(string header, string message,string link,enum_MessageType activeMessageType = enum_MessageType.Message)
@@ -158,18 +161,28 @@ namespace iKCoder_Platform_SDK_Kit
             RESPONSEDOCUMENT.SelectSingleNode("/root").AppendChild(newNode);
         }
 
+        protected void switchResponseMode(enumResponseMode activeResponseMode)
+        {
+            switch(activeResponseMode)
+            {
+                case enumResponseMode.bin:
+                    ISBINRESPONSE = true;
+                    ISRESPONSEDOC = false;
+                    break;
+                case enumResponseMode.text:
+                    ISBINRESPONSE = false;
+                    ISRESPONSEDOC = true;
+                    break;                
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            APPFOLDERPATH = Server.MapPath("~/");
-            this.REQUESTIP = GetClientIPAddr();
-            InitAction();                   
-            if (string.IsNullOrEmpty(REQUESTIP))
-                REQUESTIP = "127.0.0.1";
             if (Session[REQUESTIP] != null)
-            {                
-                DateTime lastRequestTime = DateTime.Now;
+            {
                 if (Session[REQUESTIP].ToString() == "")
                 {
+                    DateTime lastRequestTime = DateTime.Now;
                     DateTime.TryParse(Session[REQUESTIP].ToString(), out lastRequestTime);
                     if ((lastRequestTime - DateTime.Now).Milliseconds < REQUESTSPANTIME)
                     {
@@ -182,33 +195,65 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 Session.Add(REQUESTIP, DateTime.Now.ToString());
-            if (GetQuerystringParam("cid") != "" || GetQuerystringParam("CID") != "")
-                ClientSymbol = GetQuerystringParam("cid");
+
+            APPFOLDERPATH = Server.MapPath("~/");
+            this.REQUESTIP = GetClientIPAddr();
+
+            ClientSymbol = GetQuerystringParam("cid");
+            string isTextRequest = GetQuerystringParam("istextreq");
+            if (string.IsNullOrEmpty(ClientSymbol))
+            {
+                if (Session["ClientSymbol"] == null)
+                    Session.Add("ClientSymbol", Guid.NewGuid().ToString());
+                else
+                    ClientSymbol = Session["ClientSymbol"].ToString();
+            }
+
+            InitAction();                         
             BeforeLoad();
+            bool isSumitData = GetQuerystringParam("sumitdata") == "1" ? true : false;
             if (Request.InputStream != null && Request.InputStream.Length > 0)
             {
-                StreamReader streamReaderObj = new StreamReader(Request.InputStream);
-                string requestStrDoc = streamReaderObj.ReadToEnd();
-                streamReaderObj.Close();
-                REQUESTDOCUMENT = new XmlDocument();
-                REQUESTDOCUMENT.LoadXml(requestStrDoc);
+                if (!isSumitData)
+                {
+                    StreamReader streamReaderObj = new StreamReader(Request.InputStream);
+                    string requestStrDoc = streamReaderObj.ReadToEnd();
+                    streamReaderObj.Close();
+                    try
+                    {
+                        if (isTextRequest == "1")
+                            REQUESTCONTENT = requestStrDoc;
+                        else
+                        {
+                            REQUESTDOCUMENT = new XmlDocument();
+                            REQUESTDOCUMENT.LoadXml(requestStrDoc);
+                        }
+                    }
+                    catch
+                    {
+                        REQUESTCONTENT = requestStrDoc;
+                    }
+                }                
             }
             if (!string.IsNullOrEmpty(RSDoamin))
             {
                 Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                Response.AddHeader("Access-Control-Allow-Headers", "Content-Type,x-requested-with");
+                Response.AddHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE");
                 Response.AddHeader("Access-Control-Allow-Origin", this.RSDoamin);                          
             }           
             DoAction();
-            if (ISRESPONSEDOC && !ISBINRESPONSE)
+            if (ISRESPONSEDOC)
             {
                 Response.ContentType = "text/xml; characterset=utf-8";
                 Response.Write(RESPONSEDOCUMENT.OuterXml);
             }
-            else if (ISRESPONSEDOC && ISBINRESPONSE)
+            else if (ISBINRESPONSE)
             {
                 Response.BinaryWrite(RESPONSEBUFFER);
                 Response.Flush();
             }
+            
         }       
     }
 }

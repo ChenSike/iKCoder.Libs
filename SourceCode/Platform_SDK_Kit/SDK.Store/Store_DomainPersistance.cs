@@ -57,72 +57,83 @@ namespace iKCoder_Platform_SDK_Kit
         {
             if (key != "")
             {
-                Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = null;
-                if (!DataBuffer.ContainsKey(key))
+                lock (DataBuffer)
                 {
-                    activeStoreItem = new Dictionary<string, class_Store_DomainPersistanceItem>();
-                    DataBuffer.Add(key, activeStoreItem);
+                    Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = null;
+                    if (!DataBuffer.ContainsKey(key))
+                    {
+                        activeStoreItem = new Dictionary<string, class_Store_DomainPersistanceItem>();
+                        DataBuffer.Add(key, activeStoreItem);
+                    }
+                    else
+                        activeStoreItem = DataBuffer[key];
+                    if (!activeStoreItem.ContainsKey(domainKeyName))
+                    {
+                        class_Store_DomainPersistanceItem newItem = new class_Store_DomainPersistanceItem();
+                        newItem.DomainKeyName = domainKeyName;
+                        newItem.Created = DateTime.Now;
+                        newItem.Data = data;
+                        newItem.Expeired = storeExpeired > 0 ? storeExpeired : 60;
+                        activeStoreItem.Add(domainKeyName, newItem);
+                    }
                 }
-                else
-                    activeStoreItem = DataBuffer[key];
-                if (!activeStoreItem.ContainsKey(domainKeyName))
-                {
-                    class_Store_DomainPersistanceItem newItem = new class_Store_DomainPersistanceItem();
-                    newItem.DomainKeyName = domainKeyName;
-                    newItem.Created = DateTime.Now;
-                    newItem.Data = data;
-                    newItem.Expeired = storeExpeired > 0 ? storeExpeired : 60;
-                    activeStoreItem.Add(domainKeyName, newItem);
-                }                
             }
         }
 
         public void FlushValue(string key,string domainKeyName,object data)
         {
-
-            if (key != "")
+            lock (DataBuffer)
             {
-                Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = null;
-                if (!DataBuffer.ContainsKey(key))
+                if (key != "")
                 {
-                    activeStoreItem = new Dictionary<string, class_Store_DomainPersistanceItem>();
-                    DataBuffer.Add(key, activeStoreItem);
+                    Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = null;
+                    if (!DataBuffer.ContainsKey(key))
+                    {
+                        activeStoreItem = new Dictionary<string, class_Store_DomainPersistanceItem>();
+                        DataBuffer.Add(key, activeStoreItem);
+                    }
+                    else
+                        activeStoreItem = DataBuffer[key];
+                    if (activeStoreItem.ContainsKey(domainKeyName))
+                    {
+                        activeStoreItem[domainKeyName].Data = data;
+                        activeStoreItem[domainKeyName].Created = DateTime.Now;
+                    }
                 }
-                else
-                    activeStoreItem = DataBuffer[key];
-                if (activeStoreItem.ContainsKey(domainKeyName))                
-                    activeStoreItem[domainKeyName].Data = data;                         
             }
         }
 
         public void Add(string key, string domainKeyName,int storeExpeired,object data)
         {
             ClearBuffer();
-            if (key != "")
+            lock (DataBuffer)
             {
-                Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = null;
-                if (!DataBuffer.ContainsKey(key))
+                if (key != "")
                 {
-                    activeStoreItem = new Dictionary<string, class_Store_DomainPersistanceItem>();
-                    DataBuffer.Add(key, activeStoreItem);
-                }
-                else
-                    activeStoreItem = DataBuffer[key];
-                if (!activeStoreItem.ContainsKey(domainKeyName))
-                {
-                    class_Store_DomainPersistanceItem newItem = new class_Store_DomainPersistanceItem();
-                    newItem.DomainKeyName = domainKeyName;
-                    newItem.Created = DateTime.Now;
-                    newItem.Data = data;
-                    newItem.Expeired = storeExpeired > 0 ? storeExpeired : 60;
-                    activeStoreItem.Add(domainKeyName, newItem);
-                }
-                else
-                {
-                    activeStoreItem[domainKeyName].DomainKeyName = domainKeyName;
-                    activeStoreItem[domainKeyName].Data = data;
-                    activeStoreItem[domainKeyName].Expeired = storeExpeired > 0 ? storeExpeired : 60;
-                    activeStoreItem[domainKeyName].Created = DateTime.Now;
+                    Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = null;
+                    if (!DataBuffer.ContainsKey(key))
+                    {
+                        activeStoreItem = new Dictionary<string, class_Store_DomainPersistanceItem>();
+                        DataBuffer.Add(key, activeStoreItem);
+                    }
+                    else
+                        activeStoreItem = DataBuffer[key];
+                    if (!activeStoreItem.ContainsKey(domainKeyName))
+                    {
+                        class_Store_DomainPersistanceItem newItem = new class_Store_DomainPersistanceItem();
+                        newItem.DomainKeyName = domainKeyName;
+                        newItem.Created = DateTime.Now;
+                        newItem.Data = data;
+                        newItem.Expeired = storeExpeired > 0 ? storeExpeired : 60;
+                        activeStoreItem.Add(domainKeyName, newItem);
+                    }
+                    else
+                    {
+                        activeStoreItem[domainKeyName].DomainKeyName = domainKeyName;
+                        activeStoreItem[domainKeyName].Data = data;
+                        activeStoreItem[domainKeyName].Expeired = storeExpeired > 0 ? storeExpeired : 60;
+                        activeStoreItem[domainKeyName].Created = DateTime.Now;
+                    }
                 }
             }
         }
@@ -168,30 +179,36 @@ namespace iKCoder_Platform_SDK_Kit
 
         public void ClearBuffer()
         {
-            List<string> removedUrlLst =new List<string>();
-            foreach(string activeUrl in DataBuffer.Keys)
+            lock (DataBuffer)
             {
-                List<string> removeLst = new List<string>();
-                foreach(string keyName in DataBuffer[activeUrl].Keys)
-                {                    
-                    class_Store_DomainPersistanceItem tmpItem = DataBuffer[activeUrl][keyName];
-                    if(tmpItem.Expeired == -999)                    
-                        continue;                    
-                    if ((DateTime.Now - tmpItem.Created).Minutes >= tmpItem.Expeired)
-                        removeLst.Add(keyName);                                               
+                List<string> removedUrlLst = new List<string>();
+                foreach (string activeUrl in DataBuffer.Keys)
+                {
+                    List<string> removeLst = new List<string>();
+                    foreach (string keyName in DataBuffer[activeUrl].Keys)
+                    {
+                        class_Store_DomainPersistanceItem tmpItem = DataBuffer[activeUrl][keyName];
+                        if (tmpItem.Expeired == 99999)
+                            continue;
+                        if ((DateTime.Now - tmpItem.Created).Minutes >= tmpItem.Expeired)
+                            removeLst.Add(keyName);
+                    }
+                    foreach (string removeKeyName in removeLst)
+                        DataBuffer[activeUrl].Remove(removeKeyName);
+                    if (DataBuffer[activeUrl].Count == 0)
+                        removedUrlLst.Add(activeUrl);
                 }
-                foreach (string removeKeyName in removeLst)
-                    DataBuffer[activeUrl].Remove(removeKeyName);
-                if (DataBuffer[activeUrl].Count == 0)
-                    removedUrlLst.Add(activeUrl);
+                foreach (string activeRemovedUrl in removedUrlLst)
+                    DataBuffer.Remove(activeRemovedUrl);
             }
-            foreach (string activeRemovedUrl in removedUrlLst)
-                DataBuffer.Remove(activeRemovedUrl);
         }
 
         public void ClearAll()
         {
-            DataBuffer.Clear();            
+            lock (DataBuffer)
+            {
+                DataBuffer.Clear();
+            }
         }
         
     }
