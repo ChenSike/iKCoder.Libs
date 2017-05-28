@@ -99,7 +99,8 @@ namespace iKCoder_Platform_SDK_Kit
         }
     }
 
-    public class class_Data_SqlSPEntry : ICloneable
+    [Serializable()]
+    public class class_Data_SqlSPEntry
     {
         public class_Data_SqlSPEntry(enum_DatabaseType activeDBType)
         {
@@ -130,13 +131,12 @@ namespace iKCoder_Platform_SDK_Kit
             get;
         }
 
-        public object Clone()
+        public virtual object Clone()
         {
-            class_Data_SqlSPEntry newEntry = new class_Data_SqlSPEntry(this.ActiveDBType);            
-            newEntry.EntryType = this.EntryType;
-            newEntry.KeyName = this.KeyName;
-            newEntry.SPName = this.SPName;
-            newEntry.EntryType = this.EntryType;
+            object newEntry = (new class_Data_SqlSPEntry(this.ActiveDBType)) as object;
+            ((class_Data_SqlSPEntry)newEntry).EntryType = this.EntryType;
+            ((class_Data_SqlSPEntry)newEntry).KeyName = this.KeyName;
+            ((class_Data_SqlSPEntry)newEntry).SPName = this.SPName;
             return newEntry;
         }
 

@@ -45,12 +45,20 @@ namespace iKCoder_Platform_SDK_Kit
             
         }
 
-        public string GetKeyName(string hostaddress,string producename,string clientsymbol = "")
+        public string GetKeyName(string sessionID)
         {
+            /*
             if (clientsymbol != "")
                 return hostaddress + "_" + producename + "_" + clientsymbol;
             else
                 return hostaddress + "_" + producename;
+                */
+            return sessionID;
+        }
+
+        public string GetKeyName(string sessionID, string symbol)
+        {
+            return sessionID + "_" + symbol;
         }
 
         public void AddSingle(string key,string domainKeyName,int storeExpeired,object data)
@@ -140,41 +148,93 @@ namespace iKCoder_Platform_SDK_Kit
 
         public object Get(string key,string domainKeyName)
         {
-            ClearBuffer();
-            if (DataBuffer.ContainsKey(key))
+            lock (DataBuffer)
             {
-                Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
-                if (activeStoreItem.ContainsKey(domainKeyName))
-                    return activeStoreItem[domainKeyName].Data;
+                if (DataBuffer.ContainsKey(key))
+                {
+                    Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
+                    object returnData = activeStoreItem[domainKeyName].Data;
+                    if (activeStoreItem.ContainsKey(domainKeyName))
+                    {
+                        return returnData;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
                 else
+                {
                     return null;
+                }
             }
-            else
-                return null;           
         }
 
         public void Remove(string key,string domainKeyName)
         {
-            if (DataBuffer.ContainsKey(key))
+            lock (DataBuffer)
             {
-                Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
-                if (activeStoreItem.ContainsKey(domainKeyName))                
-                    activeStoreItem.Remove(domainKeyName);                
+                if (DataBuffer.ContainsKey(key))
+                {
+                    Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
+                    if (activeStoreItem.ContainsKey(domainKeyName))
+                        activeStoreItem.Remove(domainKeyName);
+                }
+            }
+            ClearBuffer();
+        }
+
+        public void Remove(string key)
+        {
+            lock (DataBuffer)
+            {
+                if (DataBuffer.ContainsKey(key))
+                {
+                    DataBuffer.Remove(key);
+                }
             }
             ClearBuffer();
         }
 
         public void Flush(string key,string domainKeyName)
         {
-            if (DataBuffer.ContainsKey(key))
+            lock (DataBuffer)
             {
-                Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
-                if (activeStoreItem.ContainsKey(domainKeyName))
+                if (DataBuffer.ContainsKey(key))
                 {
-                    activeStoreItem[domainKeyName].Created = DateTime.Now;
+                    Dictionary<string, class_Store_DomainPersistanceItem> activeStoreItem = DataBuffer[key];
+                    if (activeStoreItem.ContainsKey(domainKeyName))
+                    {
+                        activeStoreItem[domainKeyName].Created = DateTime.Now;
+                    }
                 }
             }
             ClearBuffer();
+        }
+
+        public bool IsKeyExisted(string KeyName)
+        {
+            lock(DataBuffer)
+            {
+                if (DataBuffer.ContainsKey(KeyName))
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        public bool IsDomainKeyExisted(string KeyName, string domainKeyName)
+        {
+            lock (DataBuffer)
+            {
+                if (DataBuffer.ContainsKey(KeyName))
+                    if (DataBuffer[KeyName].ContainsKey(domainKeyName))
+                        return true;
+                    else
+                        return false;
+                else
+                    return false;
+            }
         }
 
         public void ClearBuffer()

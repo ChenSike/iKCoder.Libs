@@ -36,7 +36,7 @@ namespace iKCoder_Platform_SDK_Kit
 
         public string GetClientIPAddr()
         {
-
+            /*
             string userHostAddress = "";
             if (HttpContext.Current.Request.ServerVariables.AllKeys.Contains("HTTP_X_FORWARDED_FOR"))
             {
@@ -55,6 +55,8 @@ namespace iKCoder_Platform_SDK_Kit
                 return userHostAddress;
             }
             return "127.0.0.1";
+            */
+            return Session.SessionID;
 
         }
 
@@ -84,6 +86,19 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 return "";
+        }
+
+        protected object GetSessionValue(string sessionName)
+        {
+            if (Session[sessionName] != null)
+                return Session[sessionName];
+            else
+                return string.Empty;
+        }
+
+        protected string GetSessionKeyName(string product,string sessionName)
+        {
+            return product + "_" + sessionName;
         }
 
         protected HttpCookie GetRequestCookie(string cookieName)
@@ -184,6 +199,9 @@ namespace iKCoder_Platform_SDK_Kit
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            this.REQUESTIP = GetClientIPAddr();
+            if (string.IsNullOrEmpty(this.REQUESTIP))
+                this.REQUESTIP = Guid.NewGuid().ToString();
             if (Session[REQUESTIP] != null)
             {
                 if (Session[REQUESTIP].ToString() == "")
@@ -201,16 +219,16 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else
                 Session.Add(REQUESTIP, DateTime.Now.ToString());
-
-            APPFOLDERPATH = Server.MapPath("~/");
-            this.REQUESTIP = GetClientIPAddr();
-
+            APPFOLDERPATH = Server.MapPath("~/");         
             ClientSymbol = GetQuerystringParam("cid");
             ISTEXTREQUEST = GetQuerystringParam("istextreq") == "1" ? true : false;
             if (string.IsNullOrEmpty(ClientSymbol))
             {
                 if (Session["ClientSymbol"] == null)
-                    Session.Add("ClientSymbol", Guid.NewGuid().ToString());
+                {
+                    ClientSymbol = Guid.NewGuid().ToString();
+                    Session.Add("ClientSymbol", ClientSymbol);
+                }
                 else
                     ClientSymbol = Session["ClientSymbol"].ToString();
             }

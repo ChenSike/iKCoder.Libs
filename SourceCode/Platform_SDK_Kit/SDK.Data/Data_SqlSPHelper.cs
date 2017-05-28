@@ -25,9 +25,11 @@ namespace iKCoder_Platform_SDK_Kit
         public const string SelectAction = "Select";
         public const string InsertAction = "Insert";
         public const string DeleteAction = "Delete";
-        public const string AllAction = "All";        
+        public const string AllAction = "All";
     }
+              
 
+    [Serializable]
     public class class_data_MySqlSPEntry : class_Data_SqlSPEntry
     {
         public class_data_MySqlSPEntry(enum_DatabaseType activeDBType):base(activeDBType)
@@ -39,6 +41,26 @@ namespace iKCoder_Platform_SDK_Kit
         {
             set;
             get;
+        }
+
+        public override object Clone()
+        {          
+            object newEntry = (new class_data_MySqlSPEntry(this.ActiveDBType)) as object;
+            ((class_data_MySqlSPEntry)newEntry).EntryType = this.EntryType;
+            ((class_data_MySqlSPEntry)newEntry).KeyName = this.KeyName;
+            ((class_data_MySqlSPEntry)newEntry).SPName = this.SPName;
+            foreach(string paramtername in this.ParametersCollection.Keys)
+            {
+                MySqlParameter activeParameter= ParametersCollection[paramtername];
+                MySqlParameter newParamter = (new MySqlParameter()) as MySqlParameter;
+                newParamter.MySqlDbType = activeParameter.MySqlDbType;
+                newParamter.ParameterName = activeParameter.ParameterName;
+                newParamter.Size = activeParameter.Size;
+                newParamter.Value = activeParameter.Value;
+                newParamter.Direction = activeParameter.Direction;
+                ((class_data_MySqlSPEntry)newEntry).ParametersCollection.Add(newParamter.ParameterName,newParamter);
+            }
+            return newEntry;
         }
         
         public Dictionary<string, MySqlParameter> ParametersCollection = new Dictionary<string, MySqlParameter>();
@@ -138,17 +160,6 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
             
-        public object Clone()
-        {
-            class_data_MySqlSPEntry newEntry = new class_data_MySqlSPEntry(this.ActiveDBType);
-            newEntry.ParametersCollection = this.ParametersCollection;
-            newEntry.EntryType = this.EntryType;
-            newEntry.KeyName = this.KeyName;
-            newEntry.SPName = this.SPName;
-            newEntry.SPType = this.SPType;
-            return newEntry;
-        }
-
         public override void ClearAllParams()
         {
             this.ParametersCollection.Clear();
@@ -175,6 +186,7 @@ namespace iKCoder_Platform_SDK_Kit
         }
     }
 
+    [Serializable]
     public class class_data_SqlServerSPEntry : class_Data_SqlSPEntry
     {
         public class_data_SqlServerSPEntry(enum_DatabaseType activeDBType):base(activeDBType)
@@ -269,14 +281,13 @@ namespace iKCoder_Platform_SDK_Kit
                 return false;
         }
             
-        public object Clone()
+        public override object Clone()
         {
-            class_data_SqlServerSPEntry newEntry = new class_data_SqlServerSPEntry(this.ActiveDBType);
-            newEntry.ParametersCollection = this.ParametersCollection;
-            newEntry.EntryType = this.EntryType;
-            newEntry.KeyName = this.KeyName;
-            newEntry.SPName = this.SPName;
-            newEntry.SPType = this.SPType;
+            object newEntry = (new class_data_SqlServerSPEntry(this.ActiveDBType)) as object;
+            ((class_data_SqlServerSPEntry)newEntry).EntryType = this.EntryType;
+            ((class_data_SqlServerSPEntry)newEntry).KeyName = this.KeyName;
+            ((class_data_SqlServerSPEntry)newEntry).SPName = this.SPName;
+            ((class_data_SqlServerSPEntry)newEntry).ParametersCollection = this.ParametersCollection;
             return newEntry;
         }
 
