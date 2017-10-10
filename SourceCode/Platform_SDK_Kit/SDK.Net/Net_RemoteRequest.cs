@@ -140,6 +140,30 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
+        public byte[] getRemoteRequestToBytesByGet(string remoteurl, int buffersize=1024*100 ,int timeout = 1000 * 5)
+        {
+            try
+            {
+                HttpWebResponse response = null;
+                HttpWebRequest request = null;
+                request = (HttpWebRequest)WebRequest.Create(remoteurl);
+                request.Timeout = timeout;
+                request.Method = "get";
+                response = (HttpWebResponse)request.GetResponse();
+                byte[] buffer = null;
+                Stream responseStream = ((HttpWebResponse)request.GetResponse()).GetResponseStream();
+                BinaryReader reader = new BinaryReader(responseStream);
+                buffer = reader.ReadBytes(buffersize);
+                reader.Close();
+                responseStream.Close();
+                return buffer;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public List<Cookie> getRemoteServerCookieFillCookieContainer(string remoteurl, string input,int timeout = 1000 * 10)
         {
             try

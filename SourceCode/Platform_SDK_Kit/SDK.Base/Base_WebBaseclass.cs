@@ -93,7 +93,15 @@ namespace iKCoder_Platform_SDK_Kit
             if (Session[sessionName] != null)
                 return Session[sessionName];
             else
-                return string.Empty;
+                return null;
+        }
+
+        protected object GetApplicationData(string applicationName)
+        {
+            if (Application[applicationName] != null)
+                return Application[applicationName];
+            else
+                return null;
         }
 
         protected string GetSessionKeyName(string product,string sessionName)
@@ -276,10 +284,12 @@ namespace iKCoder_Platform_SDK_Kit
             }
             else if (ISBINRESPONSE)
             {
-                Response.BinaryWrite(RESPONSEBUFFER);
-                Response.Flush();
-            }
-            
+                if (RESPONSEBUFFER != null)
+                {
+                    Response.BinaryWrite(RESPONSEBUFFER);
+                    Response.Flush();
+                }
+            }            
         }       
     }
 }

@@ -7,6 +7,7 @@ using Gma.QrCodeNet.Encoding;
 using Gma.QrCodeNet.Encoding.Windows.Render;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Drawing;
 
 namespace iKCoder_Platform_SDK_Kit
 {
@@ -16,13 +17,14 @@ namespace iKCoder_Platform_SDK_Kit
         {
             Gma.QrCodeNet.Encoding.QrEncoder obj = new Gma.QrCodeNet.Encoding.QrEncoder();
             Gma.QrCodeNet.Encoding.QrCode qrcode;
-            obj.TryEncode("http://ikcoder.iok.la:24525/IKCoder/Data/GET_UrlMap.aspx?mapkey=reg&fulurl=1", out qrcode);
+            obj.TryEncode(content, out qrcode);
             QuietZoneModules QuietZones = QuietZoneModules.Two;
             Gma.QrCodeNet.Encoding.Windows.Render.GraphicsRenderer newRender = new Gma.QrCodeNet.Encoding.Windows.Render.GraphicsRenderer(new FixedModuleSize(12, QuietZones));
             MemoryStream newStream = new MemoryStream();
             newRender.WriteToStream(qrcode.Matrix, imageFormat, newStream);
             byte[] dataBuffer = new byte[newStream.Length];
-            newStream.Read(dataBuffer, 0, dataBuffer.Length);
+            newStream.Seek(0, SeekOrigin.Begin);
+            newStream.Read(dataBuffer, 0, (int)newStream.Length);            
             newStream.Close();
             return dataBuffer;
         }
@@ -31,7 +33,7 @@ namespace iKCoder_Platform_SDK_Kit
         {
             Gma.QrCodeNet.Encoding.QrEncoder obj = new Gma.QrCodeNet.Encoding.QrEncoder();
             Gma.QrCodeNet.Encoding.QrCode qrcode;
-            obj.TryEncode("http://ikcoder.iok.la:24525/IKCoder/Data/GET_UrlMap.aspx?mapkey=reg&fulurl=1", out qrcode);
+            obj.TryEncode(content, out qrcode);
             QuietZoneModules QuietZones = QuietZoneModules.Two;
             Gma.QrCodeNet.Encoding.Windows.Render.GraphicsRenderer newRender = new Gma.QrCodeNet.Encoding.Windows.Render.GraphicsRenderer(new FixedModuleSize(12, QuietZones));
             FileStream newFS = new FileStream(objectFile, FileMode.Create);

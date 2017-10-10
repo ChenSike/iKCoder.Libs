@@ -39,12 +39,7 @@ namespace iKCoder_Platform_SDK_Kit
     {
         
         public Dictionary<string, Dictionary<string, class_Store_DomainPersistanceItem>> DataBuffer = new Dictionary<string, Dictionary<string, class_Store_DomainPersistanceItem>>();
-               
-        public class_Store_DomainPersistance()
-        {            
-            
-        }
-
+     
         public string GetKeyName(string sessionID)
         {
             /*

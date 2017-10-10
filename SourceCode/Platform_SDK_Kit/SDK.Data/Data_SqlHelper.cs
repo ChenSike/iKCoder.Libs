@@ -30,13 +30,45 @@ namespace iKCoder_Platform_SDK_Kit
     public class class_Data_SqlHelper
     {
 
+        public bool ActionExportsTablesAndDatasToXML(class_data_PlatformDBConnection ActiveConnection,string exportDir)
+        {
+            /*try
+            {
+                if (ActiveConnection != null && ActiveConnection.activeDatabaseType == enum_DatabaseType.SqlServer)
+                {
+                    string sql_getALLTables = class_Data_SqlStringHelper.SQL_GETALLTABLES_FOR_SQL2008;
+                }
+                else if (ActiveConnection != null && ActiveConnection.activeDatabaseType == enum_DatabaseType.MySql)
+                {
+                    class_data_MySqlConnectionItem mysqlActiveConnectionItem = (class_data_MySqlConnectionItem)ActiveConnection;
+                    string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);
+                    DataTable TableInfo = new DataTable();
+                    StringBuilder sql_CreateNewSp = new StringBuilder();
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableInfo))
+                    {
+                        foreach(DataRow activeDataRow in TableInfo.Rows)
+                        {
+                            string tableName = class_Data_SqlDataHelper.GetColumnData(activeDataRow, "table_name", out tableName);
+
+                        }
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }*/
+            return true;
+        }
+
         public bool ActionAutoCreateSPS(class_data_PlatformDBConnection ActiveConnection)
         {
             try
             {
                 if (ActiveConnection != null && ActiveConnection.activeDatabaseType == enum_DatabaseType.SqlServer)
                 {
-                    string sql_getALLTables = class_Data_SqlStringHelper.SQL_GETALLTABLES_FOR_SQL2008;                                      
+                    string sql_getALLTables = class_Data_SqlStringHelper.SQL_GETALLTABLES_FOR_SQL2008;
                     DataTable TablesInfo = new DataTable();
                     DataTable ColumnInfo = new DataTable();
                     DataTable TypesInfo = new DataTable();
@@ -176,7 +208,7 @@ namespace iKCoder_Platform_SDK_Kit
                                                 sql_CreateNewSp.Append(keyColumn + "=@" + keyColumn + " and ");
                                             }
                                             sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
-                                            sql_CreateNewSp.AppendLine("");                       
+                                            sql_CreateNewSp.AppendLine("");
                                             sql_CreateNewSp.AppendLine("end");
                                             sql_CreateNewSp.AppendLine("else if @operation='selectkey'");
                                             sql_CreateNewSp.AppendLine("begin");
@@ -193,7 +225,7 @@ namespace iKCoder_Platform_SDK_Kit
                                             sql_CreateNewSp.AppendLine("select * from [" + tableName + "] where ");
                                             foreach (string selectColumn in activeColumn)
                                             {
-                                                if(!filterTypeList.Contains(selectColumn))
+                                                if (!filterTypeList.Contains(selectColumn))
                                                     sql_CreateNewSp.Append(selectColumn + "=@" + selectColumn + " or ");
                                             }
                                             sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
@@ -223,11 +255,11 @@ namespace iKCoder_Platform_SDK_Kit
                 else if (ActiveConnection != null && ActiveConnection.activeDatabaseType == enum_DatabaseType.MySql)
                 {
                     class_data_MySqlConnectionItem mysqlActiveConnectionItem = (class_data_MySqlConnectionItem)ActiveConnection;
-                    string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);                    
-                    string name_sp = "spa_operation_";                                        
-                    DataTable TableInfo = new DataTable();     
+                    string sql_getALLTables = class_Data_SqlStringHelper.Get_SQL_GETALLTABLES_FOR_MYSQL(mysqlActiveConnectionItem.ActiveConnection.Database);
+                    string name_sp = "spa_operation_";
+                    DataTable TableInfo = new DataTable();
                     StringBuilder sql_CreateNewSp = new StringBuilder();
-                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection,sql_getALLTables,out TableInfo))
+                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLTables, out TableInfo))
                     {
                         DataTable TableSPInfos = new DataTable();
                         string sql_getALLSPInfos = class_Data_SqlStringHelper.Get_SQL_GETALLSPS_FOR_MYSQL(((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);
@@ -244,134 +276,154 @@ namespace iKCoder_Platform_SDK_Kit
                         foreach (DataRow activeTable in TableInfo.Rows)
                         {
                             string sql_getALLColumns = "Select COLUMN_NAME,COLUMN_TYPE,COLUMN_KEY,EXTRA from INFORMATION_SCHEMA.COLUMNS Where table_schema = '{schemaname}' and table_name = '{tablename}'";
-                            sql_getALLColumns = sql_getALLColumns.Replace("{schemaname}", ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);  
-                            sql_CreateNewSp.Clear();                            
-                            string tableName = ""; 
-                            class_Data_SqlDataHelper.GetColumnData(activeTable, "table_name", out tableName);                        
+                            sql_getALLColumns = sql_getALLColumns.Replace("{schemaname}", ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database);
+                            sql_CreateNewSp.Clear();
+                            string tableName = "";
+                            class_Data_SqlDataHelper.GetColumnData(activeTable, "table_name", out tableName);
                             List<string> tmpSelectedColumsLst = new List<string>();
                             List<string> tmpSelectedKeyColumnsLst = new List<string>();
-                           
-                                if (tableName != "")
-                                {                                    
 
-                                    sql_getALLColumns = sql_getALLColumns.Replace("{tablename}", tableName);
-                                    DataTable TableColumnsInfo = new DataTable();
-                                    if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out TableColumnsInfo))
+                            if (tableName != "")
+                            {
+
+                                sql_getALLColumns = sql_getALLColumns.Replace("{tablename}", tableName);
+                                DataTable TableColumnsInfo = new DataTable();
+                                if (class_Data_SqlDataHelper.ActionExecuteSQLForDT(ActiveConnection, sql_getALLColumns, out TableColumnsInfo))
+                                {
+                                    sql_CreateNewSp.AppendLine("CREATE PROCEDURE " + name_sp + tableName);
+                                    sql_CreateNewSp.Append("(");
+                                    sql_CreateNewSp.Append("_operation varchar(40),");
+                                    if (TableColumnsInfo.Rows.Count > 0)
                                     {
-                                        sql_CreateNewSp.AppendLine("CREATE PROCEDURE " + name_sp + tableName);
-                                        sql_CreateNewSp.Append("(");
-                                        sql_CreateNewSp.Append("_operation varchar(40),");
-                                        if (TableColumnsInfo.Rows.Count > 0)
-                                        {                                                            
-                                            foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
-                                            {
-                                                string column_name = "";
-                                                string column_type = "";
-                                                string column_extra = "";
-                                                string column_key = "";
-                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
-                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_TYPE", out column_type);
-                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_KEY", out column_key);
-                                                class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
-                                                if (column_key == "PRI")
-                                                    tmpSelectedKeyColumnsLst.Add(column_name);                                                
-                                                sql_CreateNewSp.Append("_" + column_name + " " + column_type + ",");
-                                                if (!tmpSelectedColumsLst.Contains(column_name))
-                                                    tmpSelectedColumsLst.Add(column_name);
-                                            }                                                                                       
-                                        }
-                                        sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);   
-                                        sql_CreateNewSp.AppendLine(")");
-                                        sql_CreateNewSp.AppendLine("BEGIN");
-                                        sql_CreateNewSp.AppendLine("DECLARE tmpsql VARCHAR(800);");                                       
-                                        sql_CreateNewSp.AppendLine("if _operation='select' then");
-                                        sql_CreateNewSp.AppendLine("select * from " + tableName+";");
-                                        sql_CreateNewSp.AppendLine("elseif _operation='insert' then");
-                                        sql_CreateNewSp.Append("insert into " + ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database + "." + tableName + "(");
                                         foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
                                         {
                                             string column_name = "";
+                                            string column_type = "";
                                             string column_extra = "";
+                                            string column_key = "";
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_TYPE", out column_type);
+                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_KEY", out column_key);
                                             class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
-                                            if (column_extra != "auto_increment")
-                                                sql_CreateNewSp.Append(column_name + ",");
+                                            if (column_key == "PRI")
+                                                tmpSelectedKeyColumnsLst.Add(column_name);
+                                            sql_CreateNewSp.Append("_" + column_name + " " + column_type + ",");
+                                            if (!tmpSelectedColumsLst.Contains(column_name))
+                                                tmpSelectedColumsLst.Add(column_name);
                                         }
-                                        sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
-                                        sql_CreateNewSp.Append(")");
-                                        sql_CreateNewSp.Append(" values(");
-                                        foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
-                                        {
-                                            string column_name = "";
-                                            string column_extra = "";
-                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
-                                            class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
-                                            if (column_extra != "auto_increment")
-                                                sql_CreateNewSp.Append("_" + column_name + ",");
-                                        }
-                                        sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
-                                        sql_CreateNewSp.AppendLine(");");
-                                        foreach (string activeSelectedColumn in tmpSelectedColumsLst)
-                                        {
-                                            if (tmpSelectedKeyColumnsLst.Contains(activeSelectedColumn))
-                                                continue;
-                                            sql_CreateNewSp.AppendLine("elseif _operation='update' and _" + activeSelectedColumn + " IS NOT NULL then");
-                                            sql_CreateNewSp.Append("update " + tableName);
-                                            sql_CreateNewSp.Append(" set " + activeSelectedColumn + " = " + "_" + activeSelectedColumn);
-                                            if (tmpSelectedKeyColumnsLst.Count > 0)
-                                            {
-                                                sql_CreateNewSp.Append(" where ");
-                                                foreach (string keyColumn in tmpSelectedKeyColumnsLst)
-                                                    sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
-                                                sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
-                                                sql_CreateNewSp.AppendLine(";");
-                                            }
-                                        }
-                                        sql_CreateNewSp.AppendLine("elseif _operation='selectmixed'then");
-                                        sql_CreateNewSp.Append("select * from " + tableName + " where ");
-                                        for(int i=0;i<tmpSelectedColumsLst.Count;i++)
-                                        {
-                                            if (i == 0)
-                                                sql_CreateNewSp.Append(tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");
-                                            else
-                                                sql_CreateNewSp.Append(" and " + tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");                                           
-                                        }
-                                        sql_CreateNewSp.AppendLine(";");
-                                        sql_CreateNewSp.AppendLine("elseif _operation='delete' then");
-                                        sql_CreateNewSp.Append("delete from " + tableName);
-                                        if (tmpSelectedKeyColumnsLst.Count > 0)
-                                        {
-                                            sql_CreateNewSp.Append(" where ");
-                                            foreach (string keyColumn in tmpSelectedKeyColumnsLst)
-                                                sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
-                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
-                                        }
-                                        sql_CreateNewSp.AppendLine(";");
-                                        sql_CreateNewSp.AppendLine("elseif _operation='selectkey' then");
-                                        sql_CreateNewSp.Append("select * from " + tableName);
-                                        if (tmpSelectedKeyColumnsLst.Count > 0)
-                                        {
-                                            sql_CreateNewSp.Append(" where ");
-                                            foreach (string keyColumn in tmpSelectedKeyColumnsLst)
-                                                sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
-                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
-                                        }
-                                        sql_CreateNewSp.AppendLine(";");
-                                        sql_CreateNewSp.AppendLine("elseif _operation='selectcondition' then");
-                                        sql_CreateNewSp.Append("select * from " + tableName);
-                                        if(tmpSelectedColumsLst.Count>0)
-                                        {
-                                            sql_CreateNewSp.Append(" where ");
-                                            foreach(string activeSelectedColumn in tmpSelectedColumsLst)
-                                                sql_CreateNewSp.Append(activeSelectedColumn + " = _" + activeSelectedColumn + " or ");
-                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
-                                        }
-                                        sql_CreateNewSp.AppendLine(";");
-                                        sql_CreateNewSp.AppendLine("END IF;");
-                                        sql_CreateNewSp.AppendLine("END");
-                                        class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
                                     }
+                                    sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
+                                    sql_CreateNewSp.AppendLine(")");
+                                    sql_CreateNewSp.AppendLine("BEGIN");
+                                    sql_CreateNewSp.AppendLine("DECLARE tmpsql VARCHAR(800);");
+                                    sql_CreateNewSp.AppendLine("if _operation='select' then");
+                                    sql_CreateNewSp.AppendLine("select * from " + tableName + ";");
+                                    sql_CreateNewSp.AppendLine("elseif _operation='insert' then");
+                                    sql_CreateNewSp.Append("insert into " + ((class_data_MySqlConnectionItem)ActiveConnection).ActiveConnection.Database + "." + tableName + "(");
+                                    foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
+                                    {
+                                        string column_name = "";
+                                        string column_extra = "";
+                                        class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
+                                        class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
+                                        if (column_extra != "auto_increment")
+                                            sql_CreateNewSp.Append(column_name + ",");
+                                    }
+                                    sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
+                                    sql_CreateNewSp.Append(")");
+                                    sql_CreateNewSp.Append(" values(");
+                                    foreach (DataRow activeColumnInfoRow in TableColumnsInfo.Rows)
+                                    {
+                                        string column_name = "";
+                                        string column_extra = "";
+                                        class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "COLUMN_NAME", out column_name);
+                                        class_Data_SqlDataHelper.GetColumnData(activeColumnInfoRow, "EXTRA", out column_extra);
+                                        if (column_extra != "auto_increment")
+                                            sql_CreateNewSp.Append("_" + column_name + ",");
+                                    }
+                                    sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 1, 1);
+                                    sql_CreateNewSp.AppendLine(");");
+                                    foreach (string activeSelectedColumn in tmpSelectedColumsLst)
+                                    {
+                                        if (tmpSelectedKeyColumnsLst.Contains(activeSelectedColumn))
+                                            continue;
+                                        sql_CreateNewSp.AppendLine("elseif _operation='update' and _" + activeSelectedColumn + " IS NOT NULL then");
+                                        sql_CreateNewSp.Append("update " + tableName);
+                                        sql_CreateNewSp.Append(" set " + activeSelectedColumn + " = " + "_" + activeSelectedColumn);
+                                        if (tmpSelectedKeyColumnsLst.Count > 0)
+                                        {
+                                            sql_CreateNewSp.Append(" where ");
+                                            foreach (string keyColumn in tmpSelectedKeyColumnsLst)
+                                                sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
+                                            sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
+                                            sql_CreateNewSp.AppendLine(";");
+                                        }
+                                    }
+                                    sql_CreateNewSp.AppendLine("elseif _operation='selectmixed'then");
+                                    sql_CreateNewSp.Append("select * from " + tableName + " where ");
+                                    for (int i = 0; i < tmpSelectedColumsLst.Count; i++)
+                                    {
+                                        if (i == 0)
+                                            sql_CreateNewSp.Append(tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");
+                                        else
+                                            sql_CreateNewSp.Append(" and " + tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");
+                                    }
+                                    sql_CreateNewSp.AppendLine(";");
+                                    sql_CreateNewSp.AppendLine("elseif _operation='delete' then");
+                                    sql_CreateNewSp.Append("delete from " + tableName);
+                                    if (tmpSelectedKeyColumnsLst.Count > 0)
+                                    {
+                                        sql_CreateNewSp.Append(" where ");
+                                        foreach (string keyColumn in tmpSelectedKeyColumnsLst)
+                                            sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
+                                        sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
+                                    }
+                                    sql_CreateNewSp.AppendLine(";");
+                                    sql_CreateNewSp.AppendLine("elseif _operation='deletecondition' then");
+                                    sql_CreateNewSp.Append("delete from " + tableName);
+                                    if (tmpSelectedColumsLst.Count > 0)
+                                    {
+                                        sql_CreateNewSp.Append(" where ");
+                                        foreach (string activeSelectedColumn in tmpSelectedColumsLst)
+                                            sql_CreateNewSp.Append(activeSelectedColumn + " = _" + activeSelectedColumn + " or ");
+                                        sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
+                                    }
+                                    sql_CreateNewSp.AppendLine(";");
+                                    sql_CreateNewSp.AppendLine("elseif _operation='deletemixed'then");
+                                    sql_CreateNewSp.Append("select * from " + tableName + " where ");
+                                    for (int i = 0; i < tmpSelectedColumsLst.Count; i++)
+                                    {
+                                        if (i == 0)
+                                            sql_CreateNewSp.Append(tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");
+                                        else
+                                            sql_CreateNewSp.Append(" and " + tmpSelectedColumsLst[i] + " = IFNULL(_" + tmpSelectedColumsLst[i] + "," + tmpSelectedColumsLst[i] + ")");
+                                    }
+                                    sql_CreateNewSp.AppendLine(";");
+                                    sql_CreateNewSp.AppendLine("elseif _operation='selectkey' then");
+                                    sql_CreateNewSp.Append("select * from " + tableName);
+                                    if (tmpSelectedKeyColumnsLst.Count > 0)
+                                    {
+                                        sql_CreateNewSp.Append(" where ");
+                                        foreach (string keyColumn in tmpSelectedKeyColumnsLst)
+                                            sql_CreateNewSp.Append(keyColumn + " = _" + keyColumn + " and ");
+                                        sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 5, 5);
+                                    }
+                                    sql_CreateNewSp.AppendLine(";");
+                                    sql_CreateNewSp.AppendLine("elseif _operation='selectcondition' then");
+                                    sql_CreateNewSp.Append("select * from " + tableName);
+                                    if (tmpSelectedColumsLst.Count > 0)
+                                    {
+                                        sql_CreateNewSp.Append(" where ");
+                                        foreach (string activeSelectedColumn in tmpSelectedColumsLst)
+                                            sql_CreateNewSp.Append(activeSelectedColumn + " = _" + activeSelectedColumn + " or ");
+                                        sql_CreateNewSp = sql_CreateNewSp.Remove(sql_CreateNewSp.Length - 4, 4);
+                                    }
+                                    sql_CreateNewSp.AppendLine(";");
+                                    sql_CreateNewSp.AppendLine("END IF;");
+                                    sql_CreateNewSp.AppendLine("END");
+                                    class_Data_SqlDataHelper.ActionExecuteForNonQuery(ActiveConnection, sql_CreateNewSp.ToString());
                                 }
+                            }
 
                         }
                     }
@@ -491,7 +543,7 @@ namespace iKCoder_Platform_SDK_Kit
             }
         }
 
-
+        
         public Dictionary<string, class_Data_SqlSPEntry> ActionAutoLoadingAllSPS(class_data_PlatformDBConnection activeConnection, string SPType)
         {
             if (activeConnection != null)
@@ -897,6 +949,36 @@ namespace iKCoder_Platform_SDK_Kit
                     ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "delete");
                 else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
                     ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "delete");
+                class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ExecuteDeleteConditionSP(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            if (activeEntry != null)
+            {
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "deletecondition");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "deletecondition");
+                class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool ExecuteDeleteMixedSP(class_Data_SqlSPEntry activeEntry, class_Data_SqlConnectionHelper connectionHelper, string connectionKeyName)
+        {
+            if (activeEntry != null)
+            {
+                if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.SqlServer)
+                    ((class_data_SqlServerSPEntry)activeEntry).ModifyParameterValue("@operation", "deletemixed");
+                else if (connectionHelper.Get_ActiveConnection(connectionKeyName).activeDatabaseType == enum_DatabaseType.MySql)
+                    ((class_data_MySqlSPEntry)activeEntry).ModifyParameterValue("_operation", "deletemixed");
                 class_Data_SqlDataHelper.ActionExecuteSPForNonQuery(connectionHelper.Get_ActiveConnection(connectionKeyName), activeEntry);
                 return true;
             }
